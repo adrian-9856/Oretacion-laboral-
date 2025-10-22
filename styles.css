@@ -2842,3 +2842,505 @@ body.dark-theme .modal-content {
         right: 20px;
     }
 }
+
+/* ========================================
+   CREADOR DE AVATAR
+======================================== */
+.avatar-creator-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.avatar-preview-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.avatar-preview-section h2 {
+    font-size: 1.5em;
+    color: var(--dark);
+    margin-bottom: 24px;
+}
+
+.avatar-canvas {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    border-radius: var(--radius);
+    padding: 40px;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.avatar-svg {
+    width: 200px;
+    height: 200px;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+}
+
+.avatar-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-avatar-action {
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-avatar-action:hover {
+    border-color: var(--primary);
+    background: #FFF8F3;
+    transform: translateY(-2px);
+}
+
+.avatar-customization-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 32px;
+    box-shadow: var(--shadow-lg);
+}
+
+.avatar-customization-section h2 {
+    font-size: 1.5em;
+    color: var(--dark);
+    margin-bottom: 32px;
+}
+
+.customization-group {
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.customization-group:last-child {
+    border-bottom: none;
+}
+
+.customization-group h3 {
+    font-size: 1.1em;
+    color: var(--dark);
+    margin-bottom: 16px;
+}
+
+.color-palette {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.color-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 3px solid var(--gray-300);
+    cursor: pointer;
+    transition: var(--transition);
+    position: relative;
+}
+
+.color-btn:hover {
+    transform: scale(1.1);
+    border-color: var(--primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.color-btn.active::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: var(--white);
+    font-weight: bold;
+    font-size: 1.5em;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.style-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.style-btn {
+    background: var(--gray-100);
+    border: 2px solid var(--gray-300);
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.style-btn:hover {
+    border-color: var(--primary);
+    background: #FFF8F3;
+}
+
+.style-btn.active {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--white);
+    border-color: var(--primary);
+}
+
+.avatar-save-section {
+    margin-top: 32px;
+}
+
+.btn-save-avatar {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent), #4ECDC4);
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-save-avatar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(42, 157, 143, 0.4);
+}
+
+.btn-save-avatar svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Animaciones del Avatar */
+@keyframes blink {
+    0%, 100% { transform: scaleY(1); }
+    50% { transform: scaleY(0.1); }
+}
+
+@keyframes smile {
+    0%, 100% { d: path("M 85 115 Q 100 125 115 115"); }
+    50% { d: path("M 85 115 Q 100 120 115 115"); }
+}
+
+@keyframes talk {
+    0%, 100% { transform: scaleY(1); }
+    25% { transform: scaleY(0.8); }
+    50% { transform: scaleY(1.1); }
+    75% { transform: scaleY(0.9); }
+}
+
+.avatar-svg.animating-blink .eye-pupil-left,
+.avatar-svg.animating-blink .eye-pupil-right {
+    animation: blink 0.3s ease-in-out;
+}
+
+.avatar-svg.animating-talk #avatarMouth path {
+    animation: talk 0.5s ease-in-out 3;
+}
+
+/* Botón Flotante Avatar */
+.floating-avatar-btn {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    font-size: 1.8em;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
+    transition: var(--transition);
+    z-index: 999;
+}
+
+.floating-avatar-btn:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 12px 32px rgba(240, 147, 251, 0.6);
+}
+
+/* ========================================
+   SIMULADOR DE ENTREVISTA CON AUDIO
+======================================== */
+.interview-mode-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    background: var(--gray-100);
+    padding: 6px;
+    border-radius: var(--radius-sm);
+}
+
+.mode-tab {
+    flex: 1;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    color: var(--gray-600);
+}
+
+.mode-tab:hover {
+    background: rgba(232, 108, 74, 0.1);
+}
+
+.mode-tab.active {
+    background: var(--white);
+    color: var(--primary);
+    box-shadow: var(--shadow);
+}
+
+.interview-mode-content {
+    display: none;
+}
+
+.interview-mode-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.audio-recorder-section {
+    background: var(--gray-100);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-top: 16px;
+}
+
+.audio-controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.btn-audio-control {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: var(--white);
+    border: none;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-audio-control:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(232, 108, 74, 0.4);
+}
+
+.btn-audio-control:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-audio-control.stop {
+    background: linear-gradient(135deg, #e86c4a, #dc2626);
+}
+
+.btn-audio-control svg {
+    width: 20px;
+    height: 20px;
+}
+
+.recording-indicator {
+    background: var(--white);
+    padding: 16px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: center;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+}
+
+.recording-pulse {
+    width: 16px;
+    height: 16px;
+    background: #dc2626;
+    border-radius: 50%;
+    animation: pulse-recording 1.5s infinite;
+}
+
+@keyframes pulse-recording {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.3);
+        opacity: 0.7;
+    }
+}
+
+.recording-indicator span {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.audio-playback {
+    background: var(--white);
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 20px;
+}
+
+.audio-playback h5 {
+    color: var(--dark);
+    margin-bottom: 12px;
+}
+
+.audio-playback audio {
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+.btn-audio-delete {
+    background: #fee;
+    color: #dc2626;
+    border: 2px solid #fca5a5;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-audio-delete:hover {
+    background: #fca5a5;
+    color: var(--white);
+}
+
+.btn-audio-delete svg {
+    width: 18px;
+    height: 18px;
+}
+
+.audio-tips {
+    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    padding: 16px;
+    border-radius: var(--radius);
+    border-left: 4px solid var(--accent);
+}
+
+.audio-tips p {
+    color: var(--gray-700);
+    font-size: 0.95em;
+    margin: 0;
+    line-height: 1.6;
+}
+
+.question-audio-control {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.btn-speak-question {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-speak-question:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-speak-question svg {
+    width: 20px;
+    height: 20px;
+}
+
+.btn-speak-question.speaking {
+    animation: pulse-glow 1.5s infinite;
+}
+
+/* Responsive para Avatar Creator */
+@media (max-width: 1024px) {
+    .avatar-creator-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .avatar-preview-section {
+        position: static;
+    }
+}
+
+@media (max-width: 768px) {
+    .avatar-canvas {
+        padding: 20px;
+    }
+
+    .avatar-svg {
+        width: 150px;
+        height: 150px;
+    }
+
+    .color-palette {
+        justify-content: center;
+    }
+
+    .style-options {
+        justify-content: center;
+    }
+
+    .floating-avatar-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 90px;
+        left: 20px;
+    }
+
+    .audio-controls {
+        flex-direction: column;
+    }
+
+    .btn-audio-control {
+        width: 100%;
+        justify-content: center;
+    }
+}

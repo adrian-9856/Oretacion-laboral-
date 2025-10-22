@@ -602,9 +602,65 @@
             </div>
             
             <div class="interview-response-section">
-                <h4>Tu respuesta:</h4>
-                <div class="interview-options" id="interviewOptions"></div>
-                
+                <div class="interview-mode-tabs">
+                    <button class="mode-tab active" onclick="switchInterviewMode('options')" id="optionsTab">
+                        📝 Opciones
+                    </button>
+                    <button class="mode-tab" onclick="switchInterviewMode('audio')" id="audioTab">
+                        🎤 Grabar Audio
+                    </button>
+                </div>
+
+                <!-- Modo Opciones -->
+                <div class="interview-mode-content active" id="optionsModeContent">
+                    <h4>Selecciona tu respuesta:</h4>
+                    <div class="interview-options" id="interviewOptions"></div>
+                </div>
+
+                <!-- Modo Audio -->
+                <div class="interview-mode-content" id="audioModeContent">
+                    <h4>Graba tu respuesta en audio:</h4>
+                    <div class="audio-recorder-section">
+                        <div class="audio-controls">
+                            <button class="btn-audio-control" id="btnStartRecording" onclick="startRecording()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 003 3v8a3 3 0 11-6 0V4a3 3 0 003-3z"/>
+                                    <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                </svg>
+                                Iniciar Grabación
+                            </button>
+                            <button class="btn-audio-control stop" id="btnStopRecording" onclick="stopRecording()" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="6" y="6" width="12" height="12" rx="2"/>
+                                </svg>
+                                Detener
+                            </button>
+                        </div>
+
+                        <div class="recording-indicator" id="recordingIndicator" style="display: none;">
+                            <div class="recording-pulse"></div>
+                            <span>Grabando... <span id="recordingTime">00:00</span></span>
+                        </div>
+
+                        <div class="audio-playback" id="audioPlayback" style="display: none;">
+                            <h5>Tu grabación:</h5>
+                            <audio id="audioPlayer" controls></audio>
+                            <button class="btn-audio-delete" onclick="deleteRecording()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
+                                Eliminar
+                            </button>
+                        </div>
+
+                        <div class="audio-tips">
+                            <p>💡 <strong>Tip:</strong> Responde de forma clara y concisa. Imagina que estás en una entrevista real.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="interview-feedback" id="interviewFeedback" style="display: none;">
                     <div class="feedback-header">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -618,7 +674,18 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- Control de Audio de la Pregunta -->
+            <div class="question-audio-control">
+                <button class="btn-speak-question" onclick="speakQuestion()" id="btnSpeakQuestion">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                        <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+                    </svg>
+                    Escuchar Pregunta
+                </button>
+            </div>
+
             <div class="interview-navigation">
                 <button class="btn-nav primary" id="interviewNextBtn" onclick="nextInterviewQuestion()" disabled>
                     Siguiente →
@@ -795,5 +862,155 @@
     🎯
     <span class="challenges-notification" id="challengesNotification">0</span>
 </button>
+
+<!-- CREADOR DE AVATAR -->
+<div class="screen" id="avatarCreatorScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span>🎨 Crea tu Avatar</span>
+            </div>
+            <div class="nav-user">
+                <span id="userName5">Usuario</span>
+                <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="avatar-creator-layout">
+            <!-- Preview del Avatar -->
+            <div class="avatar-preview-section">
+                <h2>Vista Previa</h2>
+                <div class="avatar-canvas" id="avatarCanvas">
+                    <svg viewBox="0 0 200 200" class="avatar-svg">
+                        <!-- Cuerpo -->
+                        <ellipse id="avatarBody" cx="100" cy="160" rx="45" ry="35" fill="#E86C4A"/>
+
+                        <!-- Cuello -->
+                        <rect id="avatarNeck" x="90" y="135" width="20" height="25" fill="#F4A261"/>
+
+                        <!-- Cabeza -->
+                        <circle id="avatarHead" cx="100" cy="100" r="50" fill="#F4A261"/>
+
+                        <!-- Cabello -->
+                        <g id="avatarHair">
+                            <path d="M 50 100 Q 50 50 100 50 Q 150 50 150 100 Q 150 70 100 60 Q 50 70 50 100" fill="#2D3748"/>
+                        </g>
+
+                        <!-- Ojos -->
+                        <g id="avatarEyes">
+                            <ellipse cx="80" cy="95" rx="8" ry="10" fill="white"/>
+                            <ellipse cx="120" cy="95" rx="8" ry="10" fill="white"/>
+                            <circle cx="80" cy="95" r="4" fill="#2D3748" class="eye-pupil-left"/>
+                            <circle cx="120" cy="95" r="4" fill="#2D3748" class="eye-pupil-right"/>
+                        </g>
+
+                        <!-- Boca -->
+                        <g id="avatarMouth">
+                            <path d="M 85 115 Q 100 125 115 115" stroke="#2D3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        </g>
+
+                        <!-- Cejas -->
+                        <g id="avatarEyebrows">
+                            <path d="M 70 85 Q 80 80 90 85" stroke="#2D3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+                            <path d="M 110 85 Q 120 80 130 85" stroke="#2D3748" stroke-width="3" fill="none" stroke-linecap="round"/>
+                        </g>
+
+                        <!-- Accesorios (gafas, opcional) -->
+                        <g id="avatarAccessories" style="display: none;">
+                            <circle cx="80" cy="95" r="12" fill="none" stroke="#2D3748" stroke-width="2"/>
+                            <circle cx="120" cy="95" r="12" fill="none" stroke="#2D3748" stroke-width="2"/>
+                            <line x1="92" y1="95" x2="108" y2="95" stroke="#2D3748" stroke-width="2"/>
+                        </g>
+                    </svg>
+                </div>
+
+                <div class="avatar-actions">
+                    <button class="btn-avatar-action" onclick="animateAvatar('blink')">👁️ Parpadear</button>
+                    <button class="btn-avatar-action" onclick="animateAvatar('smile')">😊 Sonreír</button>
+                    <button class="btn-avatar-action" onclick="animateAvatar('talk')">💬 Hablar</button>
+                </div>
+            </div>
+
+            <!-- Opciones de Personalización -->
+            <div class="avatar-customization-section">
+                <h2>Personaliza tu Avatar</h2>
+
+                <div class="customization-group">
+                    <h3>🎨 Color de Piel</h3>
+                    <div class="color-palette">
+                        <button class="color-btn" style="background: #F4A261;" onclick="changeSkinColor('#F4A261')"></button>
+                        <button class="color-btn" style="background: #E8C4A0;" onclick="changeSkinColor('#E8C4A0')"></button>
+                        <button class="color-btn" style="background: #D4A373;" onclick="changeSkinColor('#D4A373')"></button>
+                        <button class="color-btn" style="background: #8B6F47;" onclick="changeSkinColor('#8B6F47')"></button>
+                        <button class="color-btn" style="background: #654321;" onclick="changeSkinColor('#654321')"></button>
+                        <button class="color-btn" style="background: #3D2817;" onclick="changeSkinColor('#3D2817')"></button>
+                    </div>
+                </div>
+
+                <div class="customization-group">
+                    <h3>💇 Estilo de Cabello</h3>
+                    <div class="style-options">
+                        <button class="style-btn" onclick="changeHairStyle('short')">Corto</button>
+                        <button class="style-btn" onclick="changeHairStyle('long')">Largo</button>
+                        <button class="style-btn" onclick="changeHairStyle('curly')">Rizado</button>
+                        <button class="style-btn" onclick="changeHairStyle('bald')">Calvo</button>
+                    </div>
+                </div>
+
+                <div class="customization-group">
+                    <h3>🎨 Color de Cabello</h3>
+                    <div class="color-palette">
+                        <button class="color-btn" style="background: #2D3748;" onclick="changeHairColor('#2D3748')"></button>
+                        <button class="color-btn" style="background: #8B4513;" onclick="changeHairColor('#8B4513')"></button>
+                        <button class="color-btn" style="background: #D4A017;" onclick="changeHairColor('#D4A017')"></button>
+                        <button class="color-btn" style="background: #E86C4A;" onclick="changeHairColor('#E86C4A')"></button>
+                        <button class="color-btn" style="background: #9370DB;" onclick="changeHairColor('#9370DB')"></button>
+                        <button class="color-btn" style="background: #C0C0C0;" onclick="changeHairColor('#C0C0C0')"></button>
+                    </div>
+                </div>
+
+                <div class="customization-group">
+                    <h3>👔 Color de Ropa</h3>
+                    <div class="color-palette">
+                        <button class="color-btn" style="background: #E86C4A;" onclick="changeClothesColor('#E86C4A')"></button>
+                        <button class="color-btn" style="background: #2A9D8F;" onclick="changeClothesColor('#2A9D8F')"></button>
+                        <button class="color-btn" style="background: #264653;" onclick="changeClothesColor('#264653')"></button>
+                        <button class="color-btn" style="background: #667eea;" onclick="changeClothesColor('#667eea')"></button>
+                        <button class="color-btn" style="background: #f093fb;" onclick="changeClothesColor('#f093fb')"></button>
+                        <button class="color-btn" style="background: #4facfe;" onclick="changeClothesColor('#4facfe')"></button>
+                    </div>
+                </div>
+
+                <div class="customization-group">
+                    <h3>😎 Accesorios</h3>
+                    <div class="style-options">
+                        <button class="style-btn" onclick="toggleAccessory('glasses')">Gafas</button>
+                        <button class="style-btn" onclick="toggleAccessory('none')">Sin Accesorios</button>
+                    </div>
+                </div>
+
+                <div class="avatar-save-section">
+                    <button class="btn-save-avatar" onclick="saveAvatar()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Guardar Avatar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botón flotante para crear avatar -->
+<button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
+    🎨
+</button>
+
 </body>
 </html>
