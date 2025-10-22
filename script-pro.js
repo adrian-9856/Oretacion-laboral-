@@ -3015,6 +3015,30 @@ let recordingInterval;
 let recordingStartTime;
 let currentInterviewMode = 'options';
 let speechSynthesis = window.speechSynthesis;
+let speechRecognition = null;
+let currentTranscription = '';
+let audioAnalysisResult = null;
+
+// Configurar reconocimiento de voz (para transcripción)
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    speechRecognition = new SpeechRecognition();
+    speechRecognition.continuous = true;
+    speechRecognition.interimResults = true;
+    speechRecognition.lang = 'es-ES';
+}
+
+// Palabras clave por categoría de entrevista
+const keywordCategories = {
+    responsabilidad: ['responsable', 'compromiso', 'cumplir', 'puntual', 'deber', 'obligación'],
+    trabajo_equipo: ['equipo', 'colaborar', 'ayudar', 'cooperar', 'comunicación', 'grupo'],
+    liderazgo: ['liderar', 'dirigir', 'guiar', 'motivar', 'delegar', 'supervisar'],
+    resolucion: ['resolver', 'solución', 'problema', 'analizar', 'estrategia', 'enfoque'],
+    adaptabilidad: ['adaptar', 'cambio', 'flexible', 'aprender', 'ajustar', 'innovar'],
+    profesionalismo: ['profesional', 'ético', 'respeto', 'honesto', 'integridad', 'valores'],
+    comunicacion: ['comunicar', 'expresar', 'escuchar', 'diálogo', 'feedback', 'presentar'],
+    iniciativa: ['iniciativa', 'proactivo', 'proponer', 'crear', 'mejorar', 'innovación']
+};
 
 // Cambiar modo de entrevista (opciones vs audio)
 function switchInterviewMode(mode) {
@@ -3067,6 +3091,171 @@ function speakQuestion() {
     speechSynthesis.speak(utterance);
 }
 
+// Analizar audio con IA
+function analyzeAudioResponse(transcription, duration) {
+    const analysis = {
+        transcription: transcription,
+        duration: duration,
+        wordCount: transcription.split(' ').filter(w => w.length > 0).length,
+        keywordsFound: {},
+        score: 0,
+        feedback: [],
+        level: ''
+    };
+
+    // 1. Analizar duración (respuestas entre 30-90 segundos son ideales)
+    if (duration < 15) {
+        analysis.feedback.push('⚠️ Respuesta muy corta. Intenta desarrollar más tus ideas.');
+        analysis.score += 20;
+    } else if (duration >= 15 && duration <= 30) {
+        analysis.feedback.push('✅ Buena duración, pero podrías dar más detalles.');
+        analysis.score += 60;
+    } else if (duration > 30 && duration <= 90) {
+        analysis.feedback.push('✅ Excelente duración de respuesta.');
+        analysis.score += 90;
+    } else {
+        analysis.feedback.push('⚠️ Respuesta muy larga. Intenta ser más conciso.');
+        analysis.score += 50;
+    }
+
+    // 2. Analizar palabras clave por categoría
+    const lowerTranscription = transcription.toLowerCase();
+    let totalKeywords = 0;
+
+    for (const [category, keywords] of Object.entries(keywordCategories)) {
+        const found = keywords.filter(kw => lowerTranscription.includes(kw));
+        if (found.length > 0) {
+            analysis.keywordsFound[category] = found;
+            totalKeywords += found.length;
+        }
+    }
+
+    // 3. Bonus por palabras clave
+    if (totalKeywords === 0) {
+        analysis.feedback.push('⚠️ No se detectaron palabras clave relevantes.');
+        analysis.score += 0;
+    } else if (totalKeywords <= 3) {
+        analysis.feedback.push('✅ Se detectaron algunas palabras clave.');
+        analysis.score += 30;
+    } else if (totalKeywords <= 6) {
+        analysis.feedback.push('✅ Excelente uso de palabras clave relevantes.');
+        analysis.score += 60;
+    } else {
+        analysis.feedback.push('🌟 Sobresaliente uso de vocabulario profesional.');
+        analysis.score += 80;
+    }
+
+    // 4. Analizar cantidad de palabras (fluidez)
+    if (analysis.wordCount < 20) {
+        analysis.feedback.push('⚠️ Respuesta muy breve. Explica más tus ideas.');
+    } else if (analysis.wordCount >= 20 && analysis.wordCount <= 50) {
+        analysis.feedback.push('✅ Buena cantidad de contenido.');
+        analysis.score += 40;
+    } else if (analysis.wordCount > 50 && analysis.wordCount <= 150) {
+        analysis.feedback.push('✅ Excelente desarrollo de ideas.');
+        analysis.score += 70;
+    } else {
+        analysis.feedback.push('⚠️ Demasiado contenido. Sé más directo.');
+        analysis.score += 30;
+    }
+
+    // 5. Detectar palabras de relleno excesivas
+    const fillerWords = ['eh', 'mmm', 'este', 'pues', 'o sea', 'como que'];
+    const fillerCount = fillerWords.reduce((count, word) => {
+        return count + (lowerTranscription.match(new RegExp(word, 'g')) || []).length;
+    }, 0);
+
+    if (fillerCount > 5) {
+        analysis.feedback.push('⚠️ Intenta reducir las muletillas (eh, mmm, este, etc.).');
+        analysis.score -= 20;
+    } else if (fillerCount === 0) {
+        analysis.feedback.push('✅ Excelente fluidez verbal sin muletillas.');
+        analysis.score += 30;
+    }
+
+    // Normalizar score (máximo 100)
+    analysis.score = Math.min(100, Math.max(0, Math.round(analysis.score / 3)));
+
+    // Determinar nivel
+    if (analysis.score >= 85) {
+        analysis.level = 'Excelente';
+    } else if (analysis.score >= 70) {
+        analysis.level = 'Muy Bueno';
+    } else if (analysis.score >= 55) {
+        analysis.level = 'Bueno';
+    } else if (analysis.score >= 40) {
+        analysis.level = 'Regular';
+    } else {
+        analysis.level = 'Necesita Mejorar';
+    }
+
+    return analysis;
+}
+
+// Mostrar análisis de audio
+function showAudioAnalysis(analysis) {
+    const feedbackDiv = document.getElementById('interviewFeedback');
+    const feedbackText = document.getElementById('feedbackText');
+    const feedbackPoints = document.getElementById('feedbackPoints');
+
+    let keywordsHTML = '';
+    if (Object.keys(analysis.keywordsFound).length > 0) {
+        keywordsHTML = '<div class="keywords-detected"><h5>🎯 Competencias detectadas:</h5><ul>';
+        for (const [category, keywords] of Object.entries(analysis.keywordsFound)) {
+            const categoryName = category.replace('_', ' ').toUpperCase();
+            keywordsHTML += `<li><strong>${categoryName}:</strong> ${keywords.join(', ')}</li>`;
+        }
+        keywordsHTML += '</ul></div>';
+    }
+
+    feedbackText.innerHTML = `
+        <div class="audio-analysis-result">
+            <div class="analysis-header">
+                <h4>📊 Análisis de tu Respuesta con IA</h4>
+            </div>
+
+            <div class="analysis-metrics">
+                <div class="metric">
+                    <span class="metric-label">⏱️ Duración:</span>
+                    <span class="metric-value">${analysis.duration}s</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">📝 Palabras:</span>
+                    <span class="metric-value">${analysis.wordCount}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">🎯 Palabras clave:</span>
+                    <span class="metric-value">${Object.values(analysis.keywordsFound).flat().length}</span>
+                </div>
+            </div>
+
+            ${keywordsHTML}
+
+            <div class="analysis-feedback">
+                <h5>💬 Retroalimentación:</h5>
+                <ul>
+                    ${analysis.feedback.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+            </div>
+
+            <div class="transcription-section">
+                <h5>📝 Transcripción:</h5>
+                <p class="transcription-text">${analysis.transcription || 'No se pudo transcribir el audio.'}</p>
+            </div>
+        </div>
+    `;
+
+    feedbackPoints.innerHTML = `
+        <div class="score-badge-large ${analysis.level.toLowerCase().replace(' ', '-')}">
+            <span class="score-number">${analysis.score}</span>
+            <span class="score-max">/100</span>
+            <span class="score-level">${analysis.level}</span>
+        </div>
+    `;
+
+    feedbackDiv.style.display = 'block';
+}
+
 // Iniciar grabación de audio
 async function startRecording() {
     try {
@@ -3074,6 +3263,28 @@ async function startRecording() {
 
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];
+        currentTranscription = '';
+
+        // Iniciar reconocimiento de voz para transcripción
+        if (speechRecognition) {
+            speechRecognition.onresult = (event) => {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript + ' ';
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                currentTranscription = finalTranscript || interimTranscript;
+            };
+
+            speechRecognition.start();
+        }
 
         mediaRecorder.ondataavailable = (event) => {
             audioChunks.push(event.data);
@@ -3088,6 +3299,13 @@ async function startRecording() {
 
             document.getElementById('audioPlayback').style.display = 'block';
             document.getElementById('interviewNextBtn').disabled = false;
+
+            // Analizar la respuesta con IA
+            const duration = Math.floor((Date.now() - recordingStartTime) / 1000);
+            audioAnalysisResult = analyzeAudioResponse(currentTranscription, duration);
+
+            // Mostrar análisis
+            showAudioAnalysis(audioAnalysisResult);
         };
 
         mediaRecorder.start();
@@ -3097,12 +3315,13 @@ async function startRecording() {
         document.getElementById('btnStopRecording').disabled = false;
         document.getElementById('recordingIndicator').style.display = 'flex';
         document.getElementById('audioPlayback').style.display = 'none';
+        document.getElementById('interviewFeedback').style.display = 'none';
 
         // Iniciar temporizador
         recordingStartTime = Date.now();
         recordingInterval = setInterval(updateRecordingTime, 1000);
 
-        showToast('Grabación iniciada', 'success');
+        showToast('🎤 Grabación y análisis iniciados', 'success');
 
     } catch (error) {
         console.error('Error al acceder al micrófono:', error);
@@ -3116,13 +3335,22 @@ function stopRecording() {
         mediaRecorder.stop();
         mediaRecorder.stream.getTracks().forEach(track => track.stop());
 
+        // Detener reconocimiento de voz
+        if (speechRecognition) {
+            try {
+                speechRecognition.stop();
+            } catch (e) {
+                // Ignorar errores si ya está detenido
+            }
+        }
+
         document.getElementById('btnStartRecording').disabled = false;
         document.getElementById('btnStopRecording').disabled = true;
         document.getElementById('recordingIndicator').style.display = 'none';
 
         clearInterval(recordingInterval);
 
-        showToast('Grabación detenida', 'success');
+        showToast('🤖 Analizando tu respuesta con IA...', 'info');
     }
 }
 
