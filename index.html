@@ -602,9 +602,65 @@
             </div>
             
             <div class="interview-response-section">
-                <h4>Tu respuesta:</h4>
-                <div class="interview-options" id="interviewOptions"></div>
-                
+                <div class="interview-mode-tabs">
+                    <button class="mode-tab active" onclick="switchInterviewMode('options')" id="optionsTab">
+                        📝 Opciones
+                    </button>
+                    <button class="mode-tab" onclick="switchInterviewMode('audio')" id="audioTab">
+                        🎤 Grabar Audio
+                    </button>
+                </div>
+
+                <!-- Modo Opciones -->
+                <div class="interview-mode-content active" id="optionsModeContent">
+                    <h4>Selecciona tu respuesta:</h4>
+                    <div class="interview-options" id="interviewOptions"></div>
+                </div>
+
+                <!-- Modo Audio -->
+                <div class="interview-mode-content" id="audioModeContent">
+                    <h4>Graba tu respuesta en audio:</h4>
+                    <div class="audio-recorder-section">
+                        <div class="audio-controls">
+                            <button class="btn-audio-control" id="btnStartRecording" onclick="startRecording()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 1a3 3 0 003 3v8a3 3 0 11-6 0V4a3 3 0 003-3z"/>
+                                    <path d="M19 10v2a7 7 0 01-14 0v-2"/>
+                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                </svg>
+                                Iniciar Grabación
+                            </button>
+                            <button class="btn-audio-control stop" id="btnStopRecording" onclick="stopRecording()" disabled>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="6" y="6" width="12" height="12" rx="2"/>
+                                </svg>
+                                Detener
+                            </button>
+                        </div>
+
+                        <div class="recording-indicator" id="recordingIndicator" style="display: none;">
+                            <div class="recording-pulse"></div>
+                            <span>Grabando... <span id="recordingTime">00:00</span></span>
+                        </div>
+
+                        <div class="audio-playback" id="audioPlayback" style="display: none;">
+                            <h5>Tu grabación:</h5>
+                            <audio id="audioPlayer" controls></audio>
+                            <button class="btn-audio-delete" onclick="deleteRecording()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                </svg>
+                                Eliminar
+                            </button>
+                        </div>
+
+                        <div class="audio-tips">
+                            <p>💡 <strong>Tip:</strong> Responde de forma clara y concisa. Imagina que estás en una entrevista real.</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="interview-feedback" id="interviewFeedback" style="display: none;">
                     <div class="feedback-header">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -618,7 +674,18 @@
                     </div>
                 </div>
             </div>
-            
+
+            <!-- Control de Audio de la Pregunta -->
+            <div class="question-audio-control">
+                <button class="btn-speak-question" onclick="speakQuestion()" id="btnSpeakQuestion">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                        <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07"/>
+                    </svg>
+                    Escuchar Pregunta
+                </button>
+            </div>
+
             <div class="interview-navigation">
                 <button class="btn-nav primary" id="interviewNextBtn" onclick="nextInterviewQuestion()" disabled>
                     Siguiente →
@@ -795,5 +862,173 @@
     🎯
     <span class="challenges-notification" id="challengesNotification">0</span>
 </button>
+
+<!-- CREADOR DE AVATAR PRO con DiceBear -->
+<div class="screen" id="avatarCreatorScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                <span>🎨 Avatar Creator PRO</span>
+                <span class="pro-badge">DiceBear</span>
+            </div>
+            <div class="nav-user">
+                <span id="userName5">Usuario</span>
+                <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="avatar-creator-pro-layout">
+            <!-- Vista Previa Grande -->
+            <div class="avatar-preview-pro-section">
+                <div class="preview-header">
+                    <h2>👤 Tu Avatar</h2>
+                    <button class="btn-randomize" onclick="randomizeAvatar()" title="Generar aleatorio">
+                        🎲 Aleatorio
+                    </button>
+                </div>
+
+                <div class="avatar-display-large">
+                    <img id="avatarPreviewLarge" src="" alt="Avatar Preview" class="avatar-img-large">
+                </div>
+
+                <div class="avatar-info-card">
+                    <p class="avatar-seed-label">🔑 Seed actual:</p>
+                    <code id="avatarSeedDisplay" class="avatar-seed">generando...</code>
+                </div>
+
+                <div class="avatar-export-actions">
+                    <button class="btn-export svg" onclick="exportAvatar('svg')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Descargar SVG
+                    </button>
+                    <button class="btn-export png" onclick="exportAvatar('png')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+                        </svg>
+                        Descargar PNG
+                    </button>
+                </div>
+            </div>
+
+            <!-- Panel de Personalización -->
+            <div class="avatar-customization-pro-section">
+                <h2>⚙️ Personalizar Avatar</h2>
+
+                <!-- Selector de Estilo -->
+                <div class="customization-group-pro">
+                    <h3>🎭 Estilo de Avatar</h3>
+                    <div class="avatar-styles-gallery">
+                        <div class="style-card" data-style="avataaars" onclick="changeAvatarStyle('avataaars')">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=preview1" alt="Avataaars">
+                            <span>Avataaars</span>
+                            <div class="style-badge popular">Popular</div>
+                        </div>
+                        <div class="style-card" data-style="adventurer" onclick="changeAvatarStyle('adventurer')">
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=preview2" alt="Adventurer">
+                            <span>Adventurer</span>
+                        </div>
+                        <div class="style-card" data-style="avataaars-neutral" onclick="changeAvatarStyle('avataaars-neutral')">
+                            <img src="https://api.dicebear.com/7.x/avataaars-neutral/svg?seed=preview3" alt="Neutral">
+                            <span>Neutral</span>
+                        </div>
+                        <div class="style-card" data-style="big-smile" onclick="changeAvatarStyle('big-smile')">
+                            <img src="https://api.dicebear.com/7.x/big-smile/svg?seed=preview4" alt="Big Smile">
+                            <span>Big Smile</span>
+                            <div class="style-badge new">Nuevo</div>
+                        </div>
+                        <div class="style-card" data-style="bottts" onclick="changeAvatarStyle('bottts')">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=preview5" alt="Bottts">
+                            <span>Robots</span>
+                        </div>
+                        <div class="style-card" data-style="personas" onclick="changeAvatarStyle('personas')">
+                            <img src="https://api.dicebear.com/7.x/personas/svg?seed=preview6" alt="Personas">
+                            <span>Personas</span>
+                        </div>
+                        <div class="style-card" data-style="lorelei" onclick="changeAvatarStyle('lorelei')">
+                            <img src="https://api.dicebear.com/7.x/lorelei/svg?seed=preview7" alt="Lorelei">
+                            <span>Lorelei</span>
+                        </div>
+                        <div class="style-card" data-style="micah" onclick="changeAvatarStyle('micah')">
+                            <img src="https://api.dicebear.com/7.x/micah/svg?seed=preview8" alt="Micah">
+                            <span>Micah</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Opciones de Personalización Específicas -->
+                <div class="customization-group-pro">
+                    <h3>🎨 Personalización</h3>
+
+                    <div class="custom-option">
+                        <label>Semilla personalizada:</label>
+                        <div class="input-with-btn">
+                            <input type="text" id="customSeed" placeholder="Ingresa tu nombre o palabra" class="custom-input">
+                            <button class="btn-apply" onclick="applyCustomSeed()">Aplicar</button>
+                        </div>
+                        <small>Usa tu nombre, apodo o cualquier palabra para generar un avatar único</small>
+                    </div>
+
+                    <div class="custom-option">
+                        <label>🎨 Fondo:</label>
+                        <div class="color-grid">
+                            <button class="color-option" style="background: transparent; border: 2px dashed #ccc;" onclick="changeBackground('transparent')" title="Transparente">✓</button>
+                            <button class="color-option" style="background: #667eea;" onclick="changeBackground('667eea')"></button>
+                            <button class="color-option" style="background: #f093fb;" onclick="changeBackground('f093fb')"></button>
+                            <button class="color-option" style="background: #4facfe;" onclick="changeBackground('4facfe')"></button>
+                            <button class="color-option" style="background: #43e97b;" onclick="changeBackground('43e97b')"></button>
+                            <button class="color-option" style="background: #fa709a;" onclick="changeBackground('fa709a')"></button>
+                            <button class="color-option" style="background: #ffd89b;" onclick="changeBackground('ffd89b')"></button>
+                            <button class="color-option" style="background: #19547b;" onclick="changeBackground('19547b')"></button>
+                        </div>
+                    </div>
+
+                    <div class="custom-option">
+                        <label>📏 Tamaño:</label>
+                        <div class="size-options">
+                            <button class="size-btn" onclick="changeSize(128)">128px</button>
+                            <button class="size-btn active" onclick="changeSize(256)">256px</button>
+                            <button class="size-btn" onclick="changeSize(512)">512px</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-option">
+                        <label>↩️ Voltear:</label>
+                        <div class="flip-options">
+                            <button class="flip-btn" onclick="toggleFlip()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                </svg>
+                                Voltear horizontal
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Guardar -->
+                <div class="avatar-save-section-pro">
+                    <button class="btn-save-avatar-pro" onclick="saveAvatarPro()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Guardar Avatar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botón flotante para crear avatar -->
+<button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
+    🎨
+</button>
+
 </body>
 </html>
