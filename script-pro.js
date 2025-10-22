@@ -2838,16 +2838,45 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // ========================================
-// CREADOR DE AVATAR ANIMADO
+// CREADOR DE AVATAR PRO - DICEBEAR API
 // ========================================
 
-let currentAvatar = {
-    skinColor: '#F4A261',
-    hairStyle: 'short',
-    hairColor: '#2D3748',
-    clothesColor: '#E86C4A',
-    accessory: 'none'
+// Configuración del avatar con DiceBear
+let avatarConfig = {
+    style: 'avataaars',  // Estilo de avatar (avataaars, adventurer, etc.)
+    seed: '',            // Semilla única para generar el avatar
+    backgroundColor: 'transparent',
+    size: 256,
+    flip: false
 };
+
+// Generar URL del avatar usando DiceBear API
+function generateAvatarURL() {
+    const baseURL = `https://api.dicebear.com/7.x/${avatarConfig.style}/svg`;
+    const params = new URLSearchParams({
+        seed: avatarConfig.seed,
+        size: avatarConfig.size,
+        backgroundColor: avatarConfig.backgroundColor === 'transparent' ? '' : avatarConfig.backgroundColor,
+        flip: avatarConfig.flip
+    });
+
+    // Eliminar parámetros vacíos
+    for (const [key, value] of Array.from(params.entries())) {
+        if (!value) params.delete(key);
+    }
+
+    return `${baseURL}?${params.toString()}`;
+}
+
+// Actualizar vista previa del avatar
+function updateAvatarPreview() {
+    const avatarImg = document.getElementById('avatarPreviewLarge');
+    const seedDisplay = document.getElementById('avatarSeedDisplay');
+
+    const avatarURL = generateAvatarURL();
+    avatarImg.src = avatarURL;
+    seedDisplay.textContent = avatarConfig.seed || 'sin definir';
+}
 
 // Mostrar pantalla del creador de avatar
 function showAvatarCreator() {
@@ -2856,146 +2885,209 @@ function showAvatarCreator() {
         return;
     }
 
-    // Cargar avatar guardado si existe
-    const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
-    if (savedAvatar) {
-        currentAvatar = JSON.parse(savedAvatar);
-        applyAvatarStyles();
+    document.getElementById('userName5').textContent = currentUser.name;
+
+    // Cargar avatar guardado o generar uno nuevo
+    const savedConfig = localStorage.getItem(`avatar_pro_${currentUser.email}`);
+    if (savedConfig) {
+        avatarConfig = JSON.parse(savedConfig);
+    } else {
+        // Generar seed basado en el nombre del usuario
+        avatarConfig.seed = currentUser.name || `user${Date.now()}`;
     }
 
-    document.getElementById('userName5').textContent = currentUser.name;
+    // Marcar estilo activo
+    document.querySelectorAll('.style-card').forEach(card => {
+        card.classList.remove('active');
+        if (card.dataset.style === avatarConfig.style) {
+            card.classList.add('active');
+        }
+    });
+
+    // Actualizar input de seed
+    document.getElementById('customSeed').value = avatarConfig.seed;
+
+    // Actualizar size activo
+    document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+    const activeSize = Array.from(document.querySelectorAll('.size-btn')).find(
+        btn => parseInt(btn.textContent) === avatarConfig.size
+    );
+    if (activeSize) activeSize.classList.add('active');
+
+    updateAvatarPreview();
     showScreen('avatarCreatorScreen');
 }
 
-// Cambiar color de piel
-function changeSkinColor(color) {
-    currentAvatar.skinColor = color;
-    document.getElementById('avatarHead').setAttribute('fill', color);
-    document.getElementById('avatarNeck').setAttribute('fill', color);
-    highlightSelected('.color-palette button', event?.target);
+// Cambiar estilo de avatar
+function changeAvatarStyle(style) {
+    avatarConfig.style = style;
+
+    // Actualizar UI
+    document.querySelectorAll('.style-card').forEach(card => {
+        card.classList.remove('active');
+        if (card.dataset.style === style) {
+            card.classList.add('active');
+        }
+    });
+
+    updateAvatarPreview();
 }
 
-// Cambiar estilo de cabello
-function changeHairStyle(style) {
-    const hairGroup = document.getElementById('avatarHair');
+// Aplicar seed personalizado
+function applyCustomSeed() {
+    const seedInput = document.getElementById('customSeed');
+    const newSeed = seedInput.value.trim();
 
-    const hairStyles = {
-        short: 'M 50 100 Q 50 50 100 50 Q 150 50 150 100 Q 150 70 100 60 Q 50 70 50 100',
-        long: 'M 50 100 Q 50 40 100 40 Q 150 40 150 100 Q 150 60 100 50 Q 50 60 50 100 L 60 130 Q 80 135 100 130 Q 120 135 140 130 L 150 100',
-        curly: 'M 50 100 Q 40 80 50 60 Q 45 50 55 45 Q 50 40 60 40 Q 55 35 70 35 Q 65 30 80 30 Q 75 25 90 25 Q 85 25 100 25 Q 110 25 110 30 Q 120 30 120 35 Q 130 35 130 40 Q 140 40 140 45 Q 148 45 148 55 Q 155 60 150 70 Q 158 80 150 100',
-        bald: ''
-    };
+    if (!newSeed) {
+        showToast('Por favor ingresa una palabra o nombre', 'warning');
+        return;
+    }
 
-    if (style === 'bald') {
-        hairGroup.innerHTML = '';
+    avatarConfig.seed = newSeed;
+    updateAvatarPreview();
+    showToast('Semilla aplicada correctamente', 'success');
+}
+
+// Generar avatar aleatorio
+function randomizeAvatar() {
+    // Generar seed aleatorio
+    const randomWords = ['awesome', 'cool', 'super', 'mega', 'ultra', 'epic', 'fantastic', 'amazing'];
+    const randomWord = randomWords[Math.floor(Math.random() * randomWords.length)];
+    const randomNum = Math.floor(Math.random() * 10000);
+
+    avatarConfig.seed = `${randomWord}${randomNum}`;
+    document.getElementById('customSeed').value = avatarConfig.seed;
+
+    updateAvatarPreview();
+    showToast('Avatar aleatorio generado', 'success');
+}
+
+// Cambiar color de fondo
+function changeBackground(color) {
+    avatarConfig.backgroundColor = color;
+
+    // Actualizar UI
+    document.querySelectorAll('.color-option').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    updateAvatarPreview();
+}
+
+// Cambiar tamaño del avatar
+function changeSize(size) {
+    avatarConfig.size = size;
+
+    // Actualizar UI
+    document.querySelectorAll('.size-btn').forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+
+    updateAvatarPreview();
+}
+
+// Voltear avatar
+function toggleFlip() {
+    avatarConfig.flip = !avatarConfig.flip;
+    updateAvatarPreview();
+
+    const btn = event.target.closest('.flip-btn');
+    if (avatarConfig.flip) {
+        btn.style.background = 'linear-gradient(135deg, var(--primary), var(--secondary))';
+        btn.style.color = 'white';
     } else {
-        hairGroup.innerHTML = `<path d="${hairStyles[style]}" fill="${currentAvatar.hairColor}"/>`;
-    }
-
-    currentAvatar.hairStyle = style;
-    highlightSelected('.style-btn', event?.target);
-}
-
-// Cambiar color de cabello
-function changeHairColor(color) {
-    currentAvatar.hairColor = color;
-    const hairPath = document.querySelector('#avatarHair path');
-    if (hairPath) {
-        hairPath.setAttribute('fill', color);
-    }
-    highlightSelected('.color-palette button', event?.target);
-}
-
-// Cambiar color de ropa
-function changeClothesColor(color) {
-    currentAvatar.clothesColor = color;
-    document.getElementById('avatarBody').setAttribute('fill', color);
-    highlightSelected('.color-palette button', event?.target);
-}
-
-// Toggle accesorios
-function toggleAccessory(accessory) {
-    currentAvatar.accessory = accessory;
-    const accessoriesGroup = document.getElementById('avatarAccessories');
-
-    if (accessory === 'glasses') {
-        accessoriesGroup.style.display = 'block';
-    } else {
-        accessoriesGroup.style.display = 'none';
-    }
-
-    highlightSelected('.style-btn', event?.target);
-}
-
-// Destacar botón seleccionado
-function highlightSelected(selector, target) {
-    if (!target) return;
-    document.querySelectorAll(selector).forEach(btn => btn.classList.remove('active'));
-    target.classList.add('active');
-}
-
-// Aplicar estilos de avatar
-function applyAvatarStyles() {
-    changeSkinColor(currentAvatar.skinColor);
-    changeHairStyle(currentAvatar.hairStyle);
-    changeHairColor(currentAvatar.hairColor);
-    changeClothesColor(currentAvatar.clothesColor);
-    toggleAccessory(currentAvatar.accessory);
-}
-
-// Animar avatar
-function animateAvatar(animationType) {
-    const avatarSvg = document.querySelector('.avatar-svg');
-
-    if (animationType === 'blink') {
-        avatarSvg.classList.add('animating-blink');
-        setTimeout(() => avatarSvg.classList.remove('animating-blink'), 300);
-    } else if (animationType === 'smile') {
-        const mouth = document.querySelector('#avatarMouth path');
-        const originalPath = mouth.getAttribute('d');
-        mouth.setAttribute('d', 'M 85 115 Q 100 120 115 115');
-        setTimeout(() => mouth.setAttribute('d', originalPath), 1000);
-    } else if (animationType === 'talk') {
-        avatarSvg.classList.add('animating-talk');
-        setTimeout(() => avatarSvg.classList.remove('animating-talk'), 1500);
+        btn.style.background = '';
+        btn.style.color = '';
     }
 }
 
-// Guardar avatar
-function saveAvatar() {
+// Exportar avatar
+async function exportAvatar(format) {
+    const avatarURL = generateAvatarURL();
+
+    if (format === 'svg') {
+        // Descargar SVG directamente
+        try {
+            const response = await fetch(avatarURL);
+            const svgBlob = await response.blob();
+            const url = window.URL.createObjectURL(svgBlob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `avatar-${avatarConfig.seed}.svg`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            showToast('Avatar SVG descargado', 'success');
+        } catch (error) {
+            showToast('Error al descargar SVG', 'error');
+        }
+    } else if (format === 'png') {
+        // Convertir SVG a PNG
+        try {
+            const response = await fetch(avatarURL);
+            const svgText = await response.text();
+
+            const canvas = document.createElement('canvas');
+            canvas.width = avatarConfig.size;
+            canvas.height = avatarConfig.size;
+            const ctx = canvas.getContext('2d');
+
+            const img = new Image();
+            const svgBlob = new Blob([svgText], { type: 'image/svg+xml' });
+            const url = URL.createObjectURL(svgBlob);
+
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0);
+                canvas.toBlob(blob => {
+                    const pngURL = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = pngURL;
+                    a.download = `avatar-${avatarConfig.seed}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(pngURL);
+                    URL.revokeObjectURL(url);
+
+                    showToast('Avatar PNG descargado', 'success');
+                });
+            };
+
+            img.src = url;
+        } catch (error) {
+            showToast('Error al convertir a PNG', 'error');
+        }
+    }
+}
+
+// Guardar avatar PRO
+function saveAvatarPro() {
     if (!currentUser) {
         showToast('Debes iniciar sesión primero', 'error');
         return;
     }
 
-    // Guardar en localStorage
-    localStorage.setItem(`avatar_${currentUser.email}`, JSON.stringify(currentAvatar));
+    // Guardar configuración en localStorage
+    localStorage.setItem(`avatar_pro_${currentUser.email}`, JSON.stringify(avatarConfig));
 
     // Actualizar avatar en la navegación
-    updateUserAvatar();
+    updateUserAvatarPro();
 
     showToast('¡Avatar guardado exitosamente!', 'success');
-
-    // Animar celebración
-    animateAvatar('smile');
-    setTimeout(() => animateAvatar('blink'), 500);
 }
 
 // Actualizar avatar del usuario en la navegación
-function updateUserAvatar() {
-    // Crear un mini avatar SVG para mostrar en la navegación
+function updateUserAvatarPro() {
+    const avatarURL = generateAvatarURL();
+
     const avatarContainer = document.createElement('div');
     avatarContainer.className = 'user-mini-avatar';
     avatarContainer.innerHTML = `
-        <svg viewBox="0 0 40 40" style="width: 35px; height: 35px;">
-            <circle cx="20" cy="20" r="15" fill="${currentAvatar.skinColor}"/>
-            <circle cx="16" cy="18" r="2" fill="#2D3748"/>
-            <circle cx="24" cy="18" r="2" fill="#2D3748"/>
-            <path d="M 15 25 Q 20 28 25 25" stroke="#2D3748" stroke-width="2" fill="none" stroke-linecap="round"/>
-        </svg>
+        <img src="${avatarURL}" alt="Avatar" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
     `;
 
-    // Insertar avatar en la navegación si no existe
+    // Insertar avatar en la navegación
     document.querySelectorAll('.nav-user').forEach(navUser => {
         const existingAvatar = navUser.querySelector('.user-mini-avatar');
         if (existingAvatar) {
@@ -3419,11 +3511,11 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('userName5').textContent = currentUser.name;
         }
 
-        // Cargar avatar si existe
-        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
-        if (savedAvatar) {
-            currentAvatar = JSON.parse(savedAvatar);
-            updateUserAvatar();
+        // Cargar avatar PRO si existe
+        const savedAvatarPro = localStorage.getItem(`avatar_pro_${currentUser.email}`);
+        if (savedAvatarPro) {
+            avatarConfig = JSON.parse(savedAvatarPro);
+            updateUserAvatarPro();
         }
 
         updateAttempts();
