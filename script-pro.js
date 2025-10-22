@@ -539,6 +539,21 @@ function showScreen(screenId) {
         screen.classList.add('active');
         window.scrollTo(0, 0);
     }
+
+    // Cargar avatar si el usuario está logueado
+    if (typeof currentUser !== 'undefined' && currentUser) {
+        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
+        if (savedAvatar) {
+            try {
+                currentAvatar = JSON.parse(savedAvatar);
+                if (typeof updateUserAvatar === 'function') {
+                    updateUserAvatar();
+                }
+            } catch (e) {
+                console.warn('Error al cargar avatar:', e);
+            }
+        }
+    }
 }
 
 function selectTest(type) {
@@ -2782,6 +2797,39 @@ function updateStreakUI() {
 // NOTIFICACIONES
 // ========================================
 
+// Mostrar tab específico de desafíos
+function showChallengeTab(tabName) {
+    // Remover clase active de todos los tabs
+    document.querySelectorAll('.challenge-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+
+    // Remover clase active de todos los contenidos
+    document.querySelectorAll('.challenge-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Activar el tab clickeado
+    const clickedTab = event?.target || document.querySelector(`.challenge-tab[onclick*="${tabName}"]`);
+    if (clickedTab && clickedTab.classList) {
+        clickedTab.classList.add('active');
+    }
+
+    // Activar el contenido correspondiente
+    const contentMap = {
+        'daily': 'dailyChallenges',
+        'weekly': 'weeklyChallenges',
+        'leaderboard': 'leaderboardContent',
+        'badges': 'badgesContent'
+    };
+
+    const contentId = contentMap[tabName];
+    const content = document.getElementById(contentId);
+    if (content) {
+        content.classList.add('active');
+    }
+}
+
 function showXPNotification(amount) {
     console.log(`✨ +${amount} XP ganados!`);
 }
@@ -3753,20 +3801,6 @@ function deleteRecording() {
 // ========================================
 // NAVEGACIÓN Y PANTALLAS
 // ========================================
-
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-
-    // Cargar avatar si el usuario está logueado
-    if (currentUser) {
-        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
-        if (savedAvatar) {
-            currentAvatar = JSON.parse(savedAvatar);
-            updateUserAvatar();
-        }
-    }
-}
 
 function goToWelcome() {
     showScreen('welcomeScreen');
