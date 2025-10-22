@@ -383,6 +383,12 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
             document.getElementById('userName3').textContent = user.name;
         }
         updateAttempts();
+
+        // Verificar racha al iniciar sesión
+        checkLoginStreak();
+        checkDailyReset();
+        checkWeeklyReset();
+
         showScreen('welcomeScreen');
         showToast(`¡Bienvenido ${user.name}!`, 'success');
     } else {
@@ -2531,24 +2537,61 @@ function saveUserChallengeData() {
 function checkLoginStreak() {
     const today = new Date().toDateString();
     const lastLogin = userChallengeData.lastLogin;
-    
+
     if (!lastLogin) {
+        // Primera vez que entra
         userChallengeData.streak = 1;
+        showToast('🔥 ¡Comienza tu racha! Entra todos los días para mantenerla', 'success');
     } else {
         const lastDate = new Date(lastLogin);
         const todayDate = new Date(today);
         const diffDays = Math.floor((todayDate - lastDate) / (1000 * 60 * 60 * 24));
-        
-        if (diffDays === 1) {
+
+        if (diffDays === 0) {
+            // Ya entró hoy, no hacer nada
+            return;
+        } else if (diffDays === 1) {
+            // Entró ayer, continúa la racha
             userChallengeData.streak++;
+            showToast(`🔥 ¡Racha de ${userChallengeData.streak} días! Sigue así`, 'success');
             updateChallengeProgress('login_streak', userChallengeData.streak);
+
+            // Badge por racha de 7 días
+            if (userChallengeData.streak === 7) {
+                unlockBadge('semana_completa');
+                showToast('🏅 ¡Badge desbloqueado: Semana Completa!', 'success');
+            }
+            // Badge por racha de 30 días
+            if (userChallengeData.streak === 30) {
+                unlockBadge('mes_constante');
+                showToast('🏅 ¡Badge desbloqueado: Mes Constante!', 'success');
+            }
         } else if (diffDays > 1) {
+            // Se saltó días, se reinicia la racha
+            const oldStreak = userChallengeData.streak;
             userChallengeData.streak = 1;
+
+            if (oldStreak > 3) {
+                showToast(`⚠️ Se perdió tu racha de ${oldStreak} días. ¡Empieza de nuevo!`, 'warning');
+            } else {
+                showToast('🔥 ¡Racha reiniciada! Entra todos los días', 'info');
+            }
         }
     }
-    
+
     userChallengeData.lastLogin = today;
     saveUserChallengeData();
+
+    // Actualizar UI de racha
+    updateStreakUI();
+}
+
+// Actualizar UI de racha en el dashboard
+function updateStreakUI() {
+    const streakElements = document.querySelectorAll('.streak-counter, #streakDays');
+    streakElements.forEach(el => {
+        if (el) el.textContent = userChallengeData.streak;
+    });
 }
 
 function checkDailyReset() {
