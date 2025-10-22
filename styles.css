@@ -3653,6 +3653,193 @@ body.dark-theme .modal-content {
     letter-spacing: 1px;
 }
 
+/* ========================================
+   ANÁLISIS AVANZADO CON IA - NUEVOS ESTILOS
+   ======================================== */
+
+/* Grid de métricas principales */
+.analysis-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    padding: 16px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 2px solid var(--gray-300);
+    transition: var(--transition);
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: var(--accent);
+}
+
+.metric-icon {
+    font-size: 2em;
+    line-height: 1;
+}
+
+.metric-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.metric-content .metric-label {
+    font-size: 0.85em;
+    color: var(--gray-600);
+    font-weight: 500;
+}
+
+.metric-content .metric-value {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+/* Análisis de sentimiento */
+.sentiment-analysis {
+    background: var(--gray-100);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 4px solid var(--gray-400);
+}
+
+.sentiment-analysis.positive {
+    background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+    border-left-color: #10b981;
+}
+
+.sentiment-analysis.negative {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-left-color: #ef4444;
+}
+
+.sentiment-analysis.neutral {
+    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    border-left-color: #6b7280;
+}
+
+.sentiment-analysis h5 {
+    color: var(--dark);
+    margin-bottom: 12px;
+    font-size: 1em;
+}
+
+.sentiment-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sentiment-type {
+    font-size: 0.95em;
+    color: var(--dark);
+}
+
+.sentiment-details {
+    color: var(--gray-600);
+    font-size: 0.85em;
+}
+
+/* Análisis de pausas */
+.pause-analysis {
+    background: linear-gradient(135deg, #fef3c7, #fde68a);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 4px solid #f59e0b;
+}
+
+.pause-analysis h5 {
+    color: var(--dark);
+    margin-bottom: 12px;
+    font-size: 1em;
+}
+
+.pause-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.95em;
+    color: var(--dark);
+}
+
+/* Análisis de estructura */
+.structure-analysis {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 4px solid #6366f1;
+}
+
+.structure-analysis h5 {
+    color: var(--dark);
+    margin-bottom: 12px;
+    font-size: 1em;
+}
+
+.structure-indicators {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.structure-indicator {
+    padding: 8px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.structure-indicator.present {
+    background: #10b981;
+    color: var(--white);
+}
+
+.structure-indicator.missing {
+    background: var(--gray-300);
+    color: var(--gray-600);
+}
+
+/* Redundancia detectada */
+.redundancy-detected {
+    background: linear-gradient(135deg, #fce7f3, #fbcfe8);
+    padding: 16px;
+    border-radius: var(--radius);
+    margin-bottom: 16px;
+    border-left: 4px solid #ec4899;
+}
+
+.redundancy-detected h5 {
+    color: var(--dark);
+    margin-bottom: 12px;
+    font-size: 1em;
+}
+
+.redundancy-detected ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.redundancy-detected li {
+    padding: 6px 0;
+    font-size: 0.9em;
+    color: var(--dark);
+}
+
 /* Responsive para Avatar Creator PRO */
 @media (max-width: 1200px) {
     .avatar-creator-pro-layout {

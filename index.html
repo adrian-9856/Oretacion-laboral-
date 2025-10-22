@@ -567,7 +567,6 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <script src="script-pro.js"></script>
     <!-- SIMULADOR DE ENTREVISTA -->
 <div class="screen" id="interviewSimulatorScreen">
     <nav class="navbar">
@@ -858,7 +857,7 @@
 </div>
 
 <!-- Botón flotante para acceder a desafíos desde cualquier pantalla -->
-<button class="floating-challenges-btn" onclick="showChallengesScreen()" title="Ver Desafíos">
+<button class="floating-challenges-btn" onclick="showScreen('challengesScreen')" title="Ver Desafíos">
     🎯
     <span class="challenges-notification" id="challengesNotification">0</span>
 </button>
@@ -1029,6 +1028,9 @@
 <button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
     🎨
 </button>
+
+<!-- JavaScript - Cargar al final para que el DOM esté completo -->
+<script src="script-pro.js"></script>
 
 </body>
 </html>

@@ -1,12 +1,12 @@
 # 🚀 NUEVAS FUNCIONALIDADES - Sistema de Evaluación Laboral PRO
 
-## ✨ Actualización: Análisis de Audio con Inteligencia Artificial
+## ✨ Actualización MAYOR: Análisis AVANZADO con Inteligencia Artificial
 
-### 🤖 ¿Qué hace el sistema de IA?
+### 🤖 Sistema de IA de Nueva Generación
 
-El nuevo sistema analiza automáticamente las respuestas de audio en el simulador de entrevistas y proporciona:
+El sistema ahora incluye **análisis avanzado multidimensional** que evalúa respuestas de audio desde múltiples perspectivas profesionales:
 
-#### 📊 Métricas Analizadas:
+#### 📊 Métricas Analizadas (10 Dimensiones):
 
 1. **⏱️ Duración de la Respuesta**
    - Ideal: 30-90 segundos
@@ -17,7 +17,21 @@ El nuevo sistema analiza automáticamente las respuestas de audio en el simulado
    - Mide la fluidez y desarrollo de ideas
    - Óptimo: 50-150 palabras
 
-3. **🎯 Detección de Palabras Clave**
+3. **⚡ Velocidad de Habla (WPM - Words Per Minute)**
+   - **NUEVO**: Cálculo automático de palabras por minuto
+   - Lento: < 100 WPM
+   - **Óptimo: 100-150 WPM**
+   - Rápido: 150-180 WPM
+   - Muy rápido: > 180 WPM
+
+4. **😊 Análisis de Sentimiento**
+   - **NUEVO**: Detección automática de tono emocional
+   - **Positivo**: palabras como excelente, logro, éxito, motivado, aprendí
+   - **Negativo**: problema, difícil, fracaso, imposible
+   - **Neutral**: normal, regular, común
+   - Muestra porcentaje de cada tipo de palabra detectada
+
+5. **🎯 Detección de Palabras Clave (8 Competencias)**
    - **Responsabilidad**: responsable, compromiso, cumplir, puntual
    - **Trabajo en Equipo**: equipo, colaborar, ayudar, cooperar
    - **Liderazgo**: liderar, dirigir, guiar, motivar
@@ -27,17 +41,39 @@ El nuevo sistema analiza automáticamente las respuestas de audio en el simulado
    - **Comunicación**: comunicar, expresar, escuchar
    - **Iniciativa**: proactivo, proponer, innovar
 
-4. **💬 Análisis de Fluidez**
-   - Detecta muletillas (eh, mmm, este, pues)
-   - Penaliza uso excesivo
-   - Premia fluidez verbal
+6. **⏸️ Análisis de Pausas y Muletillas**
+   - **NUEVO**: Detección inteligente de pausas
+   - Cuenta pausas naturales (puntuación)
+   - Detecta muletillas (eh, mmm, este, pues, o sea)
+   - Diferencia entre pausas efectivas y muletillas problemáticas
 
-5. **⭐ Calificación Automática (0-100)**
-   - **85-100**: Excelente
-   - **70-84**: Muy Bueno
-   - **55-69**: Bueno
-   - **40-54**: Regular
-   - **0-39**: Necesita Mejorar
+7. **🏗️ Análisis de Estructura**
+   - **NUEVO**: Evalúa organización de la respuesta
+   - **Introducción**: detecta "primero", "para empezar", "inicialmente"
+   - **Desarrollo**: detecta "además", "también", "por ejemplo"
+   - **Conclusión**: detecta "finalmente", "en resumen", "por último"
+   - Bonificación si tiene las 3 partes
+
+8. **🔄 Detección de Redundancia**
+   - **NUEVO**: Identifica palabras repetidas excesivamente
+   - Lista las 5 palabras más repetidas
+   - Sugiere usar sinónimos para enriquecer vocabulario
+   - Penaliza repetición excesiva (>3 veces)
+
+9. **💪 Nivel de Confianza**
+   - **NUEVO**: Cálculo multifactorial de confianza (0-100%)
+   - Basado en: vocabulario, estructura, sentimiento, muletillas, WPM
+   - **Alto (80-100%)**: Respuesta transmite seguridad
+   - **Bueno (60-79%)**: Buen nivel, seguir practicando
+   - **Moderado (40-59%)**: Trabajar en estructura y muletillas
+   - **Bajo (<40%)**: Necesita más preparación
+
+10. **⭐ Calificación Automática (0-100)**
+    - **85-100**: Excelente
+    - **70-84**: Muy Bueno
+    - **55-69**: Bueno
+    - **40-54**: Regular
+    - **0-39**: Necesita Mejorar
 
 ---
 
@@ -66,13 +102,51 @@ El nuevo sistema analiza automáticamente las respuestas de audio en el simulado
   - Duración y fluidez
   - Muletillas detectadas
 
-### Paso 5: Ver Resultados
-El sistema muestra:
-- 📊 **Métricas**: Duración, palabras, palabras clave
-- 🎯 **Competencias Detectadas**: Lista de habilidades identificadas
-- 💬 **Retroalimentación Personalizada**: Consejos específicos para mejorar
-- ⭐ **Calificación**: Puntuación de 0-100 con nivel
-- 📝 **Transcripción**: Texto completo de lo que dijiste
+### Paso 5: Ver Resultados Avanzados con IA
+El sistema ahora muestra un **dashboard completo** con:
+
+#### 📊 Panel de Métricas Principales
+- ⏱️ **Duración**: Tiempo total de respuesta
+- 📝 **Palabras**: Conteo total de palabras
+- ⚡ **Velocidad**: WPM (palabras por minuto)
+- 💪 **Confianza**: Nivel de seguridad detectado (0-100%)
+
+#### 😊 Análisis de Sentimiento
+- **Tono detectado**: Positivo, Negativo o Neutral
+- **Porcentaje**: Qué tan fuerte es el tono
+- **Detalles**: Conteo de palabras por tipo
+
+#### ⏸️ Análisis de Pausas
+- **Pausas estimadas**: Total de pausas detectadas
+- **Muletillas**: Cantidad de muletillas identificadas
+
+#### 🏗️ Estructura de la Respuesta
+- ✅ **Introducción**: Presente o ausente
+- ✅ **Desarrollo**: Presente o ausente
+- ✅ **Conclusión**: Presente o ausente
+
+#### 🎯 Competencias Detectadas
+- Lista de habilidades profesionales identificadas
+- Organizado por categorías (Liderazgo, Trabajo en Equipo, etc.)
+
+#### 🔄 Palabras Repetidas
+- Top 5 palabras más repetidas
+- Contador de repeticiones
+- Sugerencias para mejorar vocabulario
+
+#### 💬 Retroalimentación Inteligente
+- Consejos personalizados basados en tu desempeño
+- Áreas de mejora específicas
+- Felicitaciones por fortalezas detectadas
+
+#### ⭐ Calificación Final
+- Puntuación de 0-100
+- Nivel: Excelente, Muy Bueno, Bueno, Regular, Necesita Mejorar
+- Código de color visual
+
+#### 📝 Transcripción Completa
+- Texto completo de lo que dijiste
+- Generado en tiempo real durante la grabación
 
 ---
 
@@ -187,22 +261,49 @@ El sistema muestra:
 
 ---
 
-## 📈 Métricas de Éxito del Sistema de IA
+## 📈 Métricas de Éxito del Sistema de IA Avanzado
 
-El algoritmo de calificación considera:
+El algoritmo de calificación **multidimensional** ahora considera:
 
-| Métrica | Peso | Rango Ideal |
-|---------|------|-------------|
-| Duración | 30% | 30-90s |
-| Palabras Clave | 35% | 3-6 palabras |
-| Cantidad de Palabras | 25% | 50-150 |
+| Métrica | Peso Aprox. | Rango Ideal |
+|---------|-------------|-------------|
+| Duración | 20% | 30-90s |
+| Palabras Clave | 25% | 3-6 palabras |
+| Cantidad de Palabras | 15% | 50-150 |
 | Fluidez (sin muletillas) | 10% | 0-2 muletillas |
+| **Velocidad (WPM)** | **10%** | **100-150 WPM** |
+| **Estructura** | **15%** | **3/3 partes** |
+| **Redundancia** | **-5% a 5%** | **0-2 palabras repetidas** |
 
-**Fórmula simplificada:**
+### Cálculo del Nivel de Confianza (0-100%):
+
+```javascript
+Base: 50%
+
+Bonificaciones:
++ 20% si tiene 4+ palabras clave profesionales
++ 15% si tiene estructura completa (intro + desarrollo + conclusión)
++ 10% si el sentimiento es positivo
++ 5% si la velocidad es óptima (100-150 WPM)
+
+Penalizaciones:
+- 15% por cada 3 muletillas detectadas
+- 10% si hay alta redundancia (>3 palabras muy repetidas)
 ```
-Score = (Duración + Palabras Clave + Cantidad + Fluidez) / 3
+
+**Fórmula del Score Final:**
+```
+Score = (Duración + Palabras Clave + Estructura + Velocidad + Cantidad - Redundancia) / 4
 Normalizado a rango 0-100
 ```
+
+### Ventajas del Nuevo Sistema:
+
+1. ✅ **Más preciso**: 10 dimensiones vs 5 originales
+2. ✅ **Más justo**: Considera organización y profesionalismo
+3. ✅ **Más útil**: Feedback específico por área
+4. ✅ **Más educativo**: Enseña buenas prácticas de comunicación
+5. ✅ **Más motivador**: Destaca fortalezas además de áreas de mejora
 
 ---
 
