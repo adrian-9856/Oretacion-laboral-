@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Evaluación Laboral PRO</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- LOGIN -->
+    <div class="screen active" id="loginScreen">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                        </svg>
+                    </div>
+                    <h1>Sistema de Evaluación PRO</h1>
+                    <p>Plataforma de Orientación Laboral</p>
+                </div>
+                <div class="login-tabs">
+                    <button class="tab active" onclick="showLoginTab('login')">Iniciar Sesión</button>
+                    <button class="tab" onclick="showLoginTab('register')">Registrarse</button>
+                </div>
+                <form id="loginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="loginEmail" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Ingresar</button>
+                    <div class="admin-link">
+                        <a href="#" onclick="showAdminLogin(); return false;">Acceso Administrador</a>
+                    </div>
+                </form>
+                <form id="registerForm" class="auth-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Nombre</label>
+                            <input type="text" id="regName" placeholder="Juan" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Apellido</label>
+                            <input type="text" id="regLastName" placeholder="Pérez" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="regEmail" placeholder="tu@email.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Teléfono</label>
+                        <input type="tel" id="regPhone" placeholder="+502 0000-0000" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Edad</label>
+                        <input type="number" id="regAge" placeholder="25" min="16" max="99" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="regPassword" placeholder="••••••••" minlength="6" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Crear Cuenta</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div class="screen" id="adminLoginScreen">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo admin-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                    </div>
+                    <h1>Panel de Administrador</h1>
+                    <p>Acceso restringido</p>
+                </div>
+                <form id="adminLoginForm" class="auth-form active">
+                    <div class="form-group">
+                        <label>Usuario Admin</label>
+                        <input type="text" id="adminUser" placeholder="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Contraseña</label>
+                        <input type="password" id="adminPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Acceder al Panel</button>
+                    <div class="admin-link">
+                        <a href="#" onclick="backToLogin(); return false;">← Volver al login</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD ADMIN -->
+    <div class="screen" id="adminDashboard">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    </svg>
+                    <span>Panel de Administrador</span>
+                </div>
+                <div class="nav-user">
+                    <span class="admin-badge">👑 ADMIN</span>
+                    <button class="btn-logout" onclick="logout()">Salir</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Dashboard de Administración</h1>
+                <div class="dashboard-actions">
+                    <button class="btn-action" onclick="exportToExcel()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14-7l-5-5m0 0L7 8m5-5v12"/>
+                        </svg>
+                        Exportar Datos
+                    </button>
+                    <button class="btn-action" onclick="refreshDashboard()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Usuarios</p>
+                        <p class="stat-value" id="totalUsers">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Pruebas Completadas</p>
+                        <p class="stat-value" id="totalTests">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Promedio General</p>
+                        <p class="stat-value" id="avgScore">0%</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Tiempo Promedio</p>
+                        <p class="stat-value" id="avgTime">0s</p>
+                    </div>
+                </div>
+            </div>
+            <div class="filters-section">
+                <input type="text" id="searchUser" placeholder="Buscar por nombre o email..." class="search-input">
+                <select id="filterTest" class="filter-select">
+                    <option value="">Todas las pruebas</option>
+                    <option value="Cuestionario">Cuestionario</option>
+                    <option value="Detectar Errores">Detectar Errores</option>
+                    <option value="Construir CV">Construir CV</option>
+                </select>
+                <select id="filterType" class="filter-select">
+                    <option value="">PRE y POST</option>
+                    <option value="pre">Solo PRE-TEST</option>
+                    <option value="post">Solo POST-TEST</option>
+                </select>
+            </div>
+            <div class="table-container">
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Email</th>
+                            <th>Prueba</th>
+                            <th>Tipo</th>
+                            <th>Puntuación</th>
+                            <th>Tiempo</th>
+                            <th>Fecha</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resultsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- BIENVENIDA -->
+    <div class="screen" id="welcomeScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    </svg>
+                    <span>Evaluación Laboral</span>
+                </div>
+                <div class="nav-user">
+                    <button class="btn-icon" onclick="toggleTheme()" title="Cambiar tema">
+                        <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="showProgress()" title="Mi progreso">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </button>
+                    <span id="userName">Usuario</span>
+                    <button class="btn-logout" onclick="logout()">Salir</button>
+                </div>
+            </div>
+        </nav>
+        <div class="welcome-container">
+            <div class="welcome-content">
+                <div class="welcome-text">
+                    <h1>Bienvenido al Sistema de Evaluación</h1>
+                    <p>Selecciona el tipo de evaluación que deseas realizar</p>
+                </div>
+                <div class="test-type-cards">
+                    <div class="type-card pre-card" onclick="selectTest('pre')">
+                        <div class="type-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                            </svg>
+                        </div>
+                        <div class="type-card-content">
+                            <h3>PRE-TEST</h3>
+                            <p>Evaluación inicial antes de la capacitación</p>
+                            <span class="difficulty easy">Nivel Básico</span>
+                            <div class="attempts-info" id="preAttempts"></div>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                    <div class="type-card post-card" onclick="selectTest('post')">
+                        <div class="type-card-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <div class="type-card-content">
+                            <h3>POST-TEST</h3>
+                            <p>Evaluación final después de la capacitación</p>
+                            <span class="difficulty hard">Nivel Avanzado</span>
+                            <div class="attempts-info" id="postAttempts"></div>
+                        </div>
+                        <div class="card-arrow">→</div>
+                    </div>
+                </div>
+                <div class="practice-mode-section">
+                    <button class="btn-practice" onclick="enablePracticeMode()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                        </svg>
+                        Modo Práctica
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROGRESO -->
+    <div class="screen" id="progressScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Mi Progreso</span></div>
+                <div class="nav-user">
+                    <span id="userName3">Usuario</span>
+                    <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="progress-dashboard">
+                <h2>Tu Historial de Evaluaciones</h2>
+                <div class="progress-stats">
+                    <div class="progress-card">
+                        <h3>Pruebas Completadas</h3>
+                        <p class="big-number" id="userTestsCompleted">0</p>
+                    </div>
+                    <div class="progress-card">
+                        <h3>Promedio General</h3>
+                        <p class="big-number" id="userAvgScore">0%</p>
+                    </div>
+                    <div class="progress-card">
+                        <h3>Mejor Puntuación</h3>
+                        <p class="big-number" id="userBestScore">0%</p>
+                    </div>
+                </div>
+                <div class="history-table">
+                    <h3>Historial Detallado</h3>
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Prueba</th>
+                                <th>Tipo</th>
+                                <th>Puntuación</th>
+                                <th>Tiempo</th>
+                                <th>Fecha</th>
+                                <th>Certificado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userHistoryTable"></tbody>
+                    </table>
+                </div>
+                <button class="btn-back" onclick="goToWelcome()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Volver
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MENÚ PRUEBAS -->
+    <div class="screen" id="testMenuScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Selecciona una Prueba</div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge"></span>
+                    <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="tests-grid">
+                <div class="test-card modern" onclick="startTest('quiz')">
+                    <div class="test-card-icon quiz">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+                            <line x1="12" y1="17" x2="12.01" y2="17"/>
+                        </svg>
+                    </div>
+                    <h3>Cuestionario</h3>
+                    <p>Preguntas sobre competencias laborales</p>
+                    <button class="test-start-btn">Iniciar →</button>
+                </div>
+                <div class="test-card modern" onclick="startTest('errors')">
+                    <div class="test-card-icon errors">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3>Detectar Errores</h3>
+                    <p>Encuentra errores en un CV</p>
+                    <button class="test-start-btn">Iniciar →</button>
+                </div>
+                <div class="test-card modern" onclick="startTest('builder')">
+                    <div class="test-card-icon builder">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                    </div>
+                    <h3>Construir CV</h3>
+                    <p>Crea tu currículum</p>
+                    <button class="test-start-btn">Iniciar →</button>
+                </div>
+                <div class="test-card modern" onclick="startTest('interview')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+    </div>
+    <h3>Simulador de Entrevista</h3>
+    <p>Practica respuestas a preguntas comunes</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CUESTIONARIO -->
+    <div class="screen" id="quizScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Cuestionario</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge2"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="quizTimer">15:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <div class="quiz-progress-section">
+                    <div class="progress-info">
+                        <span>Pregunta <strong id="currentQuestion">1</strong> de <strong id="totalQuestions">10</strong></span>
+                        <span class="progress-percentage"><span id="progressPercentage">0</span>%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                </div>
+                <div id="questionContainer"></div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-nav primary" id="nextBtn" onclick="nextQuestion()">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETECTAR ERRORES -->
+    <div class="screen" id="errorDetectionScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Detectar Errores en CV</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge3"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="errorTimer">10:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="error-detection-layout">
+                <div class="error-instructions">
+                    <h3>📋 Instrucciones</h3>
+                    <p>Haz clic en las palabras o frases que contengan errores ortográficos, gramaticales o de formato.</p>
+                    <p><strong>Encuentra 10 errores</strong> en el CV</p>
+                </div>
+                <div id="cvErrorContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONSTRUIR CV -->
+    <div class="screen" id="cvBuilderScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Construir tu CV</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge4"></span>
+                    <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div id="cvBuilderContainer"></div>
+        </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    <div class="screen" id="resultsScreen">
+        <div class="results-wrapper">
+            <div class="results-card">
+                <div class="results-icon" id="resultsIcon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h2>¡Evaluación Completada!</h2>
+                <div class="score-circle">
+                    <svg viewBox="0 0 200 200">
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#E86C4A;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#F4A261;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="100" cy="100" r="90" class="score-bg"/>
+                        <circle cx="100" cy="100" r="90" class="score-progress" id="scoreCircle"/>
+                    </svg>
+                    <div class="score-text">
+                        <span class="score-number" id="finalScore">0</span>
+                        <span class="score-percent">%</span>
+                    </div>
+                </div>
+                <div class="results-info" id="resultsMessage"></div>
+                <div class="results-stats">
+                    <div class="result-stat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <div>
+                            <span class="stat-label">Tiempo</span>
+                            <span class="stat-value"><span id="totalTime">0</span>s</span>
+                        </div>
+                    </div>
+                    <div class="result-stat">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <span class="stat-label">Tipo</span>
+                            <span class="stat-value" id="testTypeResult"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="results-actions">
+                    <button class="btn-result primary" onclick="downloadCertificate()" id="certBtn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        Descargar Certificado
+                    </button>
+                    <button class="btn-result secondary" onclick="goToMenu()">Hacer Otra Prueba</button>
+                    <button class="btn-result secondary" onclick="goToWelcome()">Volver al Inicio</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3>¿Estás seguro?</h3>
+            <p id="modalMessage">¿Deseas salir de la prueba? Perderás tu progreso actual.</p>
+            <div class="modal-actions">
+                <button class="btn-modal cancel" onclick="closeModal()">Cancelar</button>
+                <button class="btn-modal confirm" onclick="confirmAction()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script src="script-pro.js"></script>
+    <!-- SIMULADOR DE ENTREVISTA -->
+<div class="screen" id="interviewSimulatorScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>🎭 Simulador de Entrevista</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge5"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="interview-simulator-card">
+            <div class="interview-progress">
+                <div class="progress-text">
+                    Pregunta <strong id="interviewCurrentQ">1</strong> de <strong id="interviewTotalQ">10</strong>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="interviewProgressBar"></div>
+                </div>
+            </div>
+            
+            <div class="interviewer-section">
+                <div class="interviewer-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                </div>
+                <div class="interviewer-bubble">
+                    <p id="interviewQuestion">Cargando pregunta...</p>
+                </div>
+            </div>
+            
+            <div class="interview-response-section">
+                <h4>Tu respuesta:</h4>
+                <div class="interview-options" id="interviewOptions"></div>
+                
+                <div class="interview-feedback" id="interviewFeedback" style="display: none;">
+                    <div class="feedback-header">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <h4>Retroalimentación</h4>
+                    </div>
+                    <p id="feedbackText"></p>
+                    <div class="feedback-score">
+                        <span id="feedbackPoints"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="interview-navigation">
+                <button class="btn-nav primary" id="interviewNextBtn" onclick="nextInterviewQuestion()" disabled>
+                    Siguiente →
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- DESAFÍOS Y COMPETENCIAS -->
+<div class="screen" id="challengesScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <span>🎯 Desafíos y Competencias</span>
+            </div>
+            <div class="nav-user">
+                <span id="userXP" class="xp-badge">0 XP</span>
+                <span id="userName4">Usuario</span>
+                <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <!-- Estadísticas del Usuario -->
+        <div class="user-stats-section">
+            <div class="stat-card-challenge">
+                <div class="stat-icon-challenge level">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div class="stat-info-challenge">
+                    <p class="stat-label-challenge">Nivel</p>
+                    <p class="stat-value-challenge" id="userLevel">1</p>
+                </div>
+            </div>
+            
+            <div class="stat-card-challenge">
+                <div class="stat-icon-challenge rank">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/>
+                    </svg>
+                </div>
+                <div class="stat-info-challenge">
+                    <p class="stat-label-challenge">Ranking</p>
+                    <p class="stat-value-challenge" id="userRank">#-</p>
+                </div>
+            </div>
+            
+            <div class="stat-card-challenge">
+                <div class="stat-icon-challenge badges">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                    </svg>
+                </div>
+                <div class="stat-info-challenge">
+                    <p class="stat-label-challenge">Badges</p>
+                    <p class="stat-value-challenge" id="userBadges">0</p>
+                </div>
+            </div>
+            
+            <div class="stat-card-challenge">
+                <div class="stat-icon-challenge streak">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                        <path d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z"/>
+                    </svg>
+                </div>
+                <div class="stat-info-challenge">
+                    <p class="stat-label-challenge">Racha</p>
+                    <p class="stat-value-challenge" id="userStreak">0 días</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Barra de Progreso de Nivel -->
+        <div class="level-progress-section">
+            <div class="level-progress-header">
+                <span>Nivel <strong id="currentLevelDisplay">1</strong></span>
+                <span><strong id="currentXPDisplay">0</strong> / <strong id="nextLevelXP">100</strong> XP</span>
+            </div>
+            <div class="level-progress-bar">
+                <div class="level-progress-fill" id="levelProgressFill"></div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="challenges-tabs">
+            <button class="challenge-tab active" onclick="showChallengeTab('daily')">
+                🌟 Desafíos Diarios
+            </button>
+            <button class="challenge-tab" onclick="showChallengeTab('weekly')">
+                🔥 Semanales
+            </button>
+            <button class="challenge-tab" onclick="showChallengeTab('leaderboard')">
+                🏆 Ranking Global
+            </button>
+            <button class="challenge-tab" onclick="showChallengeTab('badges')">
+                🎖️ Mis Badges
+            </button>
+        </div>
+
+        <!-- Contenido de Tabs -->
+        <div class="challenges-content">
+            <!-- Desafíos Diarios -->
+            <div class="challenge-tab-content active" id="dailyChallenges">
+                <h2>Desafíos del Día</h2>
+                <p class="tab-subtitle">Completa estos desafíos para ganar XP y subir de nivel</p>
+                <div class="challenges-grid" id="dailyChallengesGrid"></div>
+            </div>
+
+            <!-- Desafíos Semanales -->
+            <div class="challenge-tab-content" id="weeklyChallenges">
+                <h2>Desafíos de la Semana</h2>
+                <p class="tab-subtitle">Desafíos más difíciles con mayores recompensas</p>
+                <div class="challenges-grid" id="weeklyChallengesGrid"></div>
+            </div>
+
+            <!-- Ranking Global -->
+            <div class="challenge-tab-content" id="leaderboardContent">
+                <h2>Ranking Global de Usuarios</h2>
+                <p class="tab-subtitle">Compite con otros usuarios por el primer lugar</p>
+                <div class="leaderboard-container">
+                    <div class="podium">
+                        <div class="podium-place second" id="podium2">
+                            <div class="podium-medal">🥈</div>
+                            <div class="podium-user">-</div>
+                            <div class="podium-xp">0 XP</div>
+                        </div>
+                        <div class="podium-place first" id="podium1">
+                            <div class="podium-medal">🥇</div>
+                            <div class="podium-user">-</div>
+                            <div class="podium-xp">0 XP</div>
+                        </div>
+                        <div class="podium-place third" id="podium3">
+                            <div class="podium-medal">🥉</div>
+                            <div class="podium-user">-</div>
+                            <div class="podium-xp">0 XP</div>
+                        </div>
+                    </div>
+                    <div class="leaderboard-table">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Usuario</th>
+                                    <th>Nivel</th>
+                                    <th>XP Total</th>
+                                    <th>Badges</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mis Badges -->
+            <div class="challenge-tab-content" id="badgesContent">
+                <h2>Colección de Badges</h2>
+                <p class="tab-subtitle">Desbloquea badges completando logros especiales</p>
+                <div class="badges-grid" id="badgesGrid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Botón flotante para acceder a desafíos desde cualquier pantalla -->
+<button class="floating-challenges-btn" onclick="showChallengesScreen()" title="Ver Desafíos">
+    🎯
+    <span class="challenges-notification" id="challengesNotification">0</span>
+</button>
+</body>
+</html>
