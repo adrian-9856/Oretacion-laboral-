@@ -3183,7 +3183,7 @@ function speakQuestion() {
     speechSynthesis.speak(utterance);
 }
 
-// Analizar audio con IA
+// Analizar audio con IA AVANZADA
 function analyzeAudioResponse(transcription, duration) {
     const analysis = {
         transcription: transcription,
@@ -3192,26 +3192,118 @@ function analyzeAudioResponse(transcription, duration) {
         keywordsFound: {},
         score: 0,
         feedback: [],
-        level: ''
+        level: '',
+        // NUEVOS: Análisis avanzado con IA
+        sentiment: { type: '', score: 0, details: {} },
+        wpm: 0,
+        pauseAnalysis: { estimatedPauses: 0, fillerCount: 0 },
+        confidenceLevel: 0,
+        structureAnalysis: { hasIntro: false, hasDevelopment: false, hasConclusion: false },
+        redundancy: { repeatedWords: [], redundancyScore: 0 }
     };
 
-    // 1. Analizar duración (respuestas entre 30-90 segundos son ideales)
-    if (duration < 15) {
-        analysis.feedback.push('⚠️ Respuesta muy corta. Intenta desarrollar más tus ideas.');
-        analysis.score += 20;
-    } else if (duration >= 15 && duration <= 30) {
-        analysis.feedback.push('✅ Buena duración, pero podrías dar más detalles.');
-        analysis.score += 60;
-    } else if (duration > 30 && duration <= 90) {
-        analysis.feedback.push('✅ Excelente duración de respuesta.');
-        analysis.score += 90;
-    } else {
-        analysis.feedback.push('⚠️ Respuesta muy larga. Intenta ser más conciso.');
-        analysis.score += 50;
+    const lowerTranscription = transcription.toLowerCase();
+    const words = transcription.split(' ').filter(w => w.length > 0);
+
+    // ========================================
+    // 1. ANÁLISIS DE SENTIMIENTO
+    // ========================================
+    const sentimentWords = {
+        positive: ['excelente', 'genial', 'bueno', 'mejor', 'éxito', 'logro', 'satisfecho',
+                   'feliz', 'positivo', 'efectivo', 'capaz', 'motivado', 'entusiasta',
+                   'orgulloso', 'alcanzar', 'superé', 'disfruté', 'aprendí', 'crecí'],
+        negative: ['problema', 'difícil', 'malo', 'peor', 'fracaso', 'error', 'frustrado',
+                   'negativo', 'incapaz', 'imposible', 'complicado', 'conflicto', 'crisis'],
+        neutral: ['normal', 'regular', 'estándar', 'común', 'básico', 'simple']
+    };
+
+    let positiveCount = 0;
+    let negativeCount = 0;
+    let neutralCount = 0;
+
+    for (const word of sentimentWords.positive) {
+        positiveCount += (lowerTranscription.match(new RegExp('\\b' + word, 'g')) || []).length;
+    }
+    for (const word of sentimentWords.negative) {
+        negativeCount += (lowerTranscription.match(new RegExp('\\b' + word, 'g')) || []).length;
+    }
+    for (const word of sentimentWords.neutral) {
+        neutralCount += (lowerTranscription.match(new RegExp('\\b' + word, 'g')) || []).length;
     }
 
-    // 2. Analizar palabras clave por categoría
-    const lowerTranscription = transcription.toLowerCase();
+    const totalSentimentWords = positiveCount + negativeCount + neutralCount;
+
+    if (totalSentimentWords > 0) {
+        const positivePercent = (positiveCount / totalSentimentWords) * 100;
+        const negativePercent = (negativeCount / totalSentimentWords) * 100;
+
+        if (positivePercent >= 50) {
+            analysis.sentiment.type = 'Positivo';
+            analysis.sentiment.score = Math.round(positivePercent);
+            analysis.feedback.push('😊 Tono positivo detectado. ¡Excelente actitud!');
+        } else if (negativePercent >= 40) {
+            analysis.sentiment.type = 'Negativo';
+            analysis.sentiment.score = Math.round(negativePercent);
+            analysis.feedback.push('⚠️ Tono algo negativo. Intenta enfocarte en soluciones y aprendizajes.');
+        } else {
+            analysis.sentiment.type = 'Neutral';
+            analysis.sentiment.score = Math.round((positivePercent + negativePercent) / 2);
+            analysis.feedback.push('😐 Tono neutral. Considera agregar más entusiasmo.');
+        }
+
+        analysis.sentiment.details = {
+            positive: positiveCount,
+            negative: negativeCount,
+            neutral: neutralCount
+        };
+    } else {
+        analysis.sentiment.type = 'No detectado';
+        analysis.sentiment.score = 0;
+    }
+
+    // ========================================
+    // 2. VELOCIDAD DE HABLA (WPM)
+    // ========================================
+    if (duration > 0) {
+        analysis.wpm = Math.round((analysis.wordCount / duration) * 60);
+
+        if (analysis.wpm < 100) {
+            analysis.feedback.push('🐌 Velocidad de habla lenta. Intenta hablar un poco más rápido.');
+            analysis.score += 40;
+        } else if (analysis.wpm >= 100 && analysis.wpm <= 150) {
+            analysis.feedback.push('✅ Excelente velocidad de habla (ritmo óptimo).');
+            analysis.score += 80;
+        } else if (analysis.wpm > 150 && analysis.wpm <= 180) {
+            analysis.feedback.push('🏃 Velocidad buena, pero podrías hablar un poco más despacio.');
+            analysis.score += 60;
+        } else {
+            analysis.feedback.push('⚡ Hablas muy rápido. Tómate tu tiempo para articular mejor.');
+            analysis.score += 30;
+        }
+    }
+
+    // ========================================
+    // 3. DETECCIÓN DE PAUSAS Y MULETILLAS
+    // ========================================
+    const punctuationPauses = (transcription.match(/[.,;!?]/g) || []).length;
+    const fillerWords = ['eh', 'mmm', 'este', 'pues', 'o sea', 'como que', 'bueno'];
+    const fillerCount = fillerWords.reduce((count, word) => {
+        return count + (lowerTranscription.match(new RegExp('\\b' + word + '\\b', 'g')) || []).length;
+    }, 0);
+
+    analysis.pauseAnalysis.estimatedPauses = punctuationPauses + fillerCount;
+    analysis.pauseAnalysis.fillerCount = fillerCount;
+
+    if (fillerCount > 5) {
+        analysis.feedback.push('⚠️ Demasiadas pausas con muletillas. Practica reducirlas.');
+    } else if (fillerCount === 0 && punctuationPauses > 3) {
+        analysis.feedback.push('✅ Buen uso de pausas naturales para estructurar tu respuesta.');
+        analysis.score += 30;
+    }
+
+    // ========================================
+    // 4. ANÁLISIS DE PALABRAS CLAVE
+    // ========================================
     let totalKeywords = 0;
 
     for (const [category, keywords] of Object.entries(keywordCategories)) {
@@ -3222,7 +3314,6 @@ function analyzeAudioResponse(transcription, duration) {
         }
     }
 
-    // 3. Bonus por palabras clave
     if (totalKeywords === 0) {
         analysis.feedback.push('⚠️ No se detectaron palabras clave relevantes.');
         analysis.score += 0;
@@ -3237,7 +3328,89 @@ function analyzeAudioResponse(transcription, duration) {
         analysis.score += 80;
     }
 
-    // 4. Analizar cantidad de palabras (fluidez)
+    // ========================================
+    // 5. ANÁLISIS DE ESTRUCTURA
+    // ========================================
+    const introKeywords = ['primero', 'en primer lugar', 'para empezar', 'inicialmente', 'comenzaré', 'bueno'];
+    const developmentKeywords = ['además', 'también', 'por otro lado', 'asimismo', 'por ejemplo', 'es decir'];
+    const conclusionKeywords = ['finalmente', 'en conclusión', 'para terminar', 'en resumen', 'por último'];
+
+    analysis.structureAnalysis.hasIntro = introKeywords.some(kw => lowerTranscription.includes(kw));
+    analysis.structureAnalysis.hasDevelopment = developmentKeywords.some(kw => lowerTranscription.includes(kw));
+    analysis.structureAnalysis.hasConclusion = conclusionKeywords.some(kw => lowerTranscription.includes(kw));
+
+    const structureScore =
+        (analysis.structureAnalysis.hasIntro ? 1 : 0) +
+        (analysis.structureAnalysis.hasDevelopment ? 1 : 0) +
+        (analysis.structureAnalysis.hasConclusion ? 1 : 0);
+
+    if (structureScore === 3) {
+        analysis.feedback.push('🎯 Excelente estructura: introducción, desarrollo y conclusión.');
+        analysis.score += 90;
+    } else if (structureScore === 2) {
+        analysis.feedback.push('✅ Buena estructura, pero podrías mejorarla agregando ' +
+            (!analysis.structureAnalysis.hasIntro ? 'una introducción' :
+             !analysis.structureAnalysis.hasConclusion ? 'una conclusión' : 'más desarrollo') + '.');
+        analysis.score += 60;
+    } else if (structureScore === 1) {
+        analysis.feedback.push('⚠️ Estructura básica. Intenta organizar mejor tu respuesta con inicio, desarrollo y cierre.');
+        analysis.score += 30;
+    } else {
+        analysis.feedback.push('❌ Sin estructura clara. Organiza tu respuesta en introducción, desarrollo y conclusión.');
+        analysis.score += 10;
+    }
+
+    // ========================================
+    // 6. DETECCIÓN DE REDUNDANCIA
+    // ========================================
+    const wordFrequency = {};
+    const cleanWords = words.map(w => w.toLowerCase().replace(/[.,!?;:]/g, ''));
+
+    cleanWords.forEach(word => {
+        if (word.length > 3) { // Ignorar palabras muy cortas
+            wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+        }
+    });
+
+    const repeatedWords = Object.entries(wordFrequency)
+        .filter(([word, count]) => count >= 3)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+
+    analysis.redundancy.repeatedWords = repeatedWords.map(([word, count]) => ({ word, count }));
+
+    if (repeatedWords.length > 3) {
+        analysis.redundancy.redundancyScore = repeatedWords.length * 10;
+        analysis.feedback.push(`⚠️ Detectada repetición excesiva de palabras. Intenta usar sinónimos.`);
+        analysis.score -= 15;
+    } else if (repeatedWords.length > 0) {
+        analysis.redundancy.redundancyScore = repeatedWords.length * 5;
+        analysis.feedback.push('💡 Algunas palabras se repiten. Considera usar sinónimos para enriquecer tu vocabulario.');
+    } else {
+        analysis.feedback.push('✅ Excelente variedad de vocabulario sin repeticiones excesivas.');
+        analysis.score += 20;
+    }
+
+    // ========================================
+    // 7. ANÁLISIS DE DURACIÓN
+    // ========================================
+    if (duration < 15) {
+        analysis.feedback.push('⚠️ Respuesta muy corta. Intenta desarrollar más tus ideas.');
+        analysis.score += 20;
+    } else if (duration >= 15 && duration <= 30) {
+        analysis.feedback.push('✅ Buena duración, pero podrías dar más detalles.');
+        analysis.score += 60;
+    } else if (duration > 30 && duration <= 90) {
+        analysis.feedback.push('✅ Excelente duración de respuesta.');
+        analysis.score += 90;
+    } else {
+        analysis.feedback.push('⚠️ Respuesta muy larga. Intenta ser más conciso.');
+        analysis.score += 50;
+    }
+
+    // ========================================
+    // 8. ANÁLISIS DE CANTIDAD DE PALABRAS
+    // ========================================
     if (analysis.wordCount < 20) {
         analysis.feedback.push('⚠️ Respuesta muy breve. Explica más tus ideas.');
     } else if (analysis.wordCount >= 20 && analysis.wordCount <= 50) {
@@ -3251,22 +3424,46 @@ function analyzeAudioResponse(transcription, duration) {
         analysis.score += 30;
     }
 
-    // 5. Detectar palabras de relleno excesivas
-    const fillerWords = ['eh', 'mmm', 'este', 'pues', 'o sea', 'como que'];
-    const fillerCount = fillerWords.reduce((count, word) => {
-        return count + (lowerTranscription.match(new RegExp(word, 'g')) || []).length;
-    }, 0);
+    // ========================================
+    // 9. NIVEL DE CONFIANZA
+    // ========================================
+    // Calculamos confianza basándonos en múltiples factores
+    let confidenceScore = 50; // Base
 
-    if (fillerCount > 5) {
-        analysis.feedback.push('⚠️ Intenta reducir las muletillas (eh, mmm, este, etc.).');
-        analysis.score -= 20;
-    } else if (fillerCount === 0) {
-        analysis.feedback.push('✅ Excelente fluidez verbal sin muletillas.');
-        analysis.score += 30;
+    // +20 si tiene buen vocabulario (palabras clave)
+    if (totalKeywords >= 4) confidenceScore += 20;
+
+    // +15 si tiene estructura clara
+    if (structureScore >= 2) confidenceScore += 15;
+
+    // +10 si sentimiento es positivo
+    if (analysis.sentiment.type === 'Positivo') confidenceScore += 10;
+
+    // -15 por cada 3 muletillas
+    confidenceScore -= Math.floor(fillerCount / 3) * 15;
+
+    // +5 si WPM es óptimo
+    if (analysis.wpm >= 100 && analysis.wpm <= 150) confidenceScore += 5;
+
+    // -10 si hay redundancia alta
+    if (analysis.redundancy.redundancyScore > 30) confidenceScore -= 10;
+
+    analysis.confidenceLevel = Math.min(100, Math.max(0, confidenceScore));
+
+    if (analysis.confidenceLevel >= 80) {
+        analysis.feedback.push('💪 Nivel de confianza muy alto. ¡Tu respuesta transmite seguridad!');
+    } else if (analysis.confidenceLevel >= 60) {
+        analysis.feedback.push('👍 Buen nivel de confianza. Sigue practicando para mejorar.');
+    } else if (analysis.confidenceLevel >= 40) {
+        analysis.feedback.push('🤔 Nivel de confianza moderado. Trabaja en eliminar muletillas y estructurar mejor.');
+    } else {
+        analysis.feedback.push('⚠️ Nivel de confianza bajo. Practica más y prepara tus respuestas con anticipación.');
     }
 
-    // Normalizar score (máximo 100)
-    analysis.score = Math.min(100, Math.max(0, Math.round(analysis.score / 3)));
+    // ========================================
+    // 10. NORMALIZACIÓN DE SCORE FINAL
+    // ========================================
+    analysis.score = Math.min(100, Math.max(0, Math.round(analysis.score / 4)));
 
     // Determinar nivel
     if (analysis.score >= 85) {
@@ -3284,7 +3481,7 @@ function analyzeAudioResponse(transcription, duration) {
     return analysis;
 }
 
-// Mostrar análisis de audio
+// Mostrar análisis de audio con IA AVANZADA
 function showAudioAnalysis(analysis) {
     const feedbackDiv = document.getElementById('interviewFeedback');
     const feedbackText = document.getElementById('feedbackText');
@@ -3300,38 +3497,126 @@ function showAudioAnalysis(analysis) {
         keywordsHTML += '</ul></div>';
     }
 
+    // HTML para palabras repetidas
+    let redundancyHTML = '';
+    if (analysis.redundancy && analysis.redundancy.repeatedWords.length > 0) {
+        redundancyHTML = '<div class="redundancy-detected"><h5>🔄 Palabras repetidas:</h5><ul>';
+        analysis.redundancy.repeatedWords.forEach(({ word, count }) => {
+            redundancyHTML += `<li><strong>${word}</strong>: ${count} veces</li>`;
+        });
+        redundancyHTML += '</ul></div>';
+    }
+
+    // HTML para estructura
+    const structureHTML = `
+        <div class="structure-analysis">
+            <h5>🏗️ Estructura de la respuesta:</h5>
+            <div class="structure-indicators">
+                <span class="structure-indicator ${analysis.structureAnalysis.hasIntro ? 'present' : 'missing'}">
+                    ${analysis.structureAnalysis.hasIntro ? '✅' : '❌'} Introducción
+                </span>
+                <span class="structure-indicator ${analysis.structureAnalysis.hasDevelopment ? 'present' : 'missing'}">
+                    ${analysis.structureAnalysis.hasDevelopment ? '✅' : '❌'} Desarrollo
+                </span>
+                <span class="structure-indicator ${analysis.structureAnalysis.hasConclusion ? 'present' : 'missing'}">
+                    ${analysis.structureAnalysis.hasConclusion ? '✅' : '❌'} Conclusión
+                </span>
+            </div>
+        </div>
+    `;
+
+    // Calcular color para sentimiento
+    let sentimentClass = 'neutral';
+    if (analysis.sentiment.type === 'Positivo') sentimentClass = 'positive';
+    else if (analysis.sentiment.type === 'Negativo') sentimentClass = 'negative';
+
     feedbackText.innerHTML = `
         <div class="audio-analysis-result">
             <div class="analysis-header">
-                <h4>📊 Análisis de tu Respuesta con IA</h4>
+                <h4>🤖 Análisis Avanzado con IA</h4>
             </div>
 
-            <div class="analysis-metrics">
-                <div class="metric">
-                    <span class="metric-label">⏱️ Duración:</span>
-                    <span class="metric-value">${analysis.duration}s</span>
+            <!-- MÉTRICAS PRINCIPALES -->
+            <div class="analysis-metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">⏱️</div>
+                    <div class="metric-content">
+                        <span class="metric-label">Duración</span>
+                        <span class="metric-value">${analysis.duration}s</span>
+                    </div>
                 </div>
-                <div class="metric">
-                    <span class="metric-label">📝 Palabras:</span>
-                    <span class="metric-value">${analysis.wordCount}</span>
+                <div class="metric-card">
+                    <div class="metric-icon">📝</div>
+                    <div class="metric-content">
+                        <span class="metric-label">Palabras</span>
+                        <span class="metric-value">${analysis.wordCount}</span>
+                    </div>
                 </div>
-                <div class="metric">
-                    <span class="metric-label">🎯 Palabras clave:</span>
-                    <span class="metric-value">${Object.values(analysis.keywordsFound).flat().length}</span>
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-content">
+                        <span class="metric-label">Velocidad</span>
+                        <span class="metric-value">${analysis.wpm} WPM</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">💪</div>
+                    <div class="metric-content">
+                        <span class="metric-label">Confianza</span>
+                        <span class="metric-value">${analysis.confidenceLevel}%</span>
+                    </div>
                 </div>
             </div>
 
+            <!-- SENTIMIENTO -->
+            <div class="sentiment-analysis ${sentimentClass}">
+                <h5>😊 Análisis de Sentimiento</h5>
+                <div class="sentiment-content">
+                    <div class="sentiment-type">
+                        <strong>Tono detectado:</strong> ${analysis.sentiment.type}
+                        ${analysis.sentiment.score > 0 ? `(${analysis.sentiment.score}%)` : ''}
+                    </div>
+                    ${analysis.sentiment.details && Object.keys(analysis.sentiment.details).length > 0 ? `
+                        <div class="sentiment-details">
+                            <small>
+                                Palabras positivas: ${analysis.sentiment.details.positive || 0} |
+                                Negativas: ${analysis.sentiment.details.negative || 0} |
+                                Neutras: ${analysis.sentiment.details.neutral || 0}
+                            </small>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- PAUSAS Y MULETILLAS -->
+            <div class="pause-analysis">
+                <h5>⏸️ Análisis de Pausas</h5>
+                <div class="pause-content">
+                    <div><strong>Pausas estimadas:</strong> ${analysis.pauseAnalysis.estimatedPauses}</div>
+                    <div><strong>Muletillas detectadas:</strong> ${analysis.pauseAnalysis.fillerCount}</div>
+                </div>
+            </div>
+
+            <!-- ESTRUCTURA -->
+            ${structureHTML}
+
+            <!-- COMPETENCIAS -->
             ${keywordsHTML}
 
+            <!-- REDUNDANCIA -->
+            ${redundancyHTML}
+
+            <!-- RETROALIMENTACIÓN -->
             <div class="analysis-feedback">
-                <h5>💬 Retroalimentación:</h5>
+                <h5>💬 Retroalimentación Inteligente:</h5>
                 <ul>
                     ${analysis.feedback.map(f => `<li>${f}</li>`).join('')}
                 </ul>
             </div>
 
+            <!-- TRANSCRIPCIÓN -->
             <div class="transcription-section">
-                <h5>📝 Transcripción:</h5>
+                <h5>📝 Transcripción Completa:</h5>
                 <p class="transcription-text">${analysis.transcription || 'No se pudo transcribir el audio.'}</p>
             </div>
         </div>
