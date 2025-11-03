@@ -315,6 +315,102 @@
         </div>
     </div>
 
+    <!-- JUEGO FORTALEZAS Y DEBILIDADES -->
+    <div class="screen" id="strengthsWeaknessesScreen">
+        <div class="onboarding-container">
+            <div class="onboarding-content">
+                <div class="onboarding-header">
+                    <h1>🎯 Descubre tus Fortalezas y Debilidades</h1>
+                    <p>Antes de comenzar, veamos un video sobre autoconocimiento laboral</p>
+                </div>
+
+                <div class="video-section">
+                    <h3>📹 Video: Conoce tus Fortalezas y Debilidades</h3>
+                    <div class="video-container">
+                        <iframe
+                            id="youtubeVideo"
+                            width="100%"
+                            height="400"
+                            src=""
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p class="video-note">💡 Tip: Mira el video completo para obtener mejores resultados</p>
+                </div>
+
+                <div class="game-section">
+                    <h3>🎮 Tu turno: Selecciona tus características</h3>
+
+                    <div class="characteristics-grid">
+                        <div class="char-category">
+                            <h4>💪 Fortalezas</h4>
+                            <p class="category-desc">Selecciona hasta 5 fortalezas que te definan</p>
+                            <div class="char-list" id="strengthsList">
+                                <button class="char-btn" data-type="strength" data-value="Responsable">Responsable</button>
+                                <button class="char-btn" data-type="strength" data-value="Creativo">Creativo</button>
+                                <button class="char-btn" data-type="strength" data-value="Comunicativo">Comunicativo</button>
+                                <button class="char-btn" data-type="strength" data-value="Organizado">Organizado</button>
+                                <button class="char-btn" data-type="strength" data-value="Líder">Líder</button>
+                                <button class="char-btn" data-type="strength" data-value="Perseverante">Perseverante</button>
+                                <button class="char-btn" data-type="strength" data-value="Empático">Empático</button>
+                                <button class="char-btn" data-type="strength" data-value="Adaptable">Adaptable</button>
+                                <button class="char-btn" data-type="strength" data-value="Proactivo">Proactivo</button>
+                                <button class="char-btn" data-type="strength" data-value="Analítico">Analítico</button>
+                                <button class="char-btn" data-type="strength" data-value="Colaborativo">Colaborativo</button>
+                                <button class="char-btn" data-type="strength" data-value="Optimista">Optimista</button>
+                            </div>
+                            <div class="selected-count">
+                                Seleccionadas: <strong id="strengthsCount">0</strong> / 5
+                            </div>
+                        </div>
+
+                        <div class="char-category">
+                            <h4>🎯 Áreas de Mejora</h4>
+                            <p class="category-desc">Selecciona hasta 3 áreas en las que quieras mejorar</p>
+                            <div class="char-list" id="weaknessesList">
+                                <button class="char-btn" data-type="weakness" data-value="Impuntualidad">Impuntualidad</button>
+                                <button class="char-btn" data-type="weakness" data-value="Timidez">Timidez</button>
+                                <button class="char-btn" data-type="weakness" data-value="Impaciencia">Impaciencia</button>
+                                <button class="char-btn" data-type="weakness" data-value="Desorganización">Desorganización</button>
+                                <button class="char-btn" data-type="weakness" data-value="Perfeccionismo">Perfeccionismo</button>
+                                <button class="char-btn" data-type="weakness" data-value="Nerviosismo">Nerviosismo</button>
+                                <button class="char-btn" data-type="weakness" data-value="Dificultad para delegar">Dificultad para delegar</button>
+                                <button class="char-btn" data-type="weakness" data-value="Procrastinación">Procrastinación</button>
+                                <button class="char-btn" data-type="weakness" data-value="Autocrítica excesiva">Autocrítica excesiva</button>
+                                <button class="char-btn" data-type="weakness" data-value="Dificultad con tecnología">Dificultad con tecnología</button>
+                            </div>
+                            <div class="selected-count">
+                                Seleccionadas: <strong id="weaknessesCount">0</strong> / 3
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="selected-summary" id="selectedSummary" style="display: none;">
+                        <h4>📝 Resumen de tu perfil:</h4>
+                        <div class="summary-content">
+                            <div class="summary-section">
+                                <strong>Fortalezas:</strong>
+                                <ul id="summaryStrengths"></ul>
+                            </div>
+                            <div class="summary-section">
+                                <strong>Áreas de mejora:</strong>
+                                <ul id="summaryWeaknesses"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="onboarding-actions">
+                        <button class="btn-onboarding primary" id="finishOnboardingBtn" onclick="finishOnboarding()" disabled>
+                            Completar Perfil →
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- INGRESAR CÓDIGO -->
     <div class="screen" id="codeEntryScreen">
         <nav class="navbar">
@@ -1130,6 +1226,40 @@
             <!-- Panel de Personalización -->
             <div class="avatar-customization-pro-section">
                 <h2>⚙️ Personalizar Avatar</h2>
+
+                <!-- Opción de Cámara -->
+                <div class="customization-group-pro">
+                    <h3>📸 Opción 1: Tomar Foto con Cámara</h3>
+                    <div class="camera-section">
+                        <video id="cameraVideo" autoplay playsinline style="display: none;" width="256" height="256"></video>
+                        <canvas id="cameraCanvas" style="display: none;" width="256" height="256"></canvas>
+                        <div class="camera-controls">
+                            <button class="btn-camera" id="startCameraBtn" onclick="startCamera()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                                    <circle cx="12" cy="13" r="4"/>
+                                </svg>
+                                Activar Cámara
+                            </button>
+                            <button class="btn-camera" id="capturePhotoBtn" onclick="capturePhoto()" style="display: none;">
+                                📷 Capturar Foto
+                            </button>
+                            <button class="btn-camera secondary" id="stopCameraBtn" onclick="stopCamera()" style="display: none;">
+                                ❌ Cerrar Cámara
+                            </button>
+                        </div>
+                        <p class="camera-note">Puedes tomar una foto real o usar el generador de avatars animados abajo</p>
+                    </div>
+                </div>
+
+                <div class="divider-section">
+                    <span>O</span>
+                </div>
+
+                <!-- Selector de Estilo -->
+                <div class="customization-group-pro">
+                    <h3>🎭 Opción 2: Generar Avatar Animado</h3>
+                </div>
 
                 <!-- Selector de Estilo -->
                 <div class="customization-group-pro">
