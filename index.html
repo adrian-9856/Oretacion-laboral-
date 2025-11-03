@@ -130,6 +130,9 @@
                     <button class="dashboard-tab active" onclick="showAdminTab('results')">
                         📊 Resultados
                     </button>
+                    <button class="dashboard-tab" onclick="showAdminTab('users')">
+                        👥 Usuarios
+                    </button>
                     <button class="dashboard-tab" onclick="showAdminTab('codes')">
                         🔑 Códigos de Examen
                     </button>
@@ -227,6 +230,52 @@
                         </thead>
                         <tbody id="resultsTableBody"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Tab Usuarios -->
+            <div class="admin-tab-content" id="usersTabContent">
+                <div class="users-management-section">
+                    <div class="users-header">
+                        <h2>👥 Gestión de Usuarios</h2>
+                        <div class="users-stats-mini">
+                            <div class="stat-mini">
+                                <span class="stat-mini-value" id="totalUsersCount">0</span>
+                                <span class="stat-mini-label">Total Usuarios</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="stat-mini-value" id="newUsersToday">0</span>
+                                <span class="stat-mini-label">Nuevos Hoy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="users-filters">
+                        <input type="text" id="searchUserManagement" placeholder="🔍 Buscar por nombre o email..." class="search-input" onkeyup="filterUsers()">
+                        <select id="filterOnboarding" class="filter-select" onchange="filterUsers()">
+                            <option value="">Todos los usuarios</option>
+                            <option value="completed">Onboarding completado</option>
+                            <option value="pending">Onboarding pendiente</option>
+                        </select>
+                    </div>
+
+                    <div class="users-table-container">
+                        <table class="results-table users-table">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Edad</th>
+                                    <th>Registro</th>
+                                    <th>Onboarding</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -615,14 +664,14 @@
                     <p>Preguntas sobre competencias laborales</p>
                     <button class="test-start-btn">Iniciar →</button>
                 </div>
-                <div class="test-card modern" onclick="startTest('errors')">
-                    <div class="test-card-icon errors">
+                <div class="test-card modern" onclick="startTest('formal')">
+                    <div class="test-card-icon" style="background: linear-gradient(135deg, #00b894, #00cec9);">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
                         </svg>
                     </div>
-                    <h3>Detectar Errores</h3>
-                    <p>Encuentra errores en un CV</p>
+                    <h3>💼 Formal vs Informal</h3>
+                    <p>Clasifica frases según su nivel de formalidad</p>
                     <button class="test-start-btn">Iniciar →</button>
                 </div>
                 <div class="test-card modern" onclick="startTest('builder')">
@@ -696,11 +745,11 @@
         </div>
     </div>
 
-    <!-- DETECTAR ERRORES -->
-    <div class="screen" id="errorDetectionScreen">
+    <!-- FORMAL VS INFORMAL -->
+    <div class="screen" id="formalInformalScreen">
         <nav class="navbar">
             <div class="nav-content">
-                <div class="nav-brand"><span>Detectar Errores en CV</span></div>
+                <div class="nav-brand"><span>💼 Formal vs Informal</span></div>
                 <div class="nav-user">
                     <span class="test-badge" id="testTypeBadge3"></span>
                     <span class="timer-badge">
@@ -708,19 +757,79 @@
                             <circle cx="12" cy="12" r="10"/>
                             <polyline points="12 6 12 12 16 14"/>
                         </svg>
-                        <span id="errorTimer">10:00</span>
+                        <span id="formalTimer">8:00</span>
                     </span>
                 </div>
             </div>
         </nav>
         <div class="container">
-            <div class="error-detection-layout">
-                <div class="error-instructions">
+            <div class="formal-game-layout">
+                <div class="formal-instructions">
                     <h3>📋 Instrucciones</h3>
-                    <p>Haz clic en las palabras o frases que contengan errores ortográficos, gramaticales o de formato.</p>
-                    <p><strong>Encuentra 10 errores</strong> en el CV</p>
+                    <p>Arrastra cada frase a la categoría correcta:</p>
+                    <ul>
+                        <li>💼 <strong>Formal:</strong> Para entrevistas y ambientes profesionales</li>
+                        <li>💬 <strong>Informal:</strong> Para conversaciones casuales</li>
+                    </ul>
+                    <div class="score-display">
+                        <span>Puntuación: <strong id="formalScore">0</strong> / <strong id="formalTotal">0</strong></span>
+                    </div>
                 </div>
-                <div id="cvErrorContainer"></div>
+
+                <div class="phrases-container">
+                    <h3>Frases para clasificar:</h3>
+                    <div class="phrases-list" id="phrasesList"></div>
+                </div>
+
+                <div class="categories-container">
+                    <div class="category-box formal-box" id="formalBox" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="category-icon">💼</div>
+                        <h3>Formal</h3>
+                        <p>Para entrevistas y trabajo</p>
+                        <div class="dropped-phrases" id="formalDropped"></div>
+                    </div>
+
+                    <div class="category-box informal-box" id="informalBox" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="category-icon">💬</div>
+                        <h3>Informal</h3>
+                        <p>Para conversaciones casuales</p>
+                        <div class="dropped-phrases" id="informalDropped"></div>
+                    </div>
+                </div>
+
+                <div class="formal-actions">
+                    <button class="btn-action secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-action primary" onclick="finishFormalGame()" id="finishFormalBtn" disabled>Finalizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETECTAR ERRORES EN MI CV -->
+    <div class="screen" id="myErrorDetectionScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>🔍 Revisa tu CV</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge7"></span>
+                    <button class="btn-logout" onclick="skipCVReview()">Saltar →</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="my-cv-review-layout">
+                <div class="review-instructions">
+                    <h3>🎯 Tu Turno de Revisar</h3>
+                    <p>Hemos agregado algunos errores intencionales a tu CV. ¿Puedes encontrarlos?</p>
+                    <div class="errors-stats">
+                        <span>Errores encontrados: <strong id="myErrorsFound">0</strong> / <strong id="myErrorsTotal">0</strong></span>
+                    </div>
+                </div>
+                <div class="my-cv-container" id="myCVContainer"></div>
+                <div class="review-actions">
+                    <button class="btn-action secondary" onclick="skipCVReview()">Omitir</button>
+                    <button class="btn-action primary" onclick="finishCVReview()">Finalizar Revisión</button>
+                </div>
             </div>
         </div>
     </div>
@@ -872,6 +981,34 @@
 
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
+
+    <!-- MODAL CAMBIAR CONTRASEÑA -->
+    <div class="modal" id="changePasswordModal" style="display: none;">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>🔐 Cambiar Contraseña</h3>
+                <button class="modal-close" onclick="closeChangePasswordModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-info-display">
+                    <p><strong>Usuario:</strong> <span id="modalUserName"></span></p>
+                    <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
+                </div>
+                <div class="form-group">
+                    <label>Nueva Contraseña:</label>
+                    <input type="password" id="newPasswordInput" placeholder="Ingresa la nueva contraseña" class="form-input" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Contraseña:</label>
+                    <input type="password" id="confirmPasswordInput" placeholder="Confirma la nueva contraseña" class="form-input" minlength="6">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal cancel" onclick="closeChangePasswordModal()">Cancelar</button>
+                <button class="btn-modal confirm" onclick="confirmChangePassword()">Cambiar Contraseña</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script-pro.js"></script>
     <!-- SIMULADOR DE ENTREVISTA -->
