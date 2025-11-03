@@ -3749,3 +3749,551 @@ body.dark-theme .modal-content {
         width: 100%;
     }
 }
+
+/* ========================================
+   SOPA DE LETRAS (WORD SEARCH)
+   ======================================== */
+
+.wordsearch-layout {
+    display: grid;
+    grid-template-columns: 350px 1fr;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.wordsearch-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.wordsearch-info-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.wordsearch-info-card h3 {
+    font-size: 1.25rem;
+    margin-bottom: 12px;
+    color: var(--primary-color);
+}
+
+.wordsearch-info-card p {
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.wordsearch-info-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.wordsearch-info-card li {
+    color: var(--text-secondary);
+    padding: 8px 0;
+    font-size: 0.9rem;
+}
+
+.wordsearch-words-list {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.wordsearch-words-list h3 {
+    font-size: 1.25rem;
+    margin-bottom: 16px;
+    color: var(--primary-color);
+}
+
+.word-item {
+    padding: 12px 16px;
+    margin-bottom: 8px;
+    background: rgba(var(--primary-rgb), 0.05);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.word-item.found {
+    background: rgba(46, 213, 115, 0.1);
+    border-left-color: #2ed573;
+    text-decoration: line-through;
+    opacity: 0.6;
+}
+
+.wordsearch-stats {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.stat-value {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.wordsearch-main {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+}
+
+.wordsearch-grid {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr);
+    gap: 4px;
+    padding: 20px;
+    background: rgba(var(--primary-rgb), 0.02);
+    border-radius: 12px;
+    user-select: none;
+}
+
+.word-cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    background: white;
+    border: 2px solid #e0e0e0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dark-theme .word-cell {
+    background: #2d3436;
+    border-color: #404040;
+    color: #e0e0e0;
+}
+
+.word-cell:hover {
+    background: rgba(var(--primary-rgb), 0.1);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.word-cell.selecting {
+    background: rgba(var(--primary-rgb), 0.3);
+    border-color: var(--primary-color);
+    transform: scale(1.05);
+}
+
+.word-cell.found {
+    background: rgba(46, 213, 115, 0.2);
+    border-color: #2ed573;
+    color: #2ed573;
+}
+
+.wordsearch-actions {
+    display: flex;
+    gap: 16px;
+    margin-top: 20px;
+}
+
+/* ========================================
+   SISTEMA DE CÓDIGOS DE EXAMEN
+   ======================================== */
+
+.code-entry-card {
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 48px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.code-entry-icon {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+}
+
+.code-entry-icon svg {
+    width: 50px;
+    height: 50px;
+    color: white;
+}
+
+.code-entry-card h2 {
+    font-size: 2rem;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+.code-entry-card p {
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+    font-size: 1.1rem;
+}
+
+.code-entry-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.code-input {
+    width: 100%;
+    padding: 16px 20px;
+    font-size: 1.2rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    text-transform: uppercase;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.code-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(var(--primary-rgb), 0.1);
+}
+
+.btn-validate-code {
+    padding: 16px 32px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+.btn-validate-code:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-validate-code svg {
+    width: 24px;
+    height: 24px;
+}
+
+.code-skip-section {
+    border-top: 1px solid var(--border-color);
+    padding-top: 24px;
+    margin-top: 24px;
+}
+
+.code-skip-section p {
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+}
+
+.btn-skip-code {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 2px solid var(--border-color);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-skip-code:hover {
+    background: var(--hover-bg);
+    border-color: var(--text-secondary);
+}
+
+/* Admin - Dashboard Tabs */
+.dashboard-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.dashboard-tab {
+    padding: 12px 24px;
+    background: transparent;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: var(--text-secondary);
+}
+
+.dashboard-tab.active {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+.dashboard-tab:hover:not(.active) {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+}
+
+.admin-tab-content {
+    display: none;
+}
+
+.admin-tab-content.active {
+    display: block;
+}
+
+/* Códigos Section */
+.codes-section {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.create-code-card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.create-code-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+.code-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.form-input,
+.form-select {
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(var(--primary-rgb), 0.1);
+}
+
+.form-select[multiple] {
+    min-height: 120px;
+}
+
+.form-group small {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.code-display-group {
+    display: flex;
+    gap: 8px;
+}
+
+.code-display {
+    flex: 1;
+    font-family: 'Courier New', monospace;
+    font-weight: 700;
+    background: rgba(var(--primary-rgb), 0.05);
+}
+
+.btn-icon-action {
+    padding: 12px 16px;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-icon-action:hover {
+    background: var(--secondary-color);
+    transform: scale(1.05);
+}
+
+.btn-create-code {
+    padding: 16px 32px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+    margin-top: 8px;
+}
+
+.btn-create-code:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(var(--primary-rgb), 0.3);
+}
+
+.btn-create-code svg {
+    width: 20px;
+    height: 20px;
+}
+
+.codes-list-section {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.codes-list-section h2 {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+}
+
+.btn-action-small {
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-action-small:hover {
+    transform: scale(1.2);
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .wordsearch-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .wordsearch-sidebar {
+        order: 2;
+    }
+
+    .wordsearch-main {
+        order: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .wordsearch-grid {
+        grid-template-columns: repeat(10, 1fr);
+        padding: 10px;
+    }
+
+    .word-cell {
+        width: 32px;
+        height: 32px;
+        font-size: 0.9rem;
+    }
+
+    .code-entry-card {
+        padding: 32px 24px;
+    }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-tabs {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .wordsearch-grid {
+        grid-template-columns: repeat(8, 1fr);
+        gap: 2px;
+    }
+
+    .word-cell {
+        width: 28px;
+        height: 28px;
+        font-size: 0.8rem;
+    }
+
+    .code-input {
+        font-size: 1rem;
+        padding: 12px 16px;
+    }
+}

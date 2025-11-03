@@ -2328,7 +2328,7 @@ function finishInterviewSimulator() {
 // Actualizar la función startTest para incluir interview
 function startTest(testType) {
     startTime = Date.now();
-    
+
     if (testType === 'quiz') {
         currentQuizQuestion = 0;
         quizAnswers = [];
@@ -2342,6 +2342,8 @@ function startTest(testType) {
         startCVBuilder();
     } else if (testType === 'interview') {
         startInterviewSimulator();
+    } else if (testType === 'wordsearch') {
+        startWordSearch();
     }
 }
 
@@ -3533,4 +3535,663 @@ window.addEventListener('DOMContentLoaded', () => {
             icon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
         }
     }
+
+    // Generar código inicial para admin
+    generateNewCode();
 });
+
+// ========================================
+// SOPA DE LETRAS (WORD SEARCH)
+// ========================================
+
+// Palabras para la sopa de letras (términos laborales)
+const wordSearchWords = [
+    'TRABAJO', 'EMPLEO', 'CARRERA', 'ENTREVISTA', 'CURRICULUM',
+    'SALARIO', 'RESPONSABILIDAD', 'EQUIPO', 'LIDERAZGO', 'COMUNICACION',
+    'EXPERIENCIA', 'PUNTUALIDAD', 'PROFESIONAL'
+];
+
+// Variables globales para el juego
+let wordSearchGrid = [];
+let wordsFoundList = [];
+let wordSearchSelection = [];
+let isSelecting = false;
+let wordSearchScore = 0;
+let wordSearchStartTime = null;
+let wordSearchTimer = null;
+let wordSearchRemainingTime = 600; // 10 minutos
+
+// Iniciar sopa de letras
+function startWordSearch() {
+    wordSearchGrid = [];
+    wordsFoundList = [];
+    wordSearchSelection = [];
+    wordSearchScore = 0;
+    wordSearchStartTime = Date.now();
+    wordSearchRemainingTime = 600;
+
+    showScreen('wordSearchScreen');
+    generateWordSearchGrid();
+    renderWordSearchGrid();
+    renderWordsList();
+    startWordSearchTimer();
+
+    showToast('🔍 ¡Encuentra todas las palabras!', 'info');
+}
+
+// Generar la grilla de sopa de letras
+function generateWordSearchGrid() {
+    const gridSize = 15;
+    const grid = Array(gridSize).fill(null).map(() => Array(gridSize).fill(''));
+    const placedWords = [];
+
+    // Direcciones: horizontal, vertical, diagonal
+    const directions = [
+        {dx: 1, dy: 0},  // horizontal derecha
+        {dx: 0, dy: 1},  // vertical abajo
+        {dx: 1, dy: 1},  // diagonal abajo-derecha
+        {dx: 1, dy: -1}  // diagonal arriba-derecha
+    ];
+
+    // Intentar colocar cada palabra
+    for (const word of wordSearchWords) {
+        let placed = false;
+        let attempts = 0;
+        const maxAttempts = 100;
+
+        while (!placed && attempts < maxAttempts) {
+            attempts++;
+
+            // Elegir dirección aleatoria
+            const dir = directions[Math.floor(Math.random() * directions.length)];
+
+            // Elegir posición inicial aleatoria
+            const startX = Math.floor(Math.random() * gridSize);
+            const startY = Math.floor(Math.random() * gridSize);
+
+            // Verificar si la palabra cabe
+            const endX = startX + dir.dx * (word.length - 1);
+            const endY = startY + dir.dy * (word.length - 1);
+
+            if (endX >= 0 && endX < gridSize && endY >= 0 && endY < gridSize) {
+                // Verificar si hay espacio
+                let canPlace = true;
+                const positions = [];
+
+                for (let i = 0; i < word.length; i++) {
+                    const x = startX + dir.dx * i;
+                    const y = startY + dir.dy * i;
+                    positions.push({x, y});
+
+                    if (grid[y][x] !== '' && grid[y][x] !== word[i]) {
+                        canPlace = false;
+                        break;
+                    }
+                }
+
+                if (canPlace) {
+                    // Colocar la palabra
+                    for (let i = 0; i < word.length; i++) {
+                        const pos = positions[i];
+                        grid[pos.y][pos.x] = word[i];
+                    }
+                    placedWords.push({word, positions});
+                    placed = true;
+                }
+            }
+        }
+    }
+
+    // Llenar espacios vacíos con letras aleatorias
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (let y = 0; y < gridSize; y++) {
+        for (let x = 0; x < gridSize; x++) {
+            if (grid[y][x] === '') {
+                grid[y][x] = letters[Math.floor(Math.random() * letters.length)];
+            }
+        }
+    }
+
+    wordSearchGrid = grid;
+}
+
+// Renderizar la grilla en el HTML
+function renderWordSearchGrid() {
+    const gridContainer = document.getElementById('wordSearchGrid');
+    gridContainer.innerHTML = '';
+
+    for (let y = 0; y < wordSearchGrid.length; y++) {
+        for (let x = 0; x < wordSearchGrid[y].length; x++) {
+            const cell = document.createElement('div');
+            cell.className = 'word-cell';
+            cell.textContent = wordSearchGrid[y][x];
+            cell.dataset.x = x;
+            cell.dataset.y = y;
+
+            // Eventos para selección
+            cell.addEventListener('mousedown', handleCellMouseDown);
+            cell.addEventListener('mouseenter', handleCellMouseEnter);
+            cell.addEventListener('mouseup', handleCellMouseUp);
+
+            gridContainer.appendChild(cell);
+        }
+    }
+
+    // Event listener global para mouseup
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+}
+
+// Renderizar lista de palabras
+function renderWordsList() {
+    const wordsListContainer = document.getElementById('wordsList');
+    wordsListContainer.innerHTML = '';
+
+    wordSearchWords.forEach(word => {
+        const wordItem = document.createElement('div');
+        wordItem.className = 'word-item';
+        if (wordsFoundList.includes(word)) {
+            wordItem.classList.add('found');
+        }
+        wordItem.textContent = word;
+        wordsListContainer.appendChild(wordItem);
+    });
+
+    // Actualizar contadores
+    document.getElementById('wordsFound').textContent = wordsFoundList.length;
+    document.getElementById('totalWords').textContent = wordSearchWords.length;
+    document.getElementById('wordSearchScore').textContent = wordSearchScore;
+}
+
+// Manejar eventos de selección
+function handleCellMouseDown(e) {
+    isSelecting = true;
+    wordSearchSelection = [{
+        x: parseInt(e.target.dataset.x),
+        y: parseInt(e.target.dataset.y)
+    }];
+    e.target.classList.add('selecting');
+}
+
+function handleCellMouseEnter(e) {
+    if (!isSelecting) return;
+
+    const x = parseInt(e.target.dataset.x);
+    const y = parseInt(e.target.dataset.y);
+
+    // Agregar a la selección
+    if (wordSearchSelection.length === 0 ||
+        wordSearchSelection[wordSearchSelection.length - 1].x !== x ||
+        wordSearchSelection[wordSearchSelection.length - 1].y !== y) {
+
+        wordSearchSelection.push({x, y});
+        e.target.classList.add('selecting');
+    }
+}
+
+function handleCellMouseUp(e) {
+    if (!isSelecting) return;
+    checkWordSelection();
+    clearSelection();
+    isSelecting = false;
+}
+
+function handleGlobalMouseUp() {
+    if (isSelecting) {
+        checkWordSelection();
+        clearSelection();
+        isSelecting = false;
+    }
+}
+
+// Verificar si la selección forma una palabra válida
+function checkWordSelection() {
+    if (wordSearchSelection.length < 2) return;
+
+    // Obtener la palabra seleccionada
+    let selectedWord = '';
+    for (const pos of wordSearchSelection) {
+        selectedWord += wordSearchGrid[pos.y][pos.x];
+    }
+
+    // También verificar al revés
+    const reversedWord = selectedWord.split('').reverse().join('');
+
+    // Verificar si es una palabra válida
+    if (wordSearchWords.includes(selectedWord) && !wordsFoundList.includes(selectedWord)) {
+        wordsFoundList.push(selectedWord);
+        wordSearchScore += 100;
+        markWordAsFound(wordSearchSelection);
+        renderWordsList();
+        showToast(`✅ ¡Encontraste "${selectedWord}"!`, 'success');
+
+        // Verificar si se encontraron todas las palabras
+        if (wordsFoundList.length === wordSearchWords.length) {
+            setTimeout(() => finishWordSearch(), 500);
+        }
+    } else if (wordSearchWords.includes(reversedWord) && !wordsFoundList.includes(reversedWord)) {
+        wordsFoundList.push(reversedWord);
+        wordSearchScore += 100;
+        markWordAsFound(wordSearchSelection);
+        renderWordsList();
+        showToast(`✅ ¡Encontraste "${reversedWord}"!`, 'success');
+
+        if (wordsFoundList.length === wordSearchWords.length) {
+            setTimeout(() => finishWordSearch(), 500);
+        }
+    }
+}
+
+// Marcar palabra como encontrada en la grilla
+function markWordAsFound(positions) {
+    positions.forEach(pos => {
+        const cells = document.querySelectorAll('.word-cell');
+        const index = pos.y * wordSearchGrid.length + pos.x;
+        if (cells[index]) {
+            cells[index].classList.add('found');
+        }
+    });
+}
+
+// Limpiar selección actual
+function clearSelection() {
+    document.querySelectorAll('.word-cell.selecting').forEach(cell => {
+        cell.classList.remove('selecting');
+    });
+    wordSearchSelection = [];
+}
+
+// Timer de sopa de letras
+function startWordSearchTimer() {
+    if (wordSearchTimer) clearInterval(wordSearchTimer);
+
+    const timerElement = document.getElementById('wordSearchTimer');
+
+    wordSearchTimer = setInterval(() => {
+        wordSearchRemainingTime--;
+
+        const minutes = Math.floor(wordSearchRemainingTime / 60);
+        const seconds = wordSearchRemainingTime % 60;
+        timerElement.textContent = `${minutes}:${String(seconds).padStart(2, '0')}`;
+
+        if (wordSearchRemainingTime <= 0) {
+            clearInterval(wordSearchTimer);
+            finishWordSearch();
+        }
+    }, 1000);
+}
+
+// Finalizar sopa de letras
+function finishWordSearch() {
+    if (wordSearchTimer) clearInterval(wordSearchTimer);
+
+    const timeElapsed = Math.floor((Date.now() - wordSearchStartTime) / 1000);
+    const totalWords = wordSearchWords.length;
+    const wordsFound = wordsFoundList.length;
+    const scorePercentage = Math.round((wordsFound / totalWords) * 100);
+
+    // Guardar resultado
+    if (!isPracticeMode) {
+        const result = {
+            user: currentUser.name,
+            email: currentUser.email,
+            test: 'Sopa de Letras',
+            testType: currentTestType,
+            score: scorePercentage,
+            time: timeElapsed,
+            timestamp: new Date().toISOString()
+        };
+
+        const results = JSON.parse(localStorage.getItem('results') || '[]');
+        results.push(result);
+        localStorage.setItem('results', JSON.stringify(results));
+
+        incrementAttempts(currentTestType);
+        addXP(50);
+    }
+
+    showResults(scorePercentage, 'Sopa de Letras');
+}
+
+// ========================================
+// SISTEMA DE CÓDIGOS DE EXAMEN
+// ========================================
+
+// Variables globales
+let currentExamCode = null;
+
+// Mostrar pantalla de ingreso de código
+function showCodeEntry() {
+    document.getElementById('userName2').textContent = currentUser.name;
+    showScreen('codeEntryScreen');
+}
+
+// Saltar ingreso de código
+function skipCodeEntry() {
+    showScreen('welcomeScreen');
+}
+
+// Generar nuevo código
+function generateNewCode() {
+    const prefix = 'EXAM';
+    const year = new Date().getFullYear();
+    const random = Math.random().toString(36).substring(2, 8).toUpperCase();
+    const code = `${prefix}-${year}-${random}`;
+
+    const codeInput = document.getElementById('generatedCode');
+    if (codeInput) {
+        codeInput.value = code;
+    }
+}
+
+// Validar código de examen
+function validateExamCode() {
+    const codeInput = document.getElementById('examCodeInput');
+    const code = codeInput.value.trim().toUpperCase();
+
+    if (!code) {
+        showToast('❌ Por favor ingresa un código', 'error');
+        return;
+    }
+
+    // Obtener códigos del localStorage
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '[]');
+    const foundCode = examCodes.find(c => c.code === code);
+
+    if (!foundCode) {
+        showToast('❌ Código inválido', 'error');
+        return;
+    }
+
+    // Verificar si está expirado
+    if (foundCode.expiration && new Date(foundCode.expiration) < new Date()) {
+        showToast('❌ Este código ha expirado', 'error');
+        return;
+    }
+
+    // Verificar usos máximos
+    if (foundCode.maxUses > 0 && foundCode.uses >= foundCode.maxUses) {
+        showToast('❌ Este código ha alcanzado el límite de usos', 'error');
+        return;
+    }
+
+    // Verificar si el usuario ya usó este código
+    const userEmail = currentUser.email;
+    if (foundCode.usedBy && foundCode.usedBy.includes(userEmail)) {
+        showToast('⚠️ Ya has usado este código anteriormente', 'warning');
+        currentExamCode = foundCode;
+        applyExamCodeRestrictions();
+        showScreen('welcomeScreen');
+        return;
+    }
+
+    // Incrementar uso del código
+    foundCode.uses = (foundCode.uses || 0) + 1;
+    if (!foundCode.usedBy) foundCode.usedBy = [];
+    foundCode.usedBy.push(userEmail);
+
+    // Guardar cambios
+    localStorage.setItem('examCodes', JSON.stringify(examCodes));
+
+    currentExamCode = foundCode;
+    applyExamCodeRestrictions();
+
+    showToast(`✅ Código validado: ${foundCode.name}`, 'success');
+    showScreen('welcomeScreen');
+}
+
+// Aplicar restricciones del código de examen
+function applyExamCodeRestrictions() {
+    if (!currentExamCode) return;
+
+    // Mostrar/ocultar tipos de test según el código
+    const preCard = document.querySelector('.pre-card');
+    const postCard = document.querySelector('.post-card');
+
+    if (currentExamCode.testType === 'pre') {
+        if (preCard) preCard.style.display = '';
+        if (postCard) postCard.style.display = 'none';
+    } else if (currentExamCode.testType === 'post') {
+        if (preCard) preCard.style.display = 'none';
+        if (postCard) postCard.style.display = '';
+    } else {
+        if (preCard) preCard.style.display = '';
+        if (postCard) postCard.style.display = '';
+    }
+
+    // Mostrar/ocultar pruebas específicas
+    const testsAvailable = currentExamCode.testsAvailable || [];
+
+    // Manejar visibilidad de pruebas en el menú
+    setTimeout(() => {
+        if (!testsAvailable.includes('quiz')) {
+            document.querySelector('[onclick="startTest(\'quiz\')"]')?.parentElement?.style.setProperty('display', 'none');
+        }
+        if (!testsAvailable.includes('errors')) {
+            document.querySelector('[onclick="startTest(\'errors\')"]')?.parentElement?.style.setProperty('display', 'none');
+        }
+        if (!testsAvailable.includes('builder')) {
+            document.querySelector('[onclick="startTest(\'builder\')"]')?.parentElement?.style.setProperty('display', 'none');
+        }
+        if (!testsAvailable.includes('interview')) {
+            document.querySelector('[onclick="startTest(\'interview\')"]')?.parentElement?.style.setProperty('display', 'none');
+        }
+
+        // Mostrar sopa de letras solo si está en la lista Y es PRE-TEST
+        const wordSearchCard = document.getElementById('wordSearchCard');
+        if (wordSearchCard) {
+            if (testsAvailable.includes('wordsearch') && currentTestType === 'pre') {
+                wordSearchCard.style.display = '';
+            } else {
+                wordSearchCard.style.display = 'none';
+            }
+        }
+    }, 100);
+}
+
+// Crear código de examen (admin)
+function createExamCode() {
+    const codeName = document.getElementById('codeName').value.trim();
+    const code = document.getElementById('generatedCode').value.trim();
+    const testType = document.getElementById('codeTestType').value;
+    const expiration = document.getElementById('codeExpiration').value;
+    const maxUses = parseInt(document.getElementById('codeMaxUses').value) || 0;
+
+    // Obtener pruebas seleccionadas
+    const testsSelect = document.getElementById('codeTestsAvailable');
+    const testsAvailable = Array.from(testsSelect.selectedOptions).map(opt => opt.value);
+
+    if (!codeName || !code) {
+        showToast('❌ Por favor completa todos los campos obligatorios', 'error');
+        return;
+    }
+
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '[]');
+
+    // Verificar si el código ya existe
+    if (examCodes.find(c => c.code === code)) {
+        showToast('❌ Este código ya existe', 'error');
+        return;
+    }
+
+    const newCode = {
+        id: Date.now(),
+        code: code,
+        name: codeName,
+        testType: testType,
+        testsAvailable: testsAvailable,
+        expiration: expiration || null,
+        maxUses: maxUses,
+        uses: 0,
+        usedBy: [],
+        createdAt: new Date().toISOString()
+    };
+
+    examCodes.push(newCode);
+    localStorage.setItem('examCodes', JSON.stringify(examCodes));
+
+    showToast('✅ Código creado exitosamente', 'success');
+
+    // Limpiar formulario
+    document.getElementById('codeName').value = '';
+    document.getElementById('codeExpiration').value = '';
+    document.getElementById('codeMaxUses').value = '0';
+    generateNewCode();
+
+    // Recargar tabla
+    loadCodesTable();
+}
+
+// Cargar tabla de códigos
+function loadCodesTable() {
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '[]');
+    const tbody = document.getElementById('codesTableBody');
+
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (examCodes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No hay códigos creados</td></tr>';
+        return;
+    }
+
+    examCodes.reverse().forEach(code => {
+        const tr = document.createElement('tr');
+
+        // Estado
+        let status = '✅ Activo';
+        if (code.expiration && new Date(code.expiration) < new Date()) {
+            status = '❌ Expirado';
+        } else if (code.maxUses > 0 && code.uses >= code.maxUses) {
+            status = '⚠️ Límite alcanzado';
+        }
+
+        // Tipo
+        let typeLabel = code.testType;
+        if (code.testType === 'pre') typeLabel = 'PRE-TEST';
+        else if (code.testType === 'post') typeLabel = 'POST-TEST';
+        else if (code.testType === 'both') typeLabel = 'PRE y POST';
+
+        // Expiración
+        let expirationText = 'Sin expiración';
+        if (code.expiration) {
+            const date = new Date(code.expiration);
+            expirationText = date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+        }
+
+        // Usos
+        let usesText = code.uses;
+        if (code.maxUses > 0) {
+            usesText += ` / ${code.maxUses}`;
+        } else {
+            usesText += ' / ∞';
+        }
+
+        tr.innerHTML = `
+            <td><strong>${code.code}</strong></td>
+            <td>${code.name}</td>
+            <td>${typeLabel}</td>
+            <td>${usesText}</td>
+            <td>${expirationText}</td>
+            <td>${status}</td>
+            <td>
+                <button class="btn-action-small" onclick="viewCodeDetails(${code.id})" title="Ver detalles">👁️</button>
+                <button class="btn-action-small" onclick="deleteExamCode(${code.id})" title="Eliminar">🗑️</button>
+            </td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+}
+
+// Ver detalles de código
+function viewCodeDetails(codeId) {
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '[]');
+    const code = examCodes.find(c => c.id === codeId);
+
+    if (!code) return;
+
+    const details = `
+Código: ${code.code}
+Nombre: ${code.name}
+Tipo: ${code.testType}
+Pruebas disponibles: ${code.testsAvailable.join(', ')}
+Usos: ${code.uses}${code.maxUses > 0 ? ' / ' + code.maxUses : ''}
+Usuarios que lo usaron: ${code.usedBy?.length || 0}
+    `;
+
+    alert(details);
+}
+
+// Eliminar código de examen
+function deleteExamCode(codeId) {
+    if (!confirm('¿Estás seguro de que deseas eliminar este código?')) return;
+
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '[]');
+    const filteredCodes = examCodes.filter(c => c.id !== codeId);
+
+    localStorage.setItem('examCodes', JSON.stringify(filteredCodes));
+    showToast('Código eliminado', 'info');
+    loadCodesTable();
+}
+
+// Mostrar tab del admin
+function showAdminTab(tab) {
+    // Remover active de todos los tabs
+    document.querySelectorAll('.dashboard-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.admin-tab-content').forEach(c => c.classList.remove('active'));
+
+    if (tab === 'results') {
+        document.querySelector('[onclick="showAdminTab(\'results\')"]').classList.add('active');
+        document.getElementById('resultsTabContent').classList.add('active');
+    } else if (tab === 'codes') {
+        document.querySelector('[onclick="showAdminTab(\'codes\')"]').classList.add('active');
+        document.getElementById('codesTabContent').classList.add('active');
+        loadCodesTable();
+    }
+}
+
+// Actualizar selectTest para mostrar sopa de letras en PRE-TEST
+const originalSelectTest = window.selectTest;
+function selectTest(type) {
+    currentTestType = type;
+
+    // Mostrar sopa de letras solo en PRE-TEST
+    const wordSearchCard = document.getElementById('wordSearchCard');
+    if (wordSearchCard) {
+        if (type === 'pre') {
+            wordSearchCard.style.display = '';
+        } else {
+            wordSearchCard.style.display = 'none';
+        }
+    }
+
+    // Llamar a la función original
+    if (originalSelectTest) {
+        originalSelectTest(type);
+    } else {
+        showScreen('testMenuScreen');
+        document.getElementById('testTypeBadge').textContent = type === 'pre' ? 'PRE-TEST' : 'POST-TEST';
+
+        // Verificar si puede tomar el test
+        if (!canTakeTest(type) && !isPracticeMode) {
+            showToast('❌ Has alcanzado el número máximo de intentos', 'error');
+            setTimeout(() => goToWelcome(), 1500);
+        }
+    }
+}
+
+// Exportar funciones globales
+window.startWordSearch = startWordSearch;
+window.finishWordSearch = finishWordSearch;
+window.showCodeEntry = showCodeEntry;
+window.skipCodeEntry = skipCodeEntry;
+window.validateExamCode = validateExamCode;
+window.generateNewCode = generateNewCode;
+window.createExamCode = createExamCode;
+window.deleteExamCode = deleteExamCode;
+window.viewCodeDetails = viewCodeDetails;
+window.showAdminTab = showAdminTab;
+window.selectTest = selectTest;
+
+console.log('✅ Sistema de Sopa de Letras y Códigos de Examen cargado');

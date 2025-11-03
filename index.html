@@ -126,6 +126,14 @@
         <div class="container">
             <div class="dashboard-header">
                 <h1>Dashboard de Administración</h1>
+                <div class="dashboard-tabs">
+                    <button class="dashboard-tab active" onclick="showAdminTab('results')">
+                        📊 Resultados
+                    </button>
+                    <button class="dashboard-tab" onclick="showAdminTab('codes')">
+                        🔑 Códigos de Examen
+                    </button>
+                </div>
                 <div class="dashboard-actions">
                     <button class="btn-action" onclick="exportToExcel()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -187,36 +195,168 @@
                     </div>
                 </div>
             </div>
-            <div class="filters-section">
-                <input type="text" id="searchUser" placeholder="Buscar por nombre o email..." class="search-input">
-                <select id="filterTest" class="filter-select">
-                    <option value="">Todas las pruebas</option>
-                    <option value="Cuestionario">Cuestionario</option>
-                    <option value="Detectar Errores">Detectar Errores</option>
-                    <option value="Construir CV">Construir CV</option>
-                </select>
-                <select id="filterType" class="filter-select">
-                    <option value="">PRE y POST</option>
-                    <option value="pre">Solo PRE-TEST</option>
-                    <option value="post">Solo POST-TEST</option>
-                </select>
+            <!-- Tab Resultados -->
+            <div class="admin-tab-content active" id="resultsTabContent">
+                <div class="filters-section">
+                    <input type="text" id="searchUser" placeholder="Buscar por nombre o email..." class="search-input">
+                    <select id="filterTest" class="filter-select">
+                        <option value="">Todas las pruebas</option>
+                        <option value="Cuestionario">Cuestionario</option>
+                        <option value="Detectar Errores">Detectar Errores</option>
+                        <option value="Construir CV">Construir CV</option>
+                    </select>
+                    <select id="filterType" class="filter-select">
+                        <option value="">PRE y POST</option>
+                        <option value="pre">Solo PRE-TEST</option>
+                        <option value="post">Solo POST-TEST</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Prueba</th>
+                                <th>Tipo</th>
+                                <th>Puntuación</th>
+                                <th>Tiempo</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody"></tbody>
+                    </table>
+                </div>
             </div>
-            <div class="table-container">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Email</th>
-                            <th>Prueba</th>
-                            <th>Tipo</th>
-                            <th>Puntuación</th>
-                            <th>Tiempo</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTableBody"></tbody>
-                </table>
+
+            <!-- Tab Códigos de Examen -->
+            <div class="admin-tab-content" id="codesTabContent">
+                <div class="codes-section">
+                    <div class="create-code-card">
+                        <h2>🔑 Crear Nuevo Código de Examen</h2>
+                        <div class="code-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nombre del Código:</label>
+                                    <input type="text" id="codeName" placeholder="Ej: Evaluación Grupo A" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Código (generado automáticamente):</label>
+                                    <div class="code-display-group">
+                                        <input type="text" id="generatedCode" readonly class="form-input code-display">
+                                        <button class="btn-icon-action" onclick="generateNewCode()" title="Generar nuevo código">
+                                            🔄
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Tipo de Examen:</label>
+                                    <select id="codeTestType" class="form-select">
+                                        <option value="pre">PRE-TEST</option>
+                                        <option value="post">POST-TEST</option>
+                                        <option value="both">PRE y POST</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pruebas Disponibles:</label>
+                                    <select id="codeTestsAvailable" class="form-select" multiple size="5">
+                                        <option value="quiz" selected>Cuestionario</option>
+                                        <option value="errors" selected>Detectar Errores</option>
+                                        <option value="builder" selected>Construir CV</option>
+                                        <option value="interview" selected>Simulador de Entrevista</option>
+                                        <option value="wordsearch" selected>Sopa de Letras</option>
+                                    </select>
+                                    <small>Mantén presionado Ctrl/Cmd para seleccionar múltiples</small>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Fecha de Expiración:</label>
+                                    <input type="datetime-local" id="codeExpiration" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Usos Máximos (0 = ilimitado):</label>
+                                    <input type="number" id="codeMaxUses" value="0" min="0" class="form-input">
+                                </div>
+                            </div>
+                            <button class="btn-create-code" onclick="createExamCode()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Crear Código
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="codes-list-section">
+                        <h2>📋 Códigos Creados</h2>
+                        <div class="table-container">
+                            <table class="results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Usos</th>
+                                        <th>Expira</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="codesTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INGRESAR CÓDIGO -->
+    <div class="screen" id="codeEntryScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    </svg>
+                    <span>Ingreso de Código</span>
+                </div>
+                <div class="nav-user">
+                    <span id="userName2">Usuario</span>
+                    <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="welcome-container">
+            <div class="welcome-content">
+                <div class="code-entry-card">
+                    <div class="code-entry-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                    </div>
+                    <h2>¿Tienes un código de examen?</h2>
+                    <p>Ingresa el código que te proporcionó tu instructor</p>
+                    <div class="code-entry-form">
+                        <input type="text" id="examCodeInput" placeholder="Ej: EXAM-2024-ABC123" class="code-input" maxlength="20">
+                        <button class="btn-validate-code" onclick="validateExamCode()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Validar Código
+                        </button>
+                    </div>
+                    <div class="code-skip-section">
+                        <p>o</p>
+                        <button class="btn-skip-code" onclick="skipCodeEntry()">
+                            Continuar sin código
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -239,7 +379,12 @@
                     </button>
                     <button class="btn-icon" onclick="showProgress()" title="Mi progreso">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 4 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="showCodeEntry()" title="Ingresar código">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                         </svg>
                     </button>
                     <span id="userName">Usuario</span>
@@ -404,6 +549,16 @@
     <p>Practica respuestas a preguntas comunes</p>
     <button class="test-start-btn">Iniciar →</button>
 </div>
+                <div class="test-card modern" onclick="startTest('wordsearch')" id="wordSearchCard" style="display: none;">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+    </div>
+    <h3>🔍 Sopa de Letras</h3>
+    <p>Encuentra palabras sobre términos laborales</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
             </div>
         </div>
     </div>
@@ -487,6 +642,61 @@
         </nav>
         <div class="container-narrow">
             <div id="cvBuilderContainer"></div>
+        </div>
+    </div>
+
+    <!-- SOPA DE LETRAS -->
+    <div class="screen" id="wordSearchScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>🔍 Sopa de Letras</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge6">PRE-TEST</span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="wordSearchTimer">10:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="wordsearch-layout">
+                <div class="wordsearch-sidebar">
+                    <div class="wordsearch-info-card">
+                        <h3>📋 Instrucciones</h3>
+                        <p>Encuentra todas las palabras relacionadas con el mundo laboral en la sopa de letras.</p>
+                        <ul>
+                            <li>✅ Selecciona las letras arrastrando el mouse</li>
+                            <li>✅ Las palabras pueden estar en horizontal, vertical o diagonal</li>
+                            <li>✅ Las palabras encontradas se marcarán en color</li>
+                        </ul>
+                    </div>
+                    <div class="wordsearch-words-list">
+                        <h3>🎯 Palabras a encontrar</h3>
+                        <div id="wordsList"></div>
+                    </div>
+                    <div class="wordsearch-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Palabras encontradas:</span>
+                            <span class="stat-value"><strong id="wordsFound">0</strong> / <strong id="totalWords">0</strong></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Puntuación:</span>
+                            <span class="stat-value"><strong id="wordSearchScore">0</strong> puntos</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wordsearch-main">
+                    <div class="wordsearch-grid" id="wordSearchGrid"></div>
+                    <div class="wordsearch-actions">
+                        <button class="btn-action secondary" onclick="confirmExit()">Cancelar</button>
+                        <button class="btn-action primary" onclick="finishWordSearch()">Finalizar</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
