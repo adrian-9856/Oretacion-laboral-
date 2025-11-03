@@ -902,6 +902,13 @@
                 </div>
 
                 <div class="avatar-export-actions">
+                    <button class="btn-export camera" onclick="togglePhotoCapture()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        📸 Tomar Foto
+                    </button>
                     <button class="btn-export svg" onclick="exportAvatar('svg')">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -914,6 +921,23 @@
                         </svg>
                         Descargar PNG
                     </button>
+                </div>
+
+                <!-- Sección de Captura de Foto -->
+                <div class="photo-capture-section" id="photoCaptureSection" style="display: none;">
+                    <div class="camera-preview">
+                        <video id="cameraVideo" autoplay playsinline></video>
+                        <canvas id="photoCanvas" style="display: none;"></canvas>
+                        <img id="capturedPhoto" style="display: none;">
+                    </div>
+                    <div class="camera-controls">
+                        <button class="btn-capture" onclick="capturePhoto()">
+                            📸 Capturar
+                        </button>
+                        <button class="btn-cancel" onclick="closePhotoCapture()">
+                            ❌ Cancelar
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -1019,6 +1043,86 @@
                         </svg>
                         Guardar Avatar
                     </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JUEGO DE FORTALEZAS Y DEBILIDADES -->
+<div class="screen" id="strengthsGameScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <span>🎮 Juego de Fortalezas y Debilidades</span>
+            </div>
+            <div class="nav-user">
+                <span id="userName6">Usuario</span>
+                <button class="btn-logout" onclick="completeOnboardingAndGoToWelcome()">Continuar →</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="strengths-game-layout">
+            <!-- Sección de Video -->
+            <div class="video-section">
+                <h2>📺 Video Tutorial</h2>
+                <p class="video-description">Mira este video para aprender sobre fortalezas y debilidades laborales</p>
+
+                <!-- El video de YouTube se insertará aquí -->
+                <div class="video-container" id="youtubeVideoContainer">
+                    <iframe
+                        id="youtubeVideo"
+                        width="100%"
+                        height="315"
+                        src=""
+                        title="Video sobre fortalezas y debilidades"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+
+                <div class="video-url-input">
+                    <label>🔗 URL del Video de YouTube:</label>
+                    <input
+                        type="text"
+                        id="youtubeUrlInput"
+                        placeholder="https://www.youtube.com/watch?v=..."
+                        value="">
+                    <button class="btn-load-video" onclick="loadYouTubeVideo()">Cargar Video</button>
+                </div>
+            </div>
+
+            <!-- Sección del Juego -->
+            <div class="game-section">
+                <h2>🎯 Identifica tus Fortalezas y Debilidades</h2>
+
+                <div class="game-progress">
+                    <div class="progress-bar-game">
+                        <div class="progress-fill-game" id="gameProgress" style="width: 0%"></div>
+                    </div>
+                    <p class="progress-text"><span id="currentGameQuestion">1</span> de <span id="totalGameQuestions">5</span></p>
+                </div>
+
+                <div class="question-container-game" id="gameQuestionContainer">
+                    <!-- Las preguntas se cargarán aquí dinámicamente -->
+                </div>
+
+                <div class="game-navigation">
+                    <button class="btn-secondary" onclick="completeOnboardingAndGoToWelcome()">Saltar</button>
+                    <button class="btn-primary" id="nextGameBtn" onclick="nextGameQuestion()">Siguiente</button>
+                </div>
+
+                <div class="game-results" id="gameResults" style="display: none;">
+                    <h3>🎉 ¡Juego Completado!</h3>
+                    <div class="results-summary" id="gameSummary"></div>
+                    <button class="btn-primary" onclick="completeOnboardingAndGoToWelcome()">Ir a la Plataforma →</button>
                 </div>
             </div>
         </div>

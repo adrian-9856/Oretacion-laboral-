@@ -409,7 +409,7 @@ document.getElementById('adminLoginForm')?.addEventListener('submit', function(e
 // Registro
 document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     const userData = {
         name: document.getElementById('regName').value,
         lastName: document.getElementById('regLastName').value,
@@ -417,23 +417,34 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
         phone: document.getElementById('regPhone').value,
         age: document.getElementById('regAge').value,
         password: document.getElementById('regPassword').value,
-        registeredAt: new Date().toISOString()
+        registeredAt: new Date().toISOString(),
+        needsOnboarding: true // Marcar que necesita completar el onboarding
     };
-    
+
     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
+
     if (users.find(u => u.email === userData.email)) {
         showToast('❌ Este correo ya está registrado', 'error');
         return;
     }
-    
+
     users.push(userData);
     localStorage.setItem('users', JSON.stringify(users));
-    
+
+    // Loguear automáticamente al usuario recién registrado
+    currentUser = userData;
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
     await sendToGoogleSheets(userData, 'registro');
-    
-    showToast('✅ Cuenta creada exitosamente', 'success');
-    showLoginTab('login');
+
+    showToast('✅ Cuenta creada exitosamente! Ahora crea tu avatar 🎨', 'success');
+
+    // Ir directo a la creación de avatar
+    setTimeout(() => {
+        showScreen('avatarCreatorScreen');
+        initializeAvatarCreator();
+    }, 1000);
+
     document.getElementById('registerForm').reset();
 });
 
@@ -532,14 +543,7 @@ function enablePracticeMode() {
 // NAVEGACIÓN
 // ========================================
 
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const screen = document.getElementById(screenId);
-    if (screen) {
-        screen.classList.add('active');
-        window.scrollTo(0, 0);
-    }
-}
+// NOTA: showScreen() mejorada está definida más adelante con soporte para avatar (línea ~3472)
 
 function selectTest(type) {
     if (!canTakeTest(type) && !isPracticeMode) {
@@ -577,22 +581,7 @@ function showProgress() {
     showScreen('progressScreen');
 }
 
-function startTest(testType) {
-    startTime = Date.now();
-    
-    if (testType === 'quiz') {
-        currentQuizQuestion = 0;
-        quizAnswers = [];
-        remainingTime = CONFIG.QUIZ_TIME_LIMIT;
-        showScreen('quizScreen');
-        loadQuestion();
-        startCountdown();
-    } else if (testType === 'errors') {
-        startErrorDetection();
-    } else if (testType === 'builder') {
-        startCVBuilder();
-    }
-}
+// NOTA: startTest() está definida más adelante con soporte para interview (línea ~2329)
 // ========================================
 // TIMER CON CUENTA REGRESIVA
 // ========================================
@@ -3075,6 +3064,123 @@ function saveAvatarPro() {
     updateUserAvatarPro();
 
     showToast('¡Avatar guardado exitosamente!', 'success');
+
+    // Si es un nuevo usuario, ir al juego de fortalezas y debilidades
+    if (currentUser.needsOnboarding) {
+        setTimeout(() => {
+            showToast('🎮 Ahora juega al juego de fortalezas y debilidades!', 'info');
+            showScreen('strengthsGameScreen');
+        }, 1500);
+
+        // Actualizar el usuario para marcar que completó el avatar
+        currentUser.needsOnboarding = false;
+        currentUser.hasAvatar = true;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Actualizar en la lista de usuarios
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.email === currentUser.email);
+        if (userIndex !== -1) {
+            users[userIndex] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+    }
+}
+
+// ========================================
+// FUNCIONES DE CAPTURA DE FOTO
+// ========================================
+
+let cameraStream = null;
+
+function togglePhotoCapture() {
+    const photoSection = document.getElementById('photoCaptureSection');
+    if (photoSection.style.display === 'none') {
+        photoSection.style.display = 'block';
+        startCamera();
+    } else {
+        closePhotoCapture();
+    }
+}
+
+async function startCamera() {
+    try {
+        const video = document.getElementById('cameraVideo');
+        cameraStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                facingMode: 'user',
+                width: { ideal: 640 },
+                height: { ideal: 480 }
+            }
+        });
+        video.srcObject = cameraStream;
+        showToast('📸 Cámara activada! Sonríe y captura tu foto', 'info');
+    } catch (error) {
+        console.error('Error al acceder a la cámara:', error);
+        showToast('❌ No se pudo acceder a la cámara. Verifica los permisos.', 'error');
+    }
+}
+
+function capturePhoto() {
+    const video = document.getElementById('cameraVideo');
+    const canvas = document.getElementById('photoCanvas');
+    const capturedPhoto = document.getElementById('capturedPhoto');
+
+    // Configurar canvas con las dimensiones del video
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    // Capturar frame del video
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convertir a imagen
+    const photoDataURL = canvas.toDataURL('image/png');
+
+    // Mostrar la foto capturada
+    capturedPhoto.src = photoDataURL;
+    capturedPhoto.style.display = 'block';
+    video.style.display = 'none';
+
+    // Guardar la foto para el usuario
+    if (currentUser) {
+        localStorage.setItem(`user_photo_${currentUser.email}`, photoDataURL);
+
+        // También actualizar el avatar preview con la foto
+        document.getElementById('avatarPreviewLarge').src = photoDataURL;
+
+        showToast('✅ Foto capturada! Puedes usarla como avatar', 'success');
+
+        // Cambiar el botón de captura a "Guardar Foto"
+        const captureBtn = document.querySelector('.btn-capture');
+        captureBtn.textContent = '✅ Usar como Avatar';
+        captureBtn.onclick = function() {
+            closePhotoCapture();
+            showToast('📸 Foto establecida como tu avatar!', 'success');
+        };
+    }
+}
+
+function closePhotoCapture() {
+    const photoSection = document.getElementById('photoCaptureSection');
+    const video = document.getElementById('cameraVideo');
+    const capturedPhoto = document.getElementById('capturedPhoto');
+
+    // Detener la cámara
+    if (cameraStream) {
+        cameraStream.getTracks().forEach(track => track.stop());
+        cameraStream = null;
+    }
+
+    // Ocultar la sección
+    photoSection.style.display = 'none';
+    video.style.display = 'block';
+    capturedPhoto.style.display = 'none';
+
+    // Restaurar botón de captura
+    const captureBtn = document.querySelector('.btn-capture');
+    captureBtn.textContent = '📸 Capturar';
+    captureBtn.onclick = capturePhoto;
 }
 
 // Actualizar avatar del usuario en la navegación
@@ -3471,7 +3577,16 @@ function deleteRecording() {
 
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+
+    // Validar que el elemento existe antes de añadir la clase
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.classList.add('active');
+        window.scrollTo(0, 0); // Scroll al inicio de la página
+    } else {
+        console.error(`❌ Screen no encontrada: ${screenId}`);
+        return;
+    }
 
     // Cargar avatar si el usuario está logueado
     if (currentUser) {
@@ -3481,15 +3596,267 @@ function showScreen(screenId) {
             updateUserAvatar();
         }
     }
+
+    // Inicializar el juego de fortalezas si se muestra esa pantalla
+    if (screenId === 'strengthsGameScreen') {
+        initializeStrengthsGame();
+    }
 }
 
-function goToWelcome() {
+// NOTA: goToWelcome() y goToMenu() están definidas anteriormente con reset (líneas ~557-565)
+
+// ========================================
+// JUEGO DE FORTALEZAS Y DEBILIDADES
+// ========================================
+
+const strengthsGameQuestions = [
+    {
+        question: '¿Cuál de estas consideras tu mayor fortaleza en el trabajo?',
+        options: [
+            { text: 'Comunicación efectiva', type: 'strength' },
+            { text: 'Trabajo en equipo', type: 'strength' },
+            { text: 'Resolución de problemas', type: 'strength' },
+            { text: 'Liderazgo', type: 'strength' }
+        ]
+    },
+    {
+        question: '¿En qué área crees que necesitas mejorar?',
+        options: [
+            { text: 'Gestión del tiempo', type: 'weakness' },
+            { text: 'Hablar en público', type: 'weakness' },
+            { text: 'Delegar tareas', type: 'weakness' },
+            { text: 'Manejo del estrés', type: 'weakness' }
+        ]
+    },
+    {
+        question: '¿Qué habilidad técnica dominas mejor?',
+        options: [
+            { text: 'Ofimática (Word, Excel, PowerPoint)', type: 'strength' },
+            { text: 'Redes sociales y marketing digital', type: 'strength' },
+            { text: 'Análisis de datos', type: 'strength' },
+            { text: 'Atención al cliente', type: 'strength' }
+        ]
+    },
+    {
+        question: '¿Qué situación te resulta más desafiante?',
+        options: [
+            { text: 'Trabajar bajo presión', type: 'weakness' },
+            { text: 'Adaptarme a cambios rápidos', type: 'weakness' },
+            { text: 'Decir "no" cuando es necesario', type: 'weakness' },
+            { text: 'Recibir críticas constructivas', type: 'weakness' }
+        ]
+    },
+    {
+        question: '¿Qué cualidad personal te define mejor?',
+        options: [
+            { text: 'Responsable y puntual', type: 'strength' },
+            { text: 'Creativo e innovador', type: 'strength' },
+            { text: 'Paciente y empático', type: 'strength' },
+            { text: 'Organizado y meticuloso', type: 'strength' }
+        ]
+    }
+];
+
+let currentGameQuestionIndex = 0;
+let gameAnswers = [];
+
+function loadYouTubeVideo() {
+    const urlInput = document.getElementById('youtubeUrlInput');
+    const url = urlInput.value.trim();
+
+    if (!url) {
+        showToast('❌ Por favor ingresa una URL de YouTube', 'error');
+        return;
+    }
+
+    // Extraer el ID del video de YouTube
+    let videoId = '';
+
+    // Formato: https://www.youtube.com/watch?v=VIDEO_ID
+    if (url.includes('youtube.com/watch?v=')) {
+        videoId = url.split('v=')[1];
+        const ampersandPosition = videoId.indexOf('&');
+        if (ampersandPosition !== -1) {
+            videoId = videoId.substring(0, ampersandPosition);
+        }
+    }
+    // Formato: https://youtu.be/VIDEO_ID
+    else if (url.includes('youtu.be/')) {
+        videoId = url.split('youtu.be/')[1];
+        const queryPosition = videoId.indexOf('?');
+        if (queryPosition !== -1) {
+            videoId = videoId.substring(0, queryPosition);
+        }
+    }
+
+    if (!videoId) {
+        showToast('❌ URL de YouTube no válida', 'error');
+        return;
+    }
+
+    // Cargar el video en el iframe
+    const iframe = document.getElementById('youtubeVideo');
+    iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=0`;
+
+    // Guardar la URL en localStorage
+    if (currentUser) {
+        localStorage.setItem(`strengthsVideo_${currentUser.email}`, url);
+    }
+
+    showToast('✅ Video cargado exitosamente!', 'success');
+}
+
+function initializeStrengthsGame() {
+    currentGameQuestionIndex = 0;
+    gameAnswers = [];
+
+    // Cargar video guardado si existe
+    if (currentUser) {
+        const savedVideo = localStorage.getItem(`strengthsVideo_${currentUser.email}`);
+        if (savedVideo) {
+            document.getElementById('youtubeUrlInput').value = savedVideo;
+            loadYouTubeVideo();
+        }
+    }
+
+    // Cargar primera pregunta
+    loadGameQuestion();
+
+    // Actualizar totales
+    document.getElementById('totalGameQuestions').textContent = strengthsGameQuestions.length;
+}
+
+function loadGameQuestion() {
+    if (currentGameQuestionIndex >= strengthsGameQuestions.length) {
+        finishStrengthsGame();
+        return;
+    }
+
+    const question = strengthsGameQuestions[currentGameQuestionIndex];
+    const container = document.getElementById('gameQuestionContainer');
+
+    // Actualizar números de progreso
+    document.getElementById('currentGameQuestion').textContent = currentGameQuestionIndex + 1;
+
+    // Actualizar barra de progreso
+    const progress = ((currentGameQuestionIndex) / strengthsGameQuestions.length) * 100;
+    document.getElementById('gameProgress').style.width = `${progress}%`;
+
+    // Renderizar pregunta
+    container.innerHTML = `
+        <div class="game-question-card">
+            <h3 class="game-question-title">${question.question}</h3>
+            <div class="game-options">
+                ${question.options.map((option, index) => `
+                    <div class="game-option ${gameAnswers[currentGameQuestionIndex] === index ? 'selected' : ''}"
+                         onclick="selectGameOption(${index})">
+                        <div class="option-radio ${gameAnswers[currentGameQuestionIndex] === index ? 'checked' : ''}"></div>
+                        <span class="option-text">${option.text}</span>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+function selectGameOption(optionIndex) {
+    gameAnswers[currentGameQuestionIndex] = optionIndex;
+    loadGameQuestion();
+}
+
+function nextGameQuestion() {
+    if (gameAnswers[currentGameQuestionIndex] === undefined) {
+        showToast('⚠️ Por favor selecciona una opción', 'warning');
+        return;
+    }
+
+    currentGameQuestionIndex++;
+    loadGameQuestion();
+}
+
+function finishStrengthsGame() {
+    // Ocultar navegación y mostrar resultados
+    document.querySelector('.game-navigation').style.display = 'none';
+    document.getElementById('gameQuestionContainer').style.display = 'none';
+    document.getElementById('gameResults').style.display = 'block';
+
+    // Actualizar progreso a 100%
+    document.getElementById('gameProgress').style.width = '100%';
+
+    // Analizar respuestas
+    const strengths = [];
+    const weaknesses = [];
+
+    gameAnswers.forEach((answerIndex, questionIndex) => {
+        const question = strengthsGameQuestions[questionIndex];
+        const selectedOption = question.options[answerIndex];
+
+        if (selectedOption.type === 'strength') {
+            strengths.push(selectedOption.text);
+        } else {
+            weaknesses.push(selectedOption.text);
+        }
+    });
+
+    // Guardar resultados
+    if (currentUser) {
+        const results = {
+            strengths,
+            weaknesses,
+            completedAt: new Date().toISOString()
+        };
+        localStorage.setItem(`strengthsGameResults_${currentUser.email}`, JSON.stringify(results));
+    }
+
+    // Mostrar resumen
+    const summaryHTML = `
+        <div class="strengths-summary">
+            <div class="summary-section">
+                <h4>💪 Tus Fortalezas</h4>
+                <ul>
+                    ${strengths.map(s => `<li>${s}</li>`).join('')}
+                </ul>
+            </div>
+            <div class="summary-section">
+                <h4>📈 Áreas de Mejora</h4>
+                <ul>
+                    ${weaknesses.map(w => `<li>${w}</li>`).join('')}
+                </ul>
+            </div>
+        </div>
+        <p class="summary-note">💡 Tip: Conocer tus fortalezas y debilidades te ayudará en entrevistas laborales y en tu desarrollo profesional.</p>
+    `;
+
+    document.getElementById('gameSummary').innerHTML = summaryHTML;
+}
+
+function completeOnboardingAndGoToWelcome() {
+    if (currentUser && currentUser.needsOnboarding !== undefined) {
+        currentUser.needsOnboarding = false;
+        currentUser.onboardingCompleted = true;
+        currentUser.completedOnboardingAt = new Date().toISOString();
+
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        // Actualizar en la lista de usuarios
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.email === currentUser.email);
+        if (userIndex !== -1) {
+            users[userIndex] = currentUser;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+    }
+
+    showToast('🎉 ¡Bienvenido a la plataforma! Ya puedes comenzar', 'success');
     showScreen('welcomeScreen');
 }
 
-function goToMenu() {
-    showScreen('testMenuScreen');
-}
+// Inicializar juego cuando se carga la pantalla
+window.initializeStrengthsGame = initializeStrengthsGame;
+window.loadYouTubeVideo = loadYouTubeVideo;
+window.selectGameOption = selectGameOption;
+window.nextGameQuestion = nextGameQuestion;
+window.completeOnboardingAndGoToWelcome = completeOnboardingAndGoToWelcome;
 
 // ========================================
 // INICIALIZACIÓN AL CARGAR LA PÁGINA
