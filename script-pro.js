@@ -568,7 +568,72 @@ function selectTest(type) {
         }
     }
 
+    // APLICAR RESTRICCIONES DE CÓDIGO AQUÍ
+    applyCodeRestrictionsToMenu();
+
     showScreen('testMenuScreen');
+}
+
+// Nueva función para aplicar restricciones al menú
+function applyCodeRestrictionsToMenu() {
+    // Si hay un código activo, aplicar restricciones
+    if (currentExamCode && currentExamCode.testsAvailable && Array.isArray(currentExamCode.testsAvailable)) {
+        const testsAvailable = currentExamCode.testsAvailable;
+
+        console.log('Aplicando restricciones de código:', testsAvailable);
+
+        // Obtener todas las tarjetas de prueba
+        setTimeout(() => {
+            // Cuestionario
+            const quizCard = document.querySelector('[onclick*="startTest(\'quiz\')"]');
+            if (quizCard) {
+                const quizParent = quizCard.closest('.test-card');
+                if (quizParent) {
+                    quizParent.style.display = testsAvailable.includes('quiz') ? '' : 'none';
+                }
+            }
+
+            // Formal vs Informal
+            const formalCard = document.querySelector('[onclick*="startTest(\'formal\')"]');
+            if (formalCard) {
+                const formalParent = formalCard.closest('.test-card');
+                if (formalParent) {
+                    formalParent.style.display = testsAvailable.includes('formal') ? '' : 'none';
+                }
+            }
+
+            // Construir CV
+            const builderCard = document.querySelector('[onclick*="startTest(\'builder\')"]');
+            if (builderCard) {
+                const builderParent = builderCard.closest('.test-card');
+                if (builderParent) {
+                    builderParent.style.display = testsAvailable.includes('builder') ? '' : 'none';
+                }
+            }
+
+            // Simulador de Entrevista
+            const interviewCard = document.querySelector('[onclick*="startTest(\'interview\')"]');
+            if (interviewCard) {
+                const interviewParent = interviewCard.closest('.test-card');
+                if (interviewParent) {
+                    interviewParent.style.display = testsAvailable.includes('interview') ? '' : 'none';
+                }
+            }
+
+            // Sopa de Letras (solo PRE-TEST)
+            const wordSearchCard = document.getElementById('wordSearchCard');
+            if (wordSearchCard) {
+                if (testsAvailable.includes('wordsearch') && currentTestType === 'pre') {
+                    wordSearchCard.style.display = '';
+                } else {
+                    wordSearchCard.style.display = 'none';
+                }
+            }
+        }, 100);
+    } else {
+        // Sin código, mostrar todas las pruebas
+        console.log('Sin código activo, mostrando todas las pruebas');
+    }
 }
 
 function goToWelcome() {
@@ -1902,65 +1967,112 @@ function renderSkills() {
 function renderCVPreview() {
     const container = document.getElementById('cvPreview');
     if (!container) return;
-    
+
+    // Obtener avatar/foto del usuario
+    let avatarHTML = '';
+    if (currentUser) {
+        const avatarData = localStorage.getItem(`avatar_pro_${currentUser.email}`);
+        if (avatarData) {
+            try {
+                const avatar = JSON.parse(avatarData);
+                if (avatar.photoData) {
+                    // Foto real
+                    avatarHTML = `<img src="${avatar.photoData}" class="cv-photo" alt="Foto de perfil">`;
+                } else if (avatar.seed) {
+                    // Avatar generado
+                    avatarHTML = `<img src="https://api.dicebear.com/7.x/${avatar.style || 'avataaars'}/svg?seed=${avatar.seed}" class="cv-photo" alt="Avatar de perfil">`;
+                }
+            } catch (e) {
+                console.error('Error loading avatar:', e);
+            }
+        }
+    }
+
     container.innerHTML = `
-        <div class="cv-paper preview">
-            <div class="cv-header">
-                <h2 class="cv-name">${cvBuilderData.personalInfo.name}</h2>
-                <div class="cv-contact">
-                    <p>📧 ${cvBuilderData.personalInfo.email}</p>
-                    <p>📱 ${cvBuilderData.personalInfo.phone}</p>
-                    ${cvBuilderData.personalInfo.address ? `<p>📍 ${cvBuilderData.personalInfo.address}</p>` : ''}
+        <div class="cv-paper-professional">
+            <!-- Encabezado con foto -->
+            <div class="cv-header-professional">
+                <div class="cv-photo-container">
+                    ${avatarHTML || '<div class="cv-photo-placeholder">📷</div>'}
+                </div>
+                <div class="cv-header-info">
+                    <h1 class="cv-name-professional">${cvBuilderData.personalInfo.name}</h1>
+                    <div class="cv-contact-professional">
+                        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cv-icon"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg> ${cvBuilderData.personalInfo.email}</span>
+                        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cv-icon"><path d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg> ${cvBuilderData.personalInfo.phone}</span>
+                        ${cvBuilderData.personalInfo.address ? `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="cv-icon"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> ${cvBuilderData.personalInfo.address}</span>` : ''}
+                    </div>
                 </div>
             </div>
-            
+
+            <div class="cv-body-professional">
+
             ${cvBuilderData.objective ? `
-                <div class="cv-section">
-                    <h3>Objetivo Profesional</h3>
-                    <p>${cvBuilderData.objective}</p>
+                <div class="cv-section-professional">
+                    <h2>Objetivo Profesional</h2>
+                    <div class="cv-subsection-professional">
+                        <p>${cvBuilderData.objective}</p>
+                    </div>
                 </div>
             ` : ''}
-            
+
             ${cvBuilderData.experience.length > 0 ? `
-                <div class="cv-section">
-                    <h3>Experiencia Laboral</h3>
+                <div class="cv-section-professional">
+                    <h2>Experiencia Laboral</h2>
                     ${cvBuilderData.experience.map(exp => `
-                        <div class="cv-item">
-                            <h4>${exp.position}</h4>
-                            <p><strong>${exp.company}</strong> | ${exp.period}</p>
+                        <div class="cv-subsection-professional">
+                            <h3>${exp.position}</h3>
+                            <h4>${exp.company} | ${exp.period}</h4>
                             <p>${exp.description}</p>
                         </div>
                     `).join('')}
                 </div>
             ` : ''}
-            
+
             ${cvBuilderData.education.length > 0 ? `
-                <div class="cv-section">
-                    <h3>Educación</h3>
+                <div class="cv-section-professional">
+                    <h2>Educación</h2>
                     ${cvBuilderData.education.map(edu => `
-                        <div class="cv-item">
-                            <h4>${edu.degree}</h4>
-                            <p><strong>${edu.institution}</strong> | ${edu.year}</p>
+                        <div class="cv-subsection-professional">
+                            <h3>${edu.degree}</h3>
+                            <h4>${edu.institution} | ${edu.year}</h4>
                         </div>
                     `).join('')}
                 </div>
             ` : ''}
-            
+
             ${cvBuilderData.skills.length > 0 ? `
-                <div class="cv-section">
-                    <h3>Habilidades</h3>
-                    <ul class="cv-skills">
-                        ${cvBuilderData.skills.map(skill => `<li>${skill}</li>`).join('')}
-                    </ul>
+                <div class="cv-section-professional">
+                    <h2>Habilidades</h2>
+                    <div class="cv-skills-grid-professional">
+                        ${cvBuilderData.skills.map(skill => `<div class="cv-skill-tag-professional">${skill}</div>`).join('')}
+                    </div>
                 </div>
             ` : ''}
-            
+
+            ${cvBuilderData.languages && cvBuilderData.languages.length > 0 ? `
+                <div class="cv-section-professional">
+                    <h2>Idiomas</h2>
+                    <div class="cv-languages-grid-professional">
+                        ${cvBuilderData.languages.map(lang => `
+                            <div class="cv-language-item-professional">
+                                <strong>${lang.language}</strong>
+                                <span>${lang.level}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
             ${cvBuilderData.references ? `
-                <div class="cv-section">
-                    <h3>Referencias</h3>
-                    <p>${cvBuilderData.references}</p>
+                <div class="cv-section-professional">
+                    <h2>Referencias</h2>
+                    <div class="cv-subsection-professional">
+                        <p>${cvBuilderData.references}</p>
+                    </div>
                 </div>
             ` : ''}
+            </div>
         </div>
     `;
 }
@@ -4979,81 +5091,5 @@ window.confirmChangePassword = confirmChangePassword;
 window.viewUserProfile = viewUserProfile;
 window.deleteUser = deleteUser;
 window.startFormalInformalGame = startFormalInformalGame;
-
-// ========================================
-// MEJORAR RESTRICCIÓN DE CÓDIGOS
-// ========================================
-
-// Modificar la función applyExamCodeRestrictions para que funcione mejor
-function applyExamCodeRestrictions() {
-    if (!currentExamCode) return;
-
-    // Mostrar/ocultar tipos de test según el código
-    const preCard = document.querySelector('.pre-card');
-    const postCard = document.querySelector('.post-card');
-
-    if (currentExamCode.testType === 'pre') {
-        if (preCard) preCard.style.display = '';
-        if (postCard) postCard.style.display = 'none';
-    } else if (currentExamCode.testType === 'post') {
-        if (preCard) preCard.style.display = 'none';
-        if (postCard) postCard.style.display = '';
-    } else {
-        if (preCard) preCard.style.display = '';
-        if (postCard) postCard.style.display = '';
-    }
-}
-
-// Modificar selectTest para aplicar restricciones
-const originalSelectTest = selectTest;
-function selectTestWithRestrictions(type) {
-    currentTestType = type;
-
-    // Mostrar sopa de letras solo en PRE-TEST
-    const wordSearchCard = document.getElementById('wordSearchCard');
-    if (wordSearchCard) {
-        if (type === 'pre') {
-            wordSearchCard.style.display = '';
-        } else {
-            wordSearchCard.style.display = 'none';
-        }
-    }
-
-    // Si hay código activo, aplicar restricciones
-    if (currentExamCode && currentExamCode.testsAvailable) {
-        const testsAvailable = currentExamCode.testsAvailable;
-
-        // Ocultar/mostrar pruebas según el código
-        const testCards = {
-            'quiz': document.querySelector('[onclick="startTest(\'quiz\')"]')?.closest('.test-card'),
-            'formal': document.querySelector('[onclick="startTest(\'formal\')"]')?.closest('.test-card'),
-            'builder': document.querySelector('[onclick="startTest(\'builder\')"]')?.closest('.test-card'),
-            'interview': document.querySelector('[onclick="startTest(\'interview\')"]')?.closest('.test-card'),
-            'wordsearch': document.getElementById('wordSearchCard')
-        };
-
-        Object.keys(testCards).forEach(testType => {
-            const card = testCards[testType];
-            if (card) {
-                if (testsAvailable.includes(testType)) {
-                    // Mostrar solo si es PRE-TEST para wordsearch
-                    if (testType === 'wordsearch' && type !== 'pre') {
-                        card.style.display = 'none';
-                    } else {
-                        card.style.display = '';
-                    }
-                } else {
-                    card.style.display = 'none';
-                }
-            }
-        });
-    }
-
-    // Llamar a la función original
-    originalSelectTest(type);
-}
-
-// Reemplazar selectTest
-window.selectTest = selectTestWithRestrictions;
 
 console.log('✅ Sistema completo cargado: Formal/Informal, Gestión de Usuarios, Restricciones mejoradas');
