@@ -390,48 +390,42 @@
                 </div>
 
                 <div class="game-section">
-                    <h3>🎮 Tu turno: Selecciona tus características</h3>
+                    <h3>🎮 Tu turno: Juego de Autoconocimiento</h3>
 
-                    <div class="characteristics-grid">
-                        <div class="char-category">
-                            <h4>💪 Fortalezas</h4>
-                            <p class="category-desc">Selecciona hasta 5 fortalezas que te definan</p>
-                            <div class="char-list" id="strengthsList">
-                                <button class="char-btn" data-type="strength" data-value="Responsable">Responsable</button>
-                                <button class="char-btn" data-type="strength" data-value="Creativo">Creativo</button>
-                                <button class="char-btn" data-type="strength" data-value="Comunicativo">Comunicativo</button>
-                                <button class="char-btn" data-type="strength" data-value="Organizado">Organizado</button>
-                                <button class="char-btn" data-type="strength" data-value="Líder">Líder</button>
-                                <button class="char-btn" data-type="strength" data-value="Perseverante">Perseverante</button>
-                                <button class="char-btn" data-type="strength" data-value="Empático">Empático</button>
-                                <button class="char-btn" data-type="strength" data-value="Adaptable">Adaptable</button>
-                                <button class="char-btn" data-type="strength" data-value="Proactivo">Proactivo</button>
-                                <button class="char-btn" data-type="strength" data-value="Analítico">Analítico</button>
-                                <button class="char-btn" data-type="strength" data-value="Colaborativo">Colaborativo</button>
-                                <button class="char-btn" data-type="strength" data-value="Optimista">Optimista</button>
-                            </div>
-                            <div class="selected-count">
-                                Seleccionadas: <strong id="strengthsCount">0</strong> / 5
-                            </div>
+                    <div class="game-header-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">⏱️ Tiempo:</span>
+                            <span class="stat-value" id="characterGameTimer">05:00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">✅ Fortalezas:</span>
+                            <span class="stat-value" id="strengthsCount">0 / 5</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">🎯 Áreas de mejora:</span>
+                            <span class="stat-value" id="weaknessesCount">0 / 3</span>
+                        </div>
+                    </div>
+
+                    <div class="characteristics-game-layout">
+                        <!-- Panel de características para arrastrar -->
+                        <div class="characteristics-panel">
+                            <h4>📋 Arrastra las características que te describen</h4>
+                            <div class="char-cards-container" id="characterCardsContainer"></div>
                         </div>
 
-                        <div class="char-category">
-                            <h4>🎯 Áreas de Mejora</h4>
-                            <p class="category-desc">Selecciona hasta 3 áreas en las que quieras mejorar</p>
-                            <div class="char-list" id="weaknessesList">
-                                <button class="char-btn" data-type="weakness" data-value="Impuntualidad">Impuntualidad</button>
-                                <button class="char-btn" data-type="weakness" data-value="Timidez">Timidez</button>
-                                <button class="char-btn" data-type="weakness" data-value="Impaciencia">Impaciencia</button>
-                                <button class="char-btn" data-type="weakness" data-value="Desorganización">Desorganización</button>
-                                <button class="char-btn" data-type="weakness" data-value="Perfeccionismo">Perfeccionismo</button>
-                                <button class="char-btn" data-type="weakness" data-value="Nerviosismo">Nerviosismo</button>
-                                <button class="char-btn" data-type="weakness" data-value="Dificultad para delegar">Dificultad para delegar</button>
-                                <button class="char-btn" data-type="weakness" data-value="Procrastinación">Procrastinación</button>
-                                <button class="char-btn" data-type="weakness" data-value="Autocrítica excesiva">Autocrítica excesiva</button>
-                                <button class="char-btn" data-type="weakness" data-value="Dificultad con tecnología">Dificultad con tecnología</button>
+                        <!-- Zonas de drop -->
+                        <div class="drop-zones-container">
+                            <div class="drop-zone-box strength-zone" id="strengthDropZone" ondrop="dropCharacteristic(event)" ondragover="allowDrop(event)">
+                                <h4>💪 Mis Fortalezas</h4>
+                                <p class="zone-hint">Arrastra hasta 5 fortalezas</p>
+                                <div class="dropped-characteristics" id="strengthsDropped"></div>
                             </div>
-                            <div class="selected-count">
-                                Seleccionadas: <strong id="weaknessesCount">0</strong> / 3
+
+                            <div class="drop-zone-box weakness-zone" id="weaknessDropZone" ondrop="dropCharacteristic(event)" ondragover="allowDrop(event)">
+                                <h4>🎯 Áreas de Mejora</h4>
+                                <p class="zone-hint">Arrastra hasta 3 áreas</p>
+                                <div class="dropped-characteristics" id="weaknessesDropped"></div>
                             </div>
                         </div>
                     </div>
@@ -589,7 +583,7 @@
     <div class="screen" id="progressScreen">
         <nav class="navbar">
             <div class="nav-content">
-                <div class="nav-brand"><span>Mi Progreso</span></div>
+                <div class="nav-brand"><span>🎯 Mi Perfil Completo</span></div>
                 <div class="nav-user">
                     <span id="userName3">Usuario</span>
                     <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
@@ -597,43 +591,102 @@
             </div>
         </nav>
         <div class="container">
-            <div class="progress-dashboard">
-                <h2>Tu Historial de Evaluaciones</h2>
-                <div class="progress-stats">
-                    <div class="progress-card">
-                        <h3>Pruebas Completadas</h3>
-                        <p class="big-number" id="userTestsCompleted">0</p>
-                    </div>
-                    <div class="progress-card">
-                        <h3>Promedio General</h3>
-                        <p class="big-number" id="userAvgScore">0%</p>
-                    </div>
-                    <div class="progress-card">
-                        <h3>Mejor Puntuación</h3>
-                        <p class="big-number" id="userBestScore">0%</p>
+            <div class="profile-complete-layout">
+                <!-- Perfil Principal con Avatar -->
+                <div class="profile-header-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-container" id="profileAvatarContainer">
+                            <div class="profile-avatar-placeholder">👤</div>
+                        </div>
+                        <div class="profile-basic-info">
+                            <h1 class="profile-name" id="profileUserName">Usuario</h1>
+                            <p class="profile-email" id="profileUserEmail">email@ejemplo.com</p>
+                            <div class="profile-badges">
+                                <span class="profile-badge" id="profileOnboardingBadge">
+                                    ✅ Perfil Completado
+                                </span>
+                                <span class="profile-badge tests">
+                                    🎯 <span id="profileTotalTests">0</span> Exámenes
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="history-table">
-                    <h3>Historial Detallado</h3>
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Prueba</th>
-                                <th>Tipo</th>
-                                <th>Puntuación</th>
-                                <th>Tiempo</th>
-                                <th>Fecha</th>
-                                <th>Certificado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userHistoryTable"></tbody>
-                    </table>
+
+                <!-- Grid de Características del Usuario -->
+                <div class="profile-characteristics-section">
+                    <div class="profile-section-card">
+                        <h3>💪 Mis Fortalezas</h3>
+                        <div class="characteristics-tags" id="profileStrengthsTags">
+                            <p class="empty-state">No se han seleccionado fortalezas</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-section-card">
+                        <h3>🎯 Áreas de Mejora</h3>
+                        <div class="characteristics-tags" id="profileWeaknessesTags">
+                            <p class="empty-state">No se han seleccionado áreas de mejora</p>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Estadísticas de Evaluaciones -->
+                <div class="profile-stats-section">
+                    <h2>📊 Estadísticas de Evaluaciones</h2>
+                    <div class="progress-stats">
+                        <div class="progress-card">
+                            <div class="stat-icon">📝</div>
+                            <h3>Pruebas Completadas</h3>
+                            <p class="big-number" id="userTestsCompleted">0</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="stat-icon">📈</div>
+                            <h3>Promedio General</h3>
+                            <p class="big-number" id="userAvgScore">0%</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="stat-icon">🏆</div>
+                            <h3>Mejor Puntuación</h3>
+                            <p class="big-number" id="userBestScore">0%</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="stat-icon">⏱️</div>
+                            <h3>Tiempo Total</h3>
+                            <p class="big-number" id="userTotalTime">0 min</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial Detallado -->
+                <div class="profile-history-section">
+                    <h2>📚 Historial Detallado</h2>
+                    <div class="history-table">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Prueba</th>
+                                    <th>Tipo</th>
+                                    <th>Puntuación</th>
+                                    <th>Tiempo</th>
+                                    <th>Fecha</th>
+                                    <th>Certificado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userHistoryTable"></tbody>
+                        </table>
+                        <div class="empty-history" id="emptyHistory" style="display: none;">
+                            <p>📭 Aún no has completado ninguna evaluación</p>
+                            <p class="empty-hint">¡Empieza ahora y construye tu historial!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Volver -->
                 <button class="btn-back" onclick="goToWelcome()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Volver
+                    Volver al Inicio
                 </button>
             </div>
         </div>

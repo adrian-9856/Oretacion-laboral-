@@ -829,12 +829,78 @@ function getUserResults() {
 
 function loadUserProgress() {
     const userResults = getUserResults();
-    
+
+    // Cargar información del perfil
+    if (currentUser) {
+        // Nombre y email
+        if (document.getElementById('profileUserName')) {
+            document.getElementById('profileUserName').textContent = currentUser.name + ' ' + currentUser.lastName;
+        }
+        if (document.getElementById('profileUserEmail')) {
+            document.getElementById('profileUserEmail').textContent = currentUser.email;
+        }
+
+        // Cargar avatar
+        const avatarContainer = document.getElementById('profileAvatarContainer');
+        if (avatarContainer) {
+            const avatarData = localStorage.getItem(`avatar_pro_${currentUser.email}`);
+            if (avatarData) {
+                try {
+                    const avatar = JSON.parse(avatarData);
+                    if (avatar.photoData) {
+                        avatarContainer.innerHTML = `<img src="${avatar.photoData}" alt="Avatar">`;
+                    } else if (avatar.seed) {
+                        avatarContainer.innerHTML = `<img src="https://api.dicebear.com/7.x/${avatar.style || 'avataaars'}/svg?seed=${avatar.seed}" alt="Avatar">`;
+                    }
+                } catch (e) {
+                    console.error('Error loading avatar:', e);
+                }
+            }
+        }
+
+        // Cargar fortalezas y debilidades
+        const profileData = localStorage.getItem(`profile_${currentUser.email}`);
+        if (profileData) {
+            try {
+                const profile = JSON.parse(profileData);
+
+                // Fortalezas
+                const strengthsContainer = document.getElementById('profileStrengthsTags');
+                if (strengthsContainer && profile.strengths && profile.strengths.length > 0) {
+                    strengthsContainer.innerHTML = profile.strengths.map(s => {
+                        const char = characteristicsData.find(c => c.value === s);
+                        const icon = char ? char.icon : '⭐';
+                        return `<span class="characteristic-tag">${icon} ${s}</span>`;
+                    }).join('');
+                } else if (strengthsContainer) {
+                    strengthsContainer.innerHTML = '<p class="empty-state">No se han seleccionado fortalezas</p>';
+                }
+
+                // Debilidades
+                const weaknessesContainer = document.getElementById('profileWeaknessesTags');
+                if (weaknessesContainer && profile.weaknesses && profile.weaknesses.length > 0) {
+                    weaknessesContainer.innerHTML = profile.weaknesses.map(w => {
+                        const char = characteristicsData.find(c => c.value === w);
+                        const icon = char ? char.icon : '🎯';
+                        return `<span class="characteristic-tag">${icon} ${w}</span>`;
+                    }).join('');
+                } else if (weaknessesContainer) {
+                    weaknessesContainer.innerHTML = '<p class="empty-state">No se han seleccionado áreas de mejora</p>';
+                }
+            } catch (e) {
+                console.error('Error loading profile:', e);
+            }
+        }
+    }
+
+    // Estadísticas
     const completed = userResults.length;
     const scores = userResults.map(r => r.score);
     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const bestScore = scores.length > 0 ? Math.max(...scores) : 0;
-    
+    const totalTime = userResults.reduce((sum, r) => sum + (r.time || 0), 0);
+    const totalTimeMinutes = Math.round(totalTime / 60);
+
     if (document.getElementById('userTestsCompleted')) {
         document.getElementById('userTestsCompleted').textContent = completed;
     }
@@ -844,28 +910,33 @@ function loadUserProgress() {
     if (document.getElementById('userBestScore')) {
         document.getElementById('userBestScore').textContent = bestScore + '%';
     }
-    
+    if (document.getElementById('userTotalTime')) {
+        document.getElementById('userTotalTime').textContent = totalTimeMinutes + ' min';
+    }
+    if (document.getElementById('profileTotalTests')) {
+        document.getElementById('profileTotalTests').textContent = completed;
+    }
+
+    // Tabla de historial
     const tableBody = document.getElementById('userHistoryTable');
+    const emptyHistory = document.getElementById('emptyHistory');
+
     if (tableBody) {
         if (userResults.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 32px; color: var(--gray-500);">
-                        No has completado ninguna evaluación aún
-                    </td>
-                </tr>
-            `;
+            tableBody.innerHTML = '';
+            if (emptyHistory) emptyHistory.style.display = 'block';
         } else {
+            if (emptyHistory) emptyHistory.style.display = 'none';
             tableBody.innerHTML = userResults.map(r => `
                 <tr>
                     <td>${r.test}</td>
-                    <td>${r.testType.toUpperCase()}</td>
+                    <td><span class="test-type-badge ${r.testType}">${r.testType.toUpperCase()}</span></td>
                     <td><span class="score-badge ${r.score >= CONFIG.PASSING_SCORE ? 'pass' : 'fail'}">${r.score}%</span></td>
                     <td>${r.time}s</td>
                     <td>${new Date(r.timestamp).toLocaleDateString()}</td>
                     <td>
-                        ${r.score >= CONFIG.PASSING_SCORE ? 
-                            `<button class="btn-cert" onclick='generateCertificate(${JSON.stringify(r).replace(/'/g, "&apos;")})'>📄 Descargar</button>` : 
+                        ${r.score >= CONFIG.PASSING_SCORE ?
+                            `<button class="btn-cert" onclick='generateCertificate(${JSON.stringify(r).replace(/'/g, "&apos;")})'>📄 Descargar</button>` :
                             '<span class="no-cert">No disponible</span>'}
                     </td>
                 </tr>
@@ -4446,11 +4517,38 @@ function stopCamera() {
 }
 
 // ========================================
-// JUEGO DE FORTALEZAS Y DEBILIDADES
+// JUEGO DE FORTALEZAS Y DEBILIDADES (DRAG & DROP)
 // ========================================
+
+const characteristicsData = [
+    { value: "Responsable", type: "strength", icon: "⭐" },
+    { value: "Creativo", type: "strength", icon: "🎨" },
+    { value: "Comunicativo", type: "strength", icon: "💬" },
+    { value: "Organizado", type: "strength", icon: "📋" },
+    { value: "Líder", type: "strength", icon: "👑" },
+    { value: "Perseverante", type: "strength", icon: "💪" },
+    { value: "Empático", type: "strength", icon: "❤️" },
+    { value: "Adaptable", type: "strength", icon: "🔄" },
+    { value: "Proactivo", type: "strength", icon: "⚡" },
+    { value: "Analítico", type: "strength", icon: "🔍" },
+    { value: "Colaborativo", type: "strength", icon: "🤝" },
+    { value: "Optimista", type: "strength", icon: "😊" },
+    { value: "Impuntualidad", type: "weakness", icon: "⏰" },
+    { value: "Timidez", type: "weakness", icon: "🙈" },
+    { value: "Impaciencia", type: "weakness", icon: "⚠️" },
+    { value: "Desorganización", type: "weakness", icon: "📦" },
+    { value: "Perfeccionismo", type: "weakness", icon: "🎯" },
+    { value: "Nerviosismo", type: "weakness", icon: "😰" },
+    { value: "Dificultad para delegar", type: "weakness", icon: "👥" },
+    { value: "Procrastinación", type: "weakness", icon: "⏳" },
+    { value: "Autocrítica excesiva", type: "weakness", icon: "😔" },
+    { value: "Dificultad con tecnología", type: "weakness", icon: "💻" }
+];
 
 let selectedStrengths = [];
 let selectedWeaknesses = [];
+let characterGameTimer = null;
+let characterGameTime = 300; // 5 minutos
 
 function showStrengthsWeaknessesGame() {
     showScreen('strengthsWeaknessesScreen');
@@ -4462,66 +4560,226 @@ function showStrengthsWeaknessesGame() {
     // Inicializar el juego
     selectedStrengths = [];
     selectedWeaknesses = [];
+    characterGameTime = 300;
+
+    // Renderizar las tarjetas de características mezcladas
+    renderCharacteristicCards();
+
+    // Iniciar timer
+    startCharacterGameTimer();
+
     updateCharacteristicsUI();
-
-    // Event listeners para los botones de características
-    document.querySelectorAll('.char-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            const type = this.dataset.type;
-            const value = this.dataset.value;
-
-            if (type === 'strength') {
-                toggleCharacteristic(value, selectedStrengths, 5, this);
-            } else {
-                toggleCharacteristic(value, selectedWeaknesses, 3, this);
-            }
-
-            updateCharacteristicsUI();
-        });
-    });
 }
 
-function toggleCharacteristic(value, array, maxCount, button) {
-    const index = array.indexOf(value);
+function renderCharacteristicCards() {
+    const container = document.getElementById('characterCardsContainer');
+    if (!container) return;
 
-    if (index > -1) {
-        // Ya está seleccionado, remover
-        array.splice(index, 1);
-        button.classList.remove('selected');
-    } else {
-        // No está seleccionado
-        if (array.length < maxCount) {
-            array.push(value);
-            button.classList.add('selected');
-        } else {
-            showToast(`❌ Solo puedes seleccionar hasta ${maxCount} opciones`, 'warning');
-        }
+    // Mezclar las características
+    const shuffled = [...characteristicsData].sort(() => Math.random() - 0.5);
+
+    container.innerHTML = shuffled.map((char, index) => `
+        <div class="characteristic-card"
+             draggable="true"
+             ondragstart="dragCharacteristic(event)"
+             data-value="${char.value}"
+             data-type="${char.type}"
+             data-index="${index}">
+            <span class="char-icon">${char.icon}</span>
+            <span class="char-text">${char.value}</span>
+        </div>
+    `).join('');
+}
+
+function dragCharacteristic(e) {
+    e.dataTransfer.setData('characterValue', e.target.dataset.value);
+    e.dataTransfer.setData('characterType', e.target.dataset.type);
+    e.dataTransfer.setData('text/html', e.target.outerHTML);
+}
+
+function dropCharacteristic(e) {
+    e.preventDefault();
+
+    const characterValue = e.dataTransfer.getData('characterValue');
+    const characterType = e.dataTransfer.getData('characterType');
+
+    // Determinar en qué zona se soltó
+    let dropZone = e.target;
+    while (dropZone && !dropZone.classList.contains('drop-zone-box')) {
+        dropZone = dropZone.parentElement;
     }
+
+    if (!dropZone) return;
+
+    const isStrengthZone = dropZone.id === 'strengthDropZone';
+    const isWeaknessZone = dropZone.id === 'weaknessDropZone';
+
+    // Validar si la característica corresponde a la zona
+    if (isStrengthZone && characterType === 'strength') {
+        if (selectedStrengths.length < 5 && !selectedStrengths.includes(characterValue)) {
+            selectedStrengths.push(characterValue);
+            addCharacteristicToZone(characterValue, 'strength', 'strengthsDropped');
+            removeCharacteristicCard(characterValue);
+            updateCharacteristicsUI();
+        } else if (selectedStrengths.length >= 5) {
+            showToast('⚠️ Solo puedes seleccionar hasta 5 fortalezas', 'warning');
+        }
+    } else if (isWeaknessZone && characterType === 'weakness') {
+        if (selectedWeaknesses.length < 3 && !selectedWeaknesses.includes(characterValue)) {
+            selectedWeaknesses.push(characterValue);
+            addCharacteristicToZone(characterValue, 'weakness', 'weaknessesDropped');
+            removeCharacteristicCard(characterValue);
+            updateCharacteristicsUI();
+        } else if (selectedWeaknesses.length >= 3) {
+            showToast('⚠️ Solo puedes seleccionar hasta 3 áreas de mejora', 'warning');
+        }
+    } else {
+        // Zona incorrecta
+        showToast('❌ Esta característica no corresponde a esta categoría', 'error');
+        dropZone.classList.add('shake-error');
+        setTimeout(() => dropZone.classList.remove('shake-error'), 500);
+    }
+}
+
+function addCharacteristicToZone(value, type, containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const char = characteristicsData.find(c => c.value === value);
+    if (!char) return;
+
+    const charElement = document.createElement('div');
+    charElement.className = 'dropped-char-item';
+    charElement.innerHTML = `
+        <span>${char.icon} ${value}</span>
+        <button class="remove-char-btn" onclick="removeCharacteristic('${value}', '${type}')">✕</button>
+    `;
+
+    container.appendChild(charElement);
+}
+
+function removeCharacteristicCard(value) {
+    const card = document.querySelector(`.characteristic-card[data-value="${value}"]`);
+    if (card) {
+        card.style.opacity = '0.3';
+        card.style.pointerEvents = 'none';
+        card.draggable = false;
+    }
+}
+
+function removeCharacteristic(value, type) {
+    if (type === 'strength') {
+        const index = selectedStrengths.indexOf(value);
+        if (index > -1) {
+            selectedStrengths.splice(index, 1);
+        }
+
+        // Remover del DOM
+        const container = document.getElementById('strengthsDropped');
+        const items = container.querySelectorAll('.dropped-char-item');
+        items.forEach(item => {
+            if (item.textContent.includes(value)) {
+                item.remove();
+            }
+        });
+    } else {
+        const index = selectedWeaknesses.indexOf(value);
+        if (index > -1) {
+            selectedWeaknesses.splice(index, 1);
+        }
+
+        // Remover del DOM
+        const container = document.getElementById('weaknessesDropped');
+        const items = container.querySelectorAll('.dropped-char-item');
+        items.forEach(item => {
+            if (item.textContent.includes(value)) {
+                item.remove();
+            }
+        });
+    }
+
+    // Restaurar la tarjeta
+    const card = document.querySelector(`.characteristic-card[data-value="${value}"]`);
+    if (card) {
+        card.style.opacity = '1';
+        card.style.pointerEvents = 'auto';
+        card.draggable = true;
+    }
+
+    updateCharacteristicsUI();
+}
+
+function startCharacterGameTimer() {
+    if (characterGameTimer) {
+        clearInterval(characterGameTimer);
+    }
+
+    characterGameTimer = setInterval(() => {
+        characterGameTime--;
+
+        const minutes = Math.floor(characterGameTime / 60);
+        const seconds = characterGameTime % 60;
+        const timerElement = document.getElementById('characterGameTimer');
+
+        if (timerElement) {
+            timerElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+            // Cambiar color cuando queda poco tiempo
+            if (characterGameTime <= 60) {
+                timerElement.style.color = '#EF4444';
+            } else if (characterGameTime <= 120) {
+                timerElement.style.color = '#F59E0B';
+            }
+        }
+
+        if (characterGameTime <= 0) {
+            clearInterval(characterGameTimer);
+            showToast('⏰ ¡Tiempo agotado! Pero puedes continuar seleccionando', 'info');
+        }
+    }, 1000);
 }
 
 function updateCharacteristicsUI() {
     // Actualizar contadores
-    document.getElementById('strengthsCount').textContent = selectedStrengths.length;
-    document.getElementById('weaknessesCount').textContent = selectedWeaknesses.length;
+    const strengthsCount = document.getElementById('strengthsCount');
+    const weaknessesCount = document.getElementById('weaknessesCount');
+
+    if (strengthsCount) {
+        strengthsCount.textContent = `${selectedStrengths.length} / 5`;
+        if (selectedStrengths.length === 5) {
+            strengthsCount.style.color = '#10B981';
+        }
+    }
+
+    if (weaknessesCount) {
+        weaknessesCount.textContent = `${selectedWeaknesses.length} / 3`;
+        if (selectedWeaknesses.length === 3) {
+            weaknessesCount.style.color = '#10B981';
+        }
+    }
 
     // Mostrar/ocultar resumen
     const summary = document.getElementById('selectedSummary');
     const finishBtn = document.getElementById('finishOnboardingBtn');
 
     if (selectedStrengths.length > 0 && selectedWeaknesses.length > 0) {
-        summary.style.display = 'block';
+        if (summary) summary.style.display = 'block';
 
         // Actualizar resumen
         const summaryStrengths = document.getElementById('summaryStrengths');
-        summaryStrengths.innerHTML = selectedStrengths.map(s => `<li>${s}</li>`).join('');
+        if (summaryStrengths) {
+            summaryStrengths.innerHTML = selectedStrengths.map(s => `<li>${s}</li>`).join('');
+        }
 
         const summaryWeaknesses = document.getElementById('summaryWeaknesses');
-        summaryWeaknesses.innerHTML = selectedWeaknesses.map(w => `<li>${w}</li>`).join('');
+        if (summaryWeaknesses) {
+            summaryWeaknesses.innerHTML = selectedWeaknesses.map(w => `<li>${w}</li>`).join('');
+        }
 
-        finishBtn.disabled = false;
+        if (finishBtn) finishBtn.disabled = false;
     } else {
-        summary.style.display = 'none';
-        finishBtn.disabled = true;
+        if (summary) summary.style.display = 'none';
+        if (finishBtn) finishBtn.disabled = true;
     }
 }
 
@@ -4590,6 +4848,9 @@ window.startCamera = startCamera;
 window.capturePhoto = capturePhoto;
 window.stopCamera = stopCamera;
 window.finishOnboarding = finishOnboarding;
+window.dragCharacteristic = dragCharacteristic;
+window.dropCharacteristic = dropCharacteristic;
+window.removeCharacteristic = removeCharacteristic;
 
 console.log('✅ Sistema de Sopa de Letras, Códigos de Examen y Onboarding cargado');
 
