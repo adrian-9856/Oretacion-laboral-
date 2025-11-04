@@ -629,6 +629,15 @@ function applyCodeRestrictionsToMenu() {
                     wordSearchCard.style.display = 'none';
                 }
             }
+
+            // Fortalezas y Debilidades
+            const strengthsCard = document.querySelector('[onclick*="startTest(\'strengths\')"]');
+            if (strengthsCard) {
+                const strengthsParent = strengthsCard.closest('.test-card');
+                if (strengthsParent) {
+                    strengthsParent.style.display = testsAvailable.includes('strengths') ? '' : 'none';
+                }
+            }
         }, 100);
     } else {
         // Sin código, mostrar todas las pruebas
@@ -3403,6 +3412,33 @@ function saveAvatarPro() {
     showToast('¡Avatar guardado exitosamente!', 'success');
 }
 
+// Eliminar foto/avatar del perfil
+function removeProfilePhoto() {
+    if (!confirm('¿Estás seguro de que quieres eliminar tu foto/avatar actual?')) {
+        return;
+    }
+
+    // Limpiar foto capturada
+    capturedPhotoData = null;
+
+    // Si hay usuario logueado, eliminar del localStorage
+    if (currentUser) {
+        localStorage.removeItem(`avatar_pro_${currentUser.email}`);
+    }
+
+    // Generar nuevo avatar aleatorio
+    avatarConfig.seed = Math.random().toString(36).substring(7);
+    updateAvatarPreview();
+
+    // Mostrar el preview (en caso de que estuviera oculto)
+    const previewLarge = document.getElementById('avatarPreviewLarge');
+    if (previewLarge) {
+        previewLarge.style.display = 'block';
+    }
+
+    showToast('✅ Foto/avatar eliminado. Se generó uno nuevo', 'success');
+}
+
 // Actualizar avatar del usuario en la navegación
 function updateUserAvatarPro() {
     const avatarURL = generateAvatarURL();
@@ -5137,6 +5173,7 @@ window.startCamera = startCamera;
 window.capturePhoto = capturePhoto;
 window.stopCamera = stopCamera;
 window.handlePhotoUpload = handlePhotoUpload;
+window.removeProfilePhoto = removeProfilePhoto;
 window.finishOnboarding = finishOnboarding;
 window.finishStrengthsTest = finishStrengthsTest;
 window.dragCharacteristic = dragCharacteristic;

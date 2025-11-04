@@ -3748,11 +3748,12 @@ body.dark-theme .modal-content {
 
 .avatar-export-actions {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
 }
 
-.btn-export {
+.btn-export,
+.btn-remove-photo {
     padding: 12px;
     border: 2px solid var(--gray-300);
     background: var(--white);
@@ -3776,7 +3777,15 @@ body.dark-theme .modal-content {
     border-color: var(--primary);
 }
 
-.btn-export:hover {
+.btn-remove-photo {
+    color: #EF4444;
+    border-color: #EF4444;
+    grid-column: span 3;
+    margin-top: 8px;
+}
+
+.btn-export:hover,
+.btn-remove-photo:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -3791,7 +3800,13 @@ body.dark-theme .modal-content {
     color: white;
 }
 
-.btn-export svg {
+.btn-remove-photo:hover {
+    background: #EF4444;
+    color: white;
+}
+
+.btn-export svg,
+.btn-remove-photo svg {
     width: 20px;
     height: 20px;
 }
