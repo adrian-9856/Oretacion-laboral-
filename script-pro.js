@@ -954,19 +954,23 @@ function loadUserProgress() {
 function loadDashboardData() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const results = getResults();
-    
+
     document.getElementById('totalUsers').textContent = users.length;
     document.getElementById('totalTests').textContent = results.length;
-    
+
     const scores = results.map(r => r.score);
     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     document.getElementById('avgScore').textContent = avgScore + '%';
-    
+
     const times = results.map(r => r.time);
     const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
     document.getElementById('avgTime').textContent = avgTime + 's';
-    
+
     loadResultsTable(results);
+
+    // Generar gráficas
+    generateScoresChart(results);
+    generateTestsPerUserChart(results, users);
 }
 
 function loadResultsTable(results) {
@@ -1032,6 +1036,131 @@ function exportToExcel() {
     a.click();
     
     showToast('✅ Datos exportados correctamente', 'success');
+}
+
+// Generar gráfica de puntuaciones por test
+function generateScoresChart(results) {
+    const chartContainer = document.getElementById('scoresChart');
+    if (!chartContainer) return;
+
+    if (results.length === 0) {
+        chartContainer.innerHTML = '<div class="bar-chart-empty"><p>No hay datos disponibles</p></div>';
+        return;
+    }
+
+    // Agrupar resultados por tipo de test
+    const testScores = {};
+    results.forEach(r => {
+        if (!testScores[r.test]) {
+            testScores[r.test] = [];
+        }
+        testScores[r.test].push(r.score);
+    });
+
+    // Calcular promedio por test
+    const testAverages = Object.keys(testScores).map(testName => {
+        const scores = testScores[testName];
+        const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+        return { name: testName, average: avg };
+    });
+
+    // Ordenar por promedio
+    testAverages.sort((a, b) => b.average - a.average);
+
+    // Generar HTML de las barras
+    const maxScore = Math.max(...testAverages.map(t => t.average), 100);
+
+    chartContainer.innerHTML = testAverages.map(test => {
+        const heightPercent = (test.average / maxScore) * 100;
+        return `
+            <div class="bar-item">
+                <div class="bar" style="height: ${heightPercent}%;">
+                    <span class="bar-value">${test.average}%</span>
+                </div>
+                <span class="bar-label">${test.name}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Generar gráfica de tests por usuario
+function generateTestsPerUserChart(results, users) {
+    const chartContainer = document.getElementById('testsPerUserChart');
+    if (!chartContainer) return;
+
+    if (results.length === 0 || users.length === 0) {
+        chartContainer.innerHTML = '<div class="pie-chart-empty"><p>No hay datos disponibles</p></div>';
+        return;
+    }
+
+    // Contar tests por usuario
+    const userTests = {};
+    results.forEach(r => {
+        if (!userTests[r.email]) {
+            userTests[r.email] = { name: r.user, count: 0 };
+        }
+        userTests[r.email].count++;
+    });
+
+    // Convertir a array y ordenar
+    const topUsers = Object.values(userTests)
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 5); // Top 5 usuarios
+
+    if (topUsers.length === 0) {
+        chartContainer.innerHTML = '<div class="pie-chart-empty"><p>No hay datos disponibles</p></div>';
+        return;
+    }
+
+    const total = topUsers.reduce((sum, u) => sum + u.count, 0);
+
+    // Generar colores y gradiente
+    const colors = [
+        '#3B82F6', // Azul
+        '#8B5CF6', // Morado
+        '#10B981', // Verde
+        '#F59E0B', // Amarillo/Naranja
+        '#EF4444'  // Rojo
+    ];
+
+    let currentAngle = 0;
+    const gradientStops = topUsers.map((user, index) => {
+        const percent = (user.count / total) * 100;
+        const angle = (percent / 100) * 360;
+        const startAngle = currentAngle;
+        const endAngle = currentAngle + angle;
+        currentAngle = endAngle;
+
+        return {
+            color: colors[index],
+            startAngle,
+            endAngle,
+            user: user.name,
+            count: user.count,
+            percent: Math.round(percent)
+        };
+    });
+
+    // Crear gradiente cónico
+    const gradient = gradientStops.map(stop =>
+        `${stop.color} ${stop.startAngle}deg ${stop.endAngle}deg`
+    ).join(', ');
+
+    // Generar HTML
+    chartContainer.innerHTML = `
+        <div class="pie-chart" style="background: conic-gradient(${gradient});">
+            <div class="pie-total">${total}</div>
+        </div>
+        <div class="pie-legend">
+            ${gradientStops.map(stop => `
+                <div class="pie-legend-item">
+                    <div class="pie-legend-color" style="background: ${stop.color};"></div>
+                    <span class="pie-legend-label">${stop.user}:</span>
+                    <span class="pie-legend-value">${stop.count}</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
 }
 
 function deleteResult(index) {
@@ -4191,9 +4320,9 @@ function createExamCode() {
     const expiration = document.getElementById('codeExpiration').value;
     const maxUses = parseInt(document.getElementById('codeMaxUses').value) || 0;
 
-    // Obtener pruebas seleccionadas
-    const testsSelect = document.getElementById('codeTestsAvailable');
-    const testsAvailable = Array.from(testsSelect.selectedOptions).map(opt => opt.value);
+    // Obtener pruebas seleccionadas de los checkboxes
+    const checkboxes = document.querySelectorAll('input[name="testsAvailable"]:checked');
+    const testsAvailable = Array.from(checkboxes).map(cb => cb.value);
 
     if (!codeName || !code) {
         showToast('❌ Por favor completa todos los campos obligatorios', 'error');

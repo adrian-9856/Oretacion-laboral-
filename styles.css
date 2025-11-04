@@ -1171,6 +1171,173 @@ body {
     color: var(--dark);
 }
 
+/* ========================================
+   GRÁFICAS DEL DASHBOARD
+======================================== */
+.charts-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 40px;
+}
+
+.chart-card {
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-color);
+}
+
+.chart-card h3 {
+    font-size: 1.2rem;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+/* Gráfica de Barras */
+.bar-chart {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-around;
+    height: 300px;
+    gap: 12px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius);
+}
+
+.bar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.bar {
+    width: 100%;
+    background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 20px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 8px;
+}
+
+.bar:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(var(--primary-rgb), 0.3);
+}
+
+.bar-value {
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.bar-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: center;
+    word-break: break-word;
+}
+
+.bar-chart-empty,
+.pie-chart-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    color: var(--text-light);
+    font-style: italic;
+}
+
+/* Gráfica de Pastel / Dona */
+.pie-chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-height: 300px;
+    padding: 20px;
+}
+
+.pie-chart {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--primary-color) 0deg 0deg
+    );
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pie-chart::before {
+    content: '';
+    width: 120px;
+    height: 120px;
+    background: var(--card-bg);
+    border-radius: 50%;
+    position: absolute;
+}
+
+.pie-total {
+    position: relative;
+    z-index: 1;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+.pie-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+}
+
+.pie-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.pie-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.pie-legend-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.pie-legend-value {
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Responsive charts */
+@media (max-width: 968px) {
+    .charts-section {
+        grid-template-columns: 1fr;
+    }
+
+    .bar-chart {
+        height: 250px;
+    }
+}
+
 .filters-section {
     display: grid;
     grid-template-columns: 2fr 1fr 1fr;
@@ -4778,6 +4945,84 @@ body.dark-theme .modal-content {
 .form-group small {
     color: var(--text-secondary);
     font-size: 0.8rem;
+}
+
+/* Tests Checkboxes Grid */
+.tests-checkboxes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.test-checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.test-checkbox-item:hover {
+    border-color: var(--primary-color);
+    background: rgba(var(--primary-rgb), 0.05);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.15);
+}
+
+.test-checkbox-item input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.checkbox-custom {
+    width: 22px;
+    height: 22px;
+    border: 2px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--bg-primary);
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.test-checkbox-item input[type="checkbox"]:checked + .checkbox-custom {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: var(--primary-color);
+}
+
+.test-checkbox-item input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.checkbox-icon {
+    font-size: 1.2rem;
+}
+
+.test-checkbox-item input[type="checkbox"]:checked ~ .checkbox-label {
+    color: var(--primary-color);
 }
 
 .code-display-group {

@@ -198,6 +198,27 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Sección de Gráficas -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3>📊 Puntuaciones por Test</h3>
+                    <div class="bar-chart" id="scoresChart">
+                        <div class="bar-chart-empty">
+                            <p>No hay datos disponibles</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>👥 Tests por Usuario</h3>
+                    <div class="pie-chart-container" id="testsPerUserChart">
+                        <div class="pie-chart-empty">
+                            <p>No hay datos disponibles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tab Resultados -->
             <div class="admin-tab-content active" id="resultsTabContent">
                 <div class="filters-section">
@@ -311,14 +332,57 @@
                                 </div>
                                 <div class="form-group">
                                     <label>Pruebas Disponibles:</label>
-                                    <select id="codeTestsAvailable" class="form-select" multiple size="5">
-                                        <option value="quiz" selected>Cuestionario</option>
-                                        <option value="errors" selected>Detectar Errores</option>
-                                        <option value="builder" selected>Construir CV</option>
-                                        <option value="interview" selected>Simulador de Entrevista</option>
-                                        <option value="wordsearch" selected>Sopa de Letras</option>
-                                    </select>
-                                    <small>Mantén presionado Ctrl/Cmd para seleccionar múltiples</small>
+                                    <div class="tests-checkboxes-grid">
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="quiz" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">📝</span>
+                                                Cuestionario
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="formal" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">💼</span>
+                                                Formal vs Informal
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="builder" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">📄</span>
+                                                Construir CV
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="interview" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">💬</span>
+                                                Simulador de Entrevista
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="wordsearch" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">🔍</span>
+                                                Sopa de Letras
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="strengths" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">🎯</span>
+                                                Fortalezas y Debilidades
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <small>Selecciona los tests que estarán disponibles con este código</small>
                                 </div>
                             </div>
                             <div class="form-row">
