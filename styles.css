@@ -5471,6 +5471,46 @@ body.dark-theme .modal-content {
     text-align: center;
 }
 
+.upload-section {
+    background: rgba(var(--accent-rgb), 0.05);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.btn-upload {
+    padding: 14px 32px;
+    background: linear-gradient(135deg, var(--accent-color), #14b8a6);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+}
+
+.btn-upload svg {
+    width: 22px;
+    height: 22px;
+}
+
+.btn-upload:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(var(--accent-rgb), 0.4);
+}
+
+.upload-note {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-top: 12px;
+}
+
 .divider-section {
     text-align: center;
     margin: 32px 0;

@@ -366,46 +366,39 @@
 
     <!-- JUEGO FORTALEZAS Y DEBILIDADES -->
     <div class="screen" id="strengthsWeaknessesScreen">
-        <div class="onboarding-container">
-            <div class="onboarding-content">
-                <div class="onboarding-header">
-                    <h1>🎯 Descubre tus Fortalezas y Debilidades</h1>
-                    <p>Antes de comenzar, veamos un video sobre autoconocimiento laboral</p>
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>🎯 Fortalezas y Debilidades</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="strengthsTestTypeBadge"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="characterGameTimer">05:00</span>
+                    </span>
+                    <button class="btn-logout" onclick="goToMenu()">← Volver</button>
                 </div>
+            </div>
+        </nav>
 
-                <div class="video-section">
-                    <h3>📹 Video: Conoce tus Fortalezas y Debilidades</h3>
-                    <div class="video-container">
-                        <iframe
-                            id="youtubeVideo"
-                            width="100%"
-                            height="400"
-                            src=""
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowfullscreen>
-                        </iframe>
+        <div class="container">
+            <div class="test-instructions">
+                <h2>Identifica tus Características Personales</h2>
+                <p>Arrastra las características a las categorías correspondientes. Este ejercicio te ayudará a conocerte mejor profesionalmente.</p>
+            </div>
+
+                <div class="game-header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">✅ Fortalezas:</span>
+                        <span class="stat-value" id="strengthsCount">0 / 5</span>
                     </div>
-                    <p class="video-note">💡 Tip: Mira el video completo para obtener mejores resultados</p>
+                    <div class="stat-item">
+                        <span class="stat-label">🎯 Áreas de mejora:</span>
+                        <span class="stat-value" id="weaknessesCount">0 / 3</span>
+                    </div>
                 </div>
-
-                <div class="game-section">
-                    <h3>🎮 Tu turno: Juego de Autoconocimiento</h3>
-
-                    <div class="game-header-stats">
-                        <div class="stat-item">
-                            <span class="stat-label">⏱️ Tiempo:</span>
-                            <span class="stat-value" id="characterGameTimer">05:00</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">✅ Fortalezas:</span>
-                            <span class="stat-value" id="strengthsCount">0 / 5</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">🎯 Áreas de mejora:</span>
-                            <span class="stat-value" id="weaknessesCount">0 / 3</span>
-                        </div>
-                    </div>
 
                     <div class="characteristics-game-layout">
                         <!-- Panel de características para arrastrar -->
@@ -444,13 +437,20 @@
                         </div>
                     </div>
 
-                    <div class="onboarding-actions">
-                        <button class="btn-onboarding primary" id="finishOnboardingBtn" onclick="finishOnboarding()" disabled>
-                            Completar Perfil →
+                    <div class="test-actions" style="display: flex; justify-content: center; gap: 16px; margin-top: 32px;">
+                        <button class="btn-secondary" onclick="goToMenu()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Volver
+                        </button>
+                        <button class="btn-primary" id="finishStrengthsBtn" onclick="finishStrengthsTest()" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Finalizar Test
                         </button>
                     </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -755,6 +755,16 @@
     </div>
     <h3>🔍 Sopa de Letras</h3>
     <p>Encuentra palabras sobre términos laborales</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+                <div class="test-card modern" onclick="startTest('strengths')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+    </div>
+    <h3>🎯 Fortalezas y Debilidades</h3>
+    <p>Identifica tus características personales</p>
     <button class="test-start-btn">Iniciar →</button>
 </div>
             </div>
@@ -1438,7 +1448,28 @@
                                 ❌ Cerrar Cámara
                             </button>
                         </div>
-                        <p class="camera-note">Puedes tomar una foto real o usar el generador de avatars animados abajo</p>
+                        <p class="camera-note">Toma una foto en tiempo real con tu cámara web o móvil</p>
+                    </div>
+                </div>
+
+                <div class="divider-section">
+                    <span>O</span>
+                </div>
+
+                <!-- Opción de Subir Foto -->
+                <div class="customization-group-pro">
+                    <h3>🖼️ Opción 2: Subir Foto desde tu Dispositivo</h3>
+                    <div class="upload-section">
+                        <input type="file" id="photoUploadInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                        <button class="btn-upload" onclick="document.getElementById('photoUploadInput').click()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            Seleccionar Foto
+                        </button>
+                        <p class="upload-note">Sube una foto que ya tengas en tu galería o archivos</p>
                     </div>
                 </div>
 
@@ -1448,7 +1479,7 @@
 
                 <!-- Selector de Estilo -->
                 <div class="customization-group-pro">
-                    <h3>🎭 Opción 2: Generar Avatar Animado</h3>
+                    <h3>🎭 Opción 3: Generar Avatar Animado</h3>
                 </div>
 
                 <!-- Selector de Estilo -->

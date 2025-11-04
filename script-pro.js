@@ -654,7 +654,7 @@ function showProgress() {
 
 function startTest(testType) {
     startTime = Date.now();
-    
+
     if (testType === 'quiz') {
         currentQuizQuestion = 0;
         quizAnswers = [];
@@ -666,6 +666,8 @@ function startTest(testType) {
         startErrorDetection();
     } else if (testType === 'builder') {
         startCVBuilder();
+    } else if (testType === 'strengths') {
+        startStrengthsWeaknessesTest();
     }
 }
 // ========================================
@@ -4395,12 +4397,12 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
 function showAvatarCreatorOnboarding() {
     document.getElementById('userName5').textContent = currentUser.name;
     showScreen('avatarCreatorScreen');
-    showToast('👋 ¡Bienvenido! Primero crea tu avatar', 'info');
+    showToast('👋 ¡Bienvenido! Crea tu avatar con una foto o genera uno animado', 'info');
 
-    // Modificar el botón de guardar para ir al juego de fortalezas
+    // Modificar el botón de guardar para completar perfil
     const saveBtn = document.querySelector('.btn-save-avatar-pro');
     if (saveBtn) {
-        saveBtn.textContent = 'Siguiente: Fortalezas y Debilidades →';
+        saveBtn.textContent = 'Completar Perfil →';
     }
 }
 
@@ -4421,12 +4423,42 @@ window.saveAvatarPro = function() {
         localStorage.setItem(`avatar_pro_${currentUser.email}`, JSON.stringify(avatarData));
         updateUserAvatarPro();
 
-        showToast('✅ Avatar guardado', 'success');
+        // Marcar onboarding como completado
+        currentUser.onboardingCompleted = true;
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.email === currentUser.email);
+        if (userIndex > -1) {
+            users[userIndex].onboardingCompleted = true;
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
-        // Ir al juego de fortalezas y debilidades
+        showToast('🎉 ¡Perfil completado! Bienvenido al sistema', 'success');
+
+        // Ir al welcome screen
         setTimeout(() => {
-            showStrengthsWeaknessesGame();
-        }, 500);
+            // Restaurar el botón de guardar avatar
+            const saveBtn = document.querySelector('.btn-save-avatar-pro');
+            if (saveBtn) {
+                saveBtn.innerHTML = `
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Guardar Avatar
+                `;
+            }
+
+            document.getElementById('userName').textContent = currentUser.name;
+            if (document.getElementById('userName3')) {
+                document.getElementById('userName3').textContent = currentUser.name;
+            }
+            if (document.getElementById('userName4')) {
+                document.getElementById('userName4').textContent = currentUser.name;
+            }
+
+            updateAttempts();
+            showScreen('welcomeScreen');
+        }, 1500);
     } else {
         // Flujo normal
         if (originalSaveAvatarPro) {
@@ -4516,6 +4548,78 @@ function stopCamera() {
     }
 }
 
+function handlePhotoUpload(event) {
+    const file = event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    // Verificar que sea una imagen
+    if (!file.type.startsWith('image/')) {
+        showToast('❌ Por favor selecciona un archivo de imagen válido', 'error');
+        return;
+    }
+
+    // Verificar tamaño (máximo 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+        showToast('❌ La imagen es demasiado grande. Máximo 5MB', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+        const img = new Image();
+
+        img.onload = function() {
+            // Crear canvas para redimensionar la imagen
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Establecer tamaño del canvas (máximo 800x800 manteniendo aspecto)
+            let width = img.width;
+            let height = img.height;
+            const maxDimension = 800;
+
+            if (width > maxDimension || height > maxDimension) {
+                if (width > height) {
+                    height = (height / width) * maxDimension;
+                    width = maxDimension;
+                } else {
+                    width = (width / height) * maxDimension;
+                    height = maxDimension;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            // Dibujar imagen redimensionada
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // Obtener data URL de la imagen procesada
+            capturedPhotoData = canvas.toDataURL('image/jpeg', 0.85);
+
+            // Mostrar en el preview
+            const previewLarge = document.getElementById('avatarPreviewLarge');
+            previewLarge.src = capturedPhotoData;
+            previewLarge.style.display = 'block';
+
+            showToast('✅ Foto cargada correctamente', 'success');
+        };
+
+        img.src = e.target.result;
+    };
+
+    reader.onerror = function() {
+        showToast('❌ Error al cargar la imagen', 'error');
+    };
+
+    reader.readAsDataURL(file);
+}
+
 // ========================================
 // JUEGO DE FORTALEZAS Y DEBILIDADES (DRAG & DROP)
 // ========================================
@@ -4550,12 +4654,15 @@ let selectedWeaknesses = [];
 let characterGameTimer = null;
 let characterGameTime = 300; // 5 minutos
 
-function showStrengthsWeaknessesGame() {
+function startStrengthsWeaknessesTest() {
     showScreen('strengthsWeaknessesScreen');
 
-    // Configurar el video de YouTube
-    const iframe = document.getElementById('youtubeVideo');
-    iframe.src = YOUTUBE_VIDEO_URL;
+    // Mostrar badge de tipo de test
+    const badge = currentTestType === 'pre' ? '📝 PRE-TEST' : '✅ POST-TEST';
+    const badgeElement = document.getElementById('strengthsTestTypeBadge');
+    if (badgeElement) {
+        badgeElement.textContent = badge;
+    }
 
     // Inicializar el juego
     selectedStrengths = [];
@@ -4760,7 +4867,8 @@ function updateCharacteristicsUI() {
 
     // Mostrar/ocultar resumen
     const summary = document.getElementById('selectedSummary');
-    const finishBtn = document.getElementById('finishOnboardingBtn');
+    const finishOnboardingBtn = document.getElementById('finishOnboardingBtn');
+    const finishStrengthsBtn = document.getElementById('finishStrengthsBtn');
 
     if (selectedStrengths.length > 0 && selectedWeaknesses.length > 0) {
         if (summary) summary.style.display = 'block';
@@ -4776,10 +4884,12 @@ function updateCharacteristicsUI() {
             summaryWeaknesses.innerHTML = selectedWeaknesses.map(w => `<li>${w}</li>`).join('');
         }
 
-        if (finishBtn) finishBtn.disabled = false;
+        if (finishOnboardingBtn) finishOnboardingBtn.disabled = false;
+        if (finishStrengthsBtn) finishStrengthsBtn.disabled = false;
     } else {
         if (summary) summary.style.display = 'none';
-        if (finishBtn) finishBtn.disabled = true;
+        if (finishOnboardingBtn) finishOnboardingBtn.disabled = true;
+        if (finishStrengthsBtn) finishStrengthsBtn.disabled = true;
     }
 }
 
@@ -4833,6 +4943,56 @@ function finishOnboarding() {
     }, 1500);
 }
 
+function finishStrengthsTest() {
+    const timeElapsed = Math.floor((Date.now() - startTime) / 1000);
+
+    // Detener el timer
+    if (characterGameTimer) {
+        clearInterval(characterGameTimer);
+        characterGameTimer = null;
+    }
+
+    // Guardar las características del usuario
+    const userProfile = {
+        strengths: selectedStrengths,
+        weaknesses: selectedWeaknesses,
+        completedAt: new Date().toISOString()
+    };
+
+    localStorage.setItem(`profile_${currentUser.email}`, JSON.stringify(userProfile));
+
+    // Calcular score basado en completitud
+    const strengthsScore = (selectedStrengths.length / 5) * 50;
+    const weaknessesScore = (selectedWeaknesses.length / 3) * 50;
+    const score = Math.round(strengthsScore + weaknessesScore);
+
+    if (!isPracticeMode) {
+        incrementAttempts(currentTestType);
+    }
+
+    const result = {
+        user: currentUser.name,
+        email: currentUser.email,
+        testType: currentTestType,
+        difficulty: currentDifficulty,
+        test: 'Fortalezas y Debilidades',
+        score: score,
+        correctAnswers: selectedStrengths.length + selectedWeaknesses.length,
+        totalQuestions: 8,
+        time: timeElapsed,
+        isPractice: isPracticeMode
+    };
+
+    lastTestResult = result;
+
+    if (!isPracticeMode) {
+        saveResult(result);
+        sendToGoogleSheets(result, 'resultado');
+    }
+
+    showResults(score, 'Fortalezas y Debilidades');
+}
+
 // Exportar funciones globales
 window.startWordSearch = startWordSearch;
 window.finishWordSearch = finishWordSearch;
@@ -4847,7 +5007,9 @@ window.showAdminTab = showAdminTab;
 window.startCamera = startCamera;
 window.capturePhoto = capturePhoto;
 window.stopCamera = stopCamera;
+window.handlePhotoUpload = handlePhotoUpload;
 window.finishOnboarding = finishOnboarding;
+window.finishStrengthsTest = finishStrengthsTest;
 window.dragCharacteristic = dragCharacteristic;
 window.dropCharacteristic = dropCharacteristic;
 window.removeCharacteristic = removeCharacteristic;
