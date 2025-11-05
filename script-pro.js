@@ -30,6 +30,26 @@ let modalCallback = null;
 let lastTestResult = null;
 let currentAvatar = null;
 
+// Variables para detección de errores
+let foundErrors = [];
+let errorStartTime;
+let errorTimerInterval;
+
+// Variables para simulador de entrevista
+let currentInterviewQuestion = 0;
+let interviewAnswers = [];
+let interviewStartTime;
+
+// Variables para grabación de audio
+let mediaRecorder;
+let audioChunks = [];
+let recordingInterval;
+let recordingStartTime;
+let currentInterviewMode = 'options';
+let speechRecognition = null;
+let currentTranscription = '';
+let audioAnalysisResult = null;
+
 // PREGUNTAS - NIVEL FÁCIL (PRE-TEST)
 const questionsEasy = [
     {
@@ -1454,10 +1474,6 @@ const errorsToFind = [
     { id: 10, type: 'referencias', error: 'a pedido', correct: 'a solicitud', found: false }
 ];
 
-let foundErrors = [];
-let errorStartTime;
-let errorTimerInterval;
-
 function startErrorDetection() {
     errorStartTime = Date.now();
     foundErrors = [];
@@ -1654,14 +1670,6 @@ let cvBuilderData = {
 
 let cvBuilderStep = 0;
 let cvBuilderStartTime;
-let cvBuilderData = {
-    personalInfo: {},
-    objective: '',
-    experience: [],
-    education: [],
-    skills: [],
-    references: ''
-};
 
 function startCVBuilder() {
     cvBuilderStartTime = Date.now();
@@ -2042,21 +2050,21 @@ function renderCVPreview() {
                     <h3>Experiencia Laboral</h3>
                     ${cvBuilderData.experience.map(exp => `
                         <div class="cv-item">
-                            <h4>${exp.position}</h4>
-                            <p><strong>${exp.company}</strong> | ${exp.period}</p>
-                            <p>${exp.description}</p>
+                            <h4>${exp.puesto}</h4>
+                            <p><strong>${exp.empresa}</strong> | ${exp.periodo}</p>
+                            <p>${exp.descripcion}</p>
                         </div>
                     `).join('')}
                 </div>
             ` : ''}
-            
+
             ${cvBuilderData.education.length > 0 ? `
                 <div class="cv-section">
                     <h3>Educación</h3>
                     ${cvBuilderData.education.map(edu => `
                         <div class="cv-item">
-                            <h4>${edu.degree}</h4>
-                            <p><strong>${edu.institution}</strong> | ${edu.year}</p>
+                            <h4>${edu.titulo}</h4>
+                            <p><strong>${edu.institucion}</strong> | ${edu.año}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -2339,10 +2347,6 @@ const interviewQuestions = [
         ]
     }
 ];
-
-let currentInterviewQuestion = 0;
-let interviewAnswers = [];
-let interviewStartTime;
 
 function startInterviewSimulator() {
     interviewStartTime = Date.now();
@@ -2717,11 +2721,15 @@ function getXPProgress() {
     const currentXP = userChallengeData.xp;
     const currentThreshold = levelThresholds[currentLevel - 1];
     const nextThreshold = getXPForNextLevel();
-    
+
     const progress = currentXP - currentThreshold;
     const required = nextThreshold - currentThreshold;
-    
+
     return { progress, required, percentage: (progress / required) * 100 };
+}
+
+function calculateLevelProgress() {
+    return getXPProgress();
 }
 
 // ========================================
@@ -3361,15 +3369,7 @@ window.saveAvatarPro = saveAvatarPro;
 // SIMULADOR DE ENTREVISTA CON AUDIO
 // ========================================
 
-let mediaRecorder;
-let audioChunks = [];
-let recordingInterval;
-let recordingStartTime;
-let currentInterviewMode = 'options';
 let speechSynthesis = window.speechSynthesis;
-let speechRecognition = null;
-let currentTranscription = '';
-let audioAnalysisResult = null;
 
 // Configurar reconocimiento de voz (para transcripción)
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
