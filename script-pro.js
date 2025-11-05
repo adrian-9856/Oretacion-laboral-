@@ -539,6 +539,17 @@ function showScreen(screenId) {
         screen.classList.add('active');
         window.scrollTo(0, 0);
     }
+
+    // Cargar avatar si el usuario está logueado
+    if (currentUser) {
+        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
+        if (savedAvatar) {
+            currentAvatar = JSON.parse(savedAvatar);
+            if (typeof updateUserAvatar === 'function') {
+                updateUserAvatar();
+            }
+        }
+    }
 }
 
 function selectTest(type) {
@@ -579,7 +590,7 @@ function showProgress() {
 
 function startTest(testType) {
     startTime = Date.now();
-    
+
     if (testType === 'quiz') {
         currentQuizQuestion = 0;
         quizAnswers = [];
@@ -591,6 +602,10 @@ function startTest(testType) {
         startErrorDetection();
     } else if (testType === 'builder') {
         startCVBuilder();
+    } else if (testType === 'interview') {
+        if (typeof startInterviewSimulator === 'function') {
+            startInterviewSimulator();
+        }
     }
 }
 // ========================================
@@ -2325,30 +2340,16 @@ function finishInterviewSimulator() {
     showResults(scorePercentage, 'Simulador de Entrevista Laboral');
 }
 
-// Actualizar la función startTest para incluir interview
-function startTest(testType) {
-    startTime = Date.now();
-    
-    if (testType === 'quiz') {
-        currentQuizQuestion = 0;
-        quizAnswers = [];
-        remainingTime = CONFIG.QUIZ_TIME_LIMIT;
-        showScreen('quizScreen');
-        loadQuestion();
-        startCountdown();
-    } else if (testType === 'errors') {
-        startErrorDetection();
-    } else if (testType === 'builder') {
-        startCVBuilder();
-    } else if (testType === 'interview') {
-        startInterviewSimulator();
-    }
+// Exportar funciones del simulador de entrevista al scope global
+if (typeof startInterviewSimulator !== 'undefined') {
+    window.startInterviewSimulator = startInterviewSimulator;
 }
-
-// Exportar funciones
-window.startInterviewSimulator = startInterviewSimulator;
-window.selectInterviewOption = selectInterviewOption;
-window.nextInterviewQuestion = nextInterviewQuestion;
+if (typeof selectInterviewOption !== 'undefined') {
+    window.selectInterviewOption = selectInterviewOption;
+}
+if (typeof nextInterviewQuestion !== 'undefined') {
+    window.nextInterviewQuestion = nextInterviewQuestion;
+}
 
 console.log('✅ Simulador de Entrevista cargado');
 // ========================================
@@ -2838,6 +2839,139 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // ========================================
+// FUNCIONES DE NAVEGACIÓN PARA DESAFÍOS
+// ========================================
+
+function showChallengesScreen() {
+    showScreen('challengesScreen');
+    loadChallengesData();
+    updateChallengesDisplay();
+}
+
+function loadChallengesData() {
+    // Actualizar estadísticas del usuario
+    if (document.getElementById('userXP')) {
+        document.getElementById('userXP').textContent = `${userChallengeData.xp} XP`;
+    }
+    if (document.getElementById('userLevel')) {
+        document.getElementById('userLevel').textContent = userChallengeData.level;
+    }
+    if (document.getElementById('userBadges')) {
+        document.getElementById('userBadges').textContent = userChallengeData.badges.length;
+    }
+    if (document.getElementById('userStreak')) {
+        document.getElementById('userStreak').textContent = `${userChallengeData.streak} días`;
+    }
+    if (document.getElementById('userRank')) {
+        document.getElementById('userRank').textContent = '#-';
+    }
+
+    // Actualizar barra de progreso de nivel
+    const levelProgress = calculateLevelProgress();
+    if (document.getElementById('currentLevelDisplay')) {
+        document.getElementById('currentLevelDisplay').textContent = userChallengeData.level;
+    }
+    if (document.getElementById('currentXPDisplay')) {
+        document.getElementById('currentXPDisplay').textContent = userChallengeData.xp;
+    }
+    if (document.getElementById('nextLevelXP')) {
+        document.getElementById('nextLevelXP').textContent = getXPForNextLevel();
+    }
+    if (document.getElementById('levelProgressFill')) {
+        document.getElementById('levelProgressFill').style.width = `${levelProgress.percentage}%`;
+    }
+}
+
+function updateChallengesDisplay() {
+    // Actualizar desafíos diarios
+    const dailyGrid = document.getElementById('dailyChallengesGrid');
+    if (dailyGrid) {
+        dailyGrid.innerHTML = '';
+        dailyChallenges.forEach(challenge => {
+            const progress = userChallengeData.dailyProgress[challenge.id] || 0;
+            const completed = progress >= challenge.target;
+            dailyGrid.innerHTML += `
+                <div class="challenge-card ${completed ? 'completed' : ''}">
+                    <div class="challenge-icon">${challenge.icon}</div>
+                    <h4>${challenge.title}</h4>
+                    <p>${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${(progress / challenge.target) * 100}%"></div>
+                        </div>
+                        <span>${progress}/${challenge.target}</span>
+                    </div>
+                    <div class="challenge-reward">+${challenge.xp} XP</div>
+                </div>
+            `;
+        });
+    }
+
+    // Actualizar desafíos semanales
+    const weeklyGrid = document.getElementById('weeklyChallengesGrid');
+    if (weeklyGrid) {
+        weeklyGrid.innerHTML = '';
+        weeklyChallenges.forEach(challenge => {
+            const progress = userChallengeData.weeklyProgress[challenge.id] || 0;
+            const completed = progress >= challenge.target;
+            weeklyGrid.innerHTML += `
+                <div class="challenge-card ${completed ? 'completed' : ''}">
+                    <div class="challenge-icon">${challenge.icon}</div>
+                    <h4>${challenge.title}</h4>
+                    <p>${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${(progress / challenge.target) * 100}%"></div>
+                        </div>
+                        <span>${progress}/${challenge.target}</span>
+                    </div>
+                    <div class="challenge-reward">+${challenge.xp} XP</div>
+                </div>
+            `;
+        });
+    }
+
+    // Actualizar badges
+    const badgesGrid = document.getElementById('badgesGrid');
+    if (badgesGrid) {
+        badgesGrid.innerHTML = '';
+        availableBadges.forEach(badge => {
+            const unlocked = userChallengeData.badges.includes(badge.id);
+            badgesGrid.innerHTML += `
+                <div class="badge-card ${unlocked ? 'unlocked' : 'locked'}">
+                    <div class="badge-icon">${badge.icon}</div>
+                    <h4>${badge.name}</h4>
+                    <p>${badge.description}</p>
+                    <span class="badge-status">${unlocked ? '✓ Desbloqueada' : '🔒 Bloqueada'}</span>
+                </div>
+            `;
+        });
+    }
+}
+
+function showChallengeTab(tabName) {
+    // Remover active de todos los tabs
+    document.querySelectorAll('.challenge-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.challenge-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Activar el tab seleccionado
+    event.target.classList.add('active');
+    const contentId = tabName + 'Challenges';
+    const content = document.getElementById(contentId) || document.getElementById(tabName + 'Content');
+    if (content) {
+        content.classList.add('active');
+    }
+}
+
+// Exportar funciones al scope global
+window.showChallengesScreen = showChallengesScreen;
+window.showChallengeTab = showChallengeTab;
+
+// ========================================
 // CREADOR DE AVATAR PRO - DICEBEAR API
 // ========================================
 
@@ -3096,6 +3230,17 @@ function updateUserAvatarPro() {
         navUser.insertBefore(avatarContainer.cloneNode(true), navUser.firstChild);
     });
 }
+
+// Exportar funciones del avatar al scope global
+window.showAvatarCreator = showAvatarCreator;
+window.changeAvatarStyle = changeAvatarStyle;
+window.randomizeAvatar = randomizeAvatar;
+window.applyCustomSeed = applyCustomSeed;
+window.changeBackground = changeBackground;
+window.changeSize = changeSize;
+window.toggleFlip = toggleFlip;
+window.exportAvatar = exportAvatar;
+window.saveAvatarPro = saveAvatarPro;
 
 // ========================================
 // SIMULADOR DE ENTREVISTA CON AUDIO
@@ -3465,31 +3610,17 @@ function deleteRecording() {
     showToast('Grabación eliminada', 'info');
 }
 
+// Exportar funciones del simulador de entrevista al scope global
+window.switchInterviewMode = switchInterviewMode;
+window.speakQuestion = speakQuestion;
+window.startRecording = startRecording;
+window.stopRecording = stopRecording;
+window.deleteRecording = deleteRecording;
+
 // ========================================
 // NAVEGACIÓN Y PANTALLAS
 // ========================================
-
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-
-    // Cargar avatar si el usuario está logueado
-    if (currentUser) {
-        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
-        if (savedAvatar) {
-            currentAvatar = JSON.parse(savedAvatar);
-            updateUserAvatar();
-        }
-    }
-}
-
-function goToWelcome() {
-    showScreen('welcomeScreen');
-}
-
-function goToMenu() {
-    showScreen('testMenuScreen');
-}
+// (Funciones movidas a la sección principal de NAVEGACIÓN)
 
 // ========================================
 // INICIALIZACIÓN AL CARGAR LA PÁGINA
