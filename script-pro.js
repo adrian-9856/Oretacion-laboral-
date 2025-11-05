@@ -28,6 +28,7 @@ let isPracticeMode = false;
 let remainingTime = 0;
 let modalCallback = null;
 let lastTestResult = null;
+let currentAvatar = null;
 
 // PREGUNTAS - NIVEL FÁCIL (PRE-TEST)
 const questionsEasy = [
@@ -542,11 +543,11 @@ function showScreen(screenId) {
 
     // Cargar avatar si el usuario está logueado
     if (currentUser) {
-        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
+        const savedAvatar = localStorage.getItem(`avatar_pro_${currentUser.email}`);
         if (savedAvatar) {
             currentAvatar = JSON.parse(savedAvatar);
-            if (typeof updateUserAvatar === 'function') {
-                updateUserAvatar();
+            if (typeof updateUserAvatarPro === 'function') {
+                updateUserAvatarPro();
             }
         }
     }
@@ -1653,6 +1654,14 @@ let cvBuilderData = {
 
 let cvBuilderStep = 0;
 let cvBuilderStartTime;
+let cvBuilderData = {
+    personalInfo: {},
+    objective: '',
+    experience: [],
+    education: [],
+    skills: [],
+    references: ''
+};
 
 function startCVBuilder() {
     cvBuilderStartTime = Date.now();
@@ -1866,11 +1875,30 @@ function saveCVStepData() {
             address: document.getElementById('cvAddress')?.value.trim()
         };
     }
-    
+
     if (cvBuilderStep === 1) {
         cvBuilderData.objective = document.getElementById('cvObjective')?.value.trim();
     }
-    
+
+    if (cvBuilderStep === 2) {
+        // Guardar experiencia
+        cvBuilderData.experience = cvBuilderData.experience.map((exp, i) => ({
+            puesto: document.getElementById(`expJob-${i}`)?.value.trim() || '',
+            empresa: document.getElementById(`expCompany-${i}`)?.value.trim() || '',
+            periodo: document.getElementById(`expPeriod-${i}`)?.value.trim() || '',
+            descripcion: document.getElementById(`expDesc-${i}`)?.value.trim() || ''
+        }));
+    }
+
+    if (cvBuilderStep === 3) {
+        // Guardar educación
+        cvBuilderData.education = cvBuilderData.education.map((edu, i) => ({
+            titulo: document.getElementById(`eduTitle-${i}`)?.value.trim() || '',
+            institucion: document.getElementById(`eduInstitution-${i}`)?.value.trim() || '',
+            año: document.getElementById(`eduYear-${i}`)?.value.trim() || ''
+        }));
+    }
+
     if (cvBuilderStep === 5) {
         cvBuilderData.references = document.getElementById('cvReferences')?.value.trim();
     }
@@ -1895,13 +1923,96 @@ function removeSkill(index) {
 function renderSkills() {
     const container = document.getElementById('skillsList');
     if (!container) return;
-    
+
     container.innerHTML = cvBuilderData.skills.map((skill, i) => `
         <span class="skill-tag">
             ${skill}
             <button onclick="removeSkill(${i})">×</button>
         </span>
     `).join('');
+}
+
+function addExperience() {
+    const experienceList = document.getElementById('experienceList');
+    if (!experienceList) return;
+
+    const index = cvBuilderData.experience.length;
+
+    const experienceHTML = `
+        <div class="experience-item" id="exp-${index}">
+            <div class="form-group">
+                <label>Puesto</label>
+                <input type="text" id="expJob-${index}" placeholder="Ej: Asistente Administrativo">
+            </div>
+            <div class="form-group">
+                <label>Empresa</label>
+                <input type="text" id="expCompany-${index}" placeholder="Ej: Empresa XYZ">
+            </div>
+            <div class="form-group">
+                <label>Período</label>
+                <input type="text" id="expPeriod-${index}" placeholder="Ej: 2020 - 2022">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="expDesc-${index}" rows="3" placeholder="Describe tus responsabilidades..."></textarea>
+            </div>
+            <button type="button" class="btn-remove" onclick="removeExperience(${index})">Eliminar</button>
+        </div>
+    `;
+
+    experienceList.insertAdjacentHTML('beforeend', experienceHTML);
+
+    cvBuilderData.experience.push({
+        puesto: '',
+        empresa: '',
+        periodo: '',
+        descripcion: ''
+    });
+}
+
+function removeExperience(index) {
+    cvBuilderData.experience.splice(index, 1);
+    const element = document.getElementById(`exp-${index}`);
+    if (element) element.remove();
+}
+
+function addEducation() {
+    const educationList = document.getElementById('educationList');
+    if (!educationList) return;
+
+    const index = cvBuilderData.education.length;
+
+    const educationHTML = `
+        <div class="education-item" id="edu-${index}">
+            <div class="form-group">
+                <label>Título/Grado</label>
+                <input type="text" id="eduTitle-${index}" placeholder="Ej: Bachillerato en Ciencias">
+            </div>
+            <div class="form-group">
+                <label>Institución</label>
+                <input type="text" id="eduInstitution-${index}" placeholder="Ej: Colegio Nacional">
+            </div>
+            <div class="form-group">
+                <label>Año</label>
+                <input type="text" id="eduYear-${index}" placeholder="Ej: 2018 - 2022">
+            </div>
+            <button type="button" class="btn-remove" onclick="removeEducation(${index})">Eliminar</button>
+        </div>
+    `;
+
+    educationList.insertAdjacentHTML('beforeend', educationHTML);
+
+    cvBuilderData.education.push({
+        titulo: '',
+        institucion: '',
+        año: ''
+    });
+}
+
+function removeEducation(index) {
+    cvBuilderData.education.splice(index, 1);
+    const element = document.getElementById(`edu-${index}`);
+    if (element) element.remove();
 }
 
 function renderCVPreview() {
@@ -2016,6 +2127,10 @@ window.startErrorDetection = startErrorDetection;
 window.startCVBuilder = startCVBuilder;
 window.addSkill = addSkill;
 window.removeSkill = removeSkill;
+window.addExperience = addExperience;
+window.removeExperience = removeExperience;
+window.addEducation = addEducation;
+window.removeEducation = removeEducation;
 window.nextCVStep = nextCVStep;
 window.previousCVStep = previousCVStep;
 // ========================================
