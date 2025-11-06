@@ -317,7 +317,41 @@ function confirmAction() {
 }
 
 function confirmExit() {
-    showModal('¿Deseas salir de la prueba? Perderás tu progreso actual.', () => {
+    showModal('⚠️ ADVERTENCIA: Si sales ahora, tu calificación será 0 (cero) y se registrará como examen completado. ¿Estás seguro de que deseas salir?', () => {
+        // Registrar resultado con nota 0
+        if (currentUser && currentTestType && !isPracticeMode) {
+            const testNames = {
+                'pre': 'Cuestionario PRE-TEST',
+                'post': 'Cuestionario POST-TEST',
+                'errors': 'Detectar Errores en CV',
+                'builder': 'Construir CV',
+                'interview': 'Simulador de Entrevista',
+                'personality': 'Test de Personalidad',
+                'formal': 'Test Formal/Informal',
+                'dresscode': 'Código de Vestimenta',
+                'wordsearch': 'Sopa de Letras',
+                'strengths': 'Fortalezas y Debilidades',
+                'codeExam': 'Examen por Código'
+            };
+
+            const result = {
+                user: currentUser.name,
+                email: currentUser.email,
+                testType: currentTestType,
+                difficulty: currentDifficulty || 'N/A',
+                test: testNames[currentTestType] || 'Test',
+                score: 0,
+                correctAnswers: 0,
+                totalQuestions: 0,
+                time: Math.floor((Date.now() - startTime) / 1000),
+                isPractice: false,
+                exitedEarly: true
+            };
+
+            saveResult(result);
+            incrementAttempts(currentTestType);
+        }
+
         if (countdownInterval) clearInterval(countdownInterval);
         goToMenu();
     });
@@ -1061,6 +1095,182 @@ function generateCertificate(result) {
 }
 
 // ========================================
+// DIPLOMA DE PROGRAMA COMPLETO
+// ========================================
+
+function checkAllExamsCompleted() {
+    if (!currentUser) return false;
+
+    const requiredTests = ['pre', 'post', 'errors', 'builder', 'interview',
+                          'personality', 'formal', 'dresscode', 'wordsearch', 'strengths'];
+
+    const userResults = getUserResults();
+    const completedTests = new Set(userResults.map(r => r.testType));
+
+    // Verificar si tiene al menos un resultado exitoso (score > 0 y no salida temprana) de cada tipo
+    const allCompleted = requiredTests.every(testType => {
+        const testResults = userResults.filter(r =>
+            r.testType === testType &&
+            r.score > 0 &&
+            !r.exitedEarly
+        );
+        return testResults.length > 0;
+    });
+
+    return allCompleted;
+}
+
+function checkCodeExamsCompleted() {
+    if (!currentUser) return false;
+
+    // Verificar si completó todos los exámenes asignados por código
+    const assignedCodes = JSON.parse(localStorage.getItem('examCodes') || '[]');
+    const userResults = getUserResults();
+
+    // Si no hay códigos asignados, retornar false
+    if (assignedCodes.length === 0) return false;
+
+    // Verificar cuántos códigos ha completado el usuario
+    const completedCodes = userResults.filter(r => r.testType === 'codeExam' && r.score > 0 && !r.exitedEarly);
+
+    // Si completó al menos uno, considerarlo para diploma
+    return completedCodes.length > 0;
+}
+
+function generateCompletionDiploma() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    // Fondo elegante con gradiente simulado
+    doc.setFillColor(15, 23, 42); // Azul muy oscuro
+    doc.rect(0, 0, 297, 210, 'F');
+
+    // Bordes dorados
+    doc.setDrawColor(251, 191, 36); // Dorado
+    doc.setLineWidth(3);
+    doc.rect(8, 8, 281, 194);
+    doc.setLineWidth(1);
+    doc.rect(12, 12, 273, 186);
+
+    // Título principal
+    doc.setFontSize(42);
+    doc.setTextColor(251, 191, 36); // Dorado
+    doc.setFont(undefined, 'bold');
+    doc.text('DIPLOMA DE EXCELENCIA', 148.5, 35, { align: 'center' });
+
+    doc.setFontSize(16);
+    doc.setTextColor(226, 232, 240); // Gris claro
+    doc.setFont(undefined, 'normal');
+    doc.text('Programa Completo de Orientación Laboral Profesional', 148.5, 47, { align: 'center' });
+
+    // Línea decorativa
+    doc.setDrawColor(251, 191, 36);
+    doc.setLineWidth(1.5);
+    doc.line(70, 53, 227, 53);
+
+    // Texto de otorgamiento
+    doc.setFontSize(14);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Se otorga el presente Diploma de Excelencia a:', 148.5, 68, { align: 'center' });
+
+    // Nombre del usuario
+    doc.setFontSize(32);
+    doc.setTextColor(251, 191, 36);
+    doc.setFont(undefined, 'bold');
+    doc.text(currentUser.name, 148.5, 88, { align: 'center' });
+
+    // Línea bajo el nombre
+    doc.setDrawColor(251, 191, 36);
+    doc.setLineWidth(0.8);
+    doc.line(50, 92, 247, 92);
+
+    // Descripción del logro
+    doc.setFontSize(13);
+    doc.setTextColor(203, 213, 225);
+    doc.setFont(undefined, 'normal');
+    doc.text('Por haber completado exitosamente TODOS los módulos de evaluación', 148.5, 105, { align: 'center' });
+    doc.text('del Sistema de Orientación Laboral Profesional, demostrando', 148.5, 113, { align: 'center' });
+    doc.text('compromiso, dedicación y excelencia en el desarrollo de competencias laborales.', 148.5, 121, { align: 'center' });
+
+    // Estadísticas del usuario
+    const userResults = getUserResults().filter(r => !r.exitedEarly && r.score > 0);
+    const avgScore = Math.round(userResults.reduce((sum, r) => sum + r.score, 0) / userResults.length);
+    const totalTests = userResults.length;
+
+    doc.setFontSize(12);
+    doc.setTextColor(251, 191, 36);
+    doc.setFont(undefined, 'bold');
+    doc.text(`Evaluaciones completadas: ${totalTests}`, 148.5, 135, { align: 'center' });
+    doc.text(`Promedio general: ${avgScore}%`, 148.5, 143, { align: 'center' });
+
+    // Fecha
+    doc.setFontSize(11);
+    doc.setTextColor(148, 163, 184);
+    doc.setFont(undefined, 'normal');
+    const fecha = new Date().toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+    doc.text(`Fecha de emisión: ${fecha}`, 148.5, 157, { align: 'center' });
+
+    // Líneas de firma
+    doc.setDrawColor(251, 191, 36);
+    doc.setLineWidth(0.5);
+    doc.line(45, 175, 110, 175);
+    doc.line(187, 175, 252, 175);
+
+    // Títulos de firma
+    doc.setFontSize(9);
+    doc.setTextColor(203, 213, 225);
+    doc.text('Director del Programa', 77.5, 182, { align: 'center' });
+    doc.text('Coordinador de Certificación', 219.5, 182, { align: 'center' });
+
+    // Sello/Código de verificación
+    doc.setFontSize(8);
+    doc.setTextColor(148, 163, 184);
+    const codigo = `DIPLOMA-COMPLETO-${currentUser.email.substring(0, 4).toUpperCase()}-${Date.now().toString().slice(-8)}`;
+    doc.text(`Código de verificación: ${codigo}`, 148.5, 192, { align: 'center' });
+    doc.text('Este diploma certifica la finalización exitosa de todo el programa', 148.5, 198, { align: 'center' });
+
+    // Guardar
+    const filename = `DIPLOMA_COMPLETO_${currentUser.name.replace(/\s+/g, '_')}.pdf`;
+    doc.save(filename);
+
+    showToast('🎓 ¡DIPLOMA DE PROGRAMA COMPLETO DESCARGADO!', 'success');
+}
+
+function checkAndOfferCompletionDiploma() {
+    if (!currentUser || isPracticeMode) return;
+
+    const allExamsCompleted = checkAllExamsCompleted();
+
+    // Verificar si ya se le ofreció el diploma
+    const diplomasOffered = JSON.parse(localStorage.getItem('diplomasOffered') || '{}');
+    const userEmail = currentUser.email;
+
+    if (allExamsCompleted && !diplomasOffered[userEmail]) {
+        // Marcar como ofrecido
+        diplomasOffered[userEmail] = {
+            offered: true,
+            date: new Date().toISOString()
+        };
+        localStorage.setItem('diplomasOffered', JSON.stringify(diplomasOffered));
+
+        // Mostrar mensaje especial y generar diploma automáticamente
+        setTimeout(() => {
+            showModal('🎉 ¡FELICITACIONES! Has completado TODOS los exámenes del programa. Se generará automáticamente tu DIPLOMA DE EXCELENCIA.', () => {
+                generateCompletionDiploma();
+            });
+        }, 2000);
+    }
+}
+
+// ========================================
 // RESULTADOS CON RETROALIMENTACIÓN
 // ========================================
 
@@ -1120,6 +1330,9 @@ function showResults(score, testName) {
     
     showScreen('resultsScreen');
     updateAttempts();
+
+    // Verificar si completó todos los exámenes para ofrecer diploma
+    checkAndOfferCompletionDiploma();
 }
 
 // ========================================
@@ -5820,173 +6033,133 @@ let newExamQuestions = [];
 
 function showExamCodesManager() {
     showScreen('examCodesManagerScreen');
-    switchExamTab('create');
     loadExamCodesList();
+
+    // Configurar listeners para los checkboxes
+    setTimeout(() => {
+        const checkboxes = document.querySelectorAll('input[name="examSelection"]');
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateExamSelectionCount);
+        });
+        updateExamSelectionCount();
+    }, 100);
 }
 
-// Cambiar entre pestañas de examen
-function switchExamTab(tab) {
-    // Ocultar todos los contenidos de tabs
-    document.querySelectorAll('.exam-tab-content').forEach(content => {
-        content.style.display = 'none';
-        content.classList.remove('active');
-    });
+// Actualizar contador de exámenes seleccionados
+function updateExamSelectionCount() {
+    const checkboxes = document.querySelectorAll('input[name="examSelection"]:checked');
+    const count = checkboxes.length;
+    const countEl = document.getElementById('selectedCount');
+    const summaryEl = document.getElementById('examSummary');
+    const summaryListEl = document.getElementById('examSummaryList');
 
-    // Remover active de todos los botones
-    document.querySelectorAll('.exam-tab').forEach(btn => {
-        btn.classList.remove('active');
-    });
+    if (countEl) countEl.textContent = count;
 
-    // Activar la pestaña seleccionada
-    if (tab === 'create') {
-        document.getElementById('createExamForm').style.display = 'block';
-        document.getElementById('createExamForm').classList.add('active');
-        event.target.classList.add('active');
-    } else if (tab === 'assign') {
-        document.getElementById('assignExamForm').style.display = 'block';
-        document.getElementById('assignExamForm').classList.add('active');
-        event.target.classList.add('active');
-    }
-}
-
-// Actualizar vista previa del examen seleccionado
-function updateExamPreview() {
-    const examType = document.getElementById('existingExamType').value;
-    const preview = document.getElementById('examPreview');
-    const titleEl = document.getElementById('examPreviewTitle');
-    const infoEl = document.getElementById('examPreviewInfo');
-
-    if (!examType) {
-        preview.style.display = 'none';
-        return;
-    }
-
-    const examInfo = {
-        'quiz_easy': {
-            title: 'Cuestionario - Nivel Fácil (PRE-TEST)',
-            info: `${questionsEasy.length} preguntas de opción múltiple. Tiempo: 15 minutos. Cubre conceptos básicos de orientación laboral.`
-        },
-        'quiz_hard': {
-            title: 'Cuestionario - Nivel Difícil (POST-TEST)',
-            info: `${questionsHard.length} preguntas de opción múltiple. Tiempo: 15 minutos. Evaluación avanzada de competencias laborales.`
-        },
-        'cv_errors': {
-            title: 'Detectar Errores en CV',
-            info: '10 errores a encontrar en un currículum. Tiempo: 10 minutos. Desarrolla habilidades de revisión de documentos.'
-        },
-        'cv_builder': {
-            title: 'Constructor de CV',
-            info: 'Formulario interactivo para crear un CV completo. Tiempo: 20 minutos. Evalúa capacidad de redacción profesional.'
-        },
-        'interview': {
-            title: 'Simulador de Entrevista',
-            info: '8 preguntas de entrevista con grabación de audio opcional. Evalúa habilidades de comunicación.'
-        },
-        'strengths': {
-            title: 'Test de Fortalezas y Debilidades',
-            info: `${strengthsQuestions.length} preguntas de autoevaluación. Tiempo: 15 minutos. Ayuda a identificar áreas de mejora.`
-        },
-        'wordsearch': {
-            title: 'Sopa de Letras Laboral',
-            info: 'Encuentra 15 palabras relacionadas con el mundo laboral. Tiempo: 10 minutos. Actividad lúdica educativa.'
-        }
+    const examNames = {
+        'quiz_easy': '📝 Cuestionario PRE-TEST',
+        'quiz_hard': '📝 Cuestionario POST-TEST',
+        'cv_errors': '🔍 Detectar Errores en CV',
+        'cv_builder': '📄 Constructor de CV',
+        'interview': '🎭 Simulador de Entrevista',
+        'personality': '🧠 Test de Personalidad',
+        'formal': '💼 Test Formal/Informal',
+        'dresscode': '👔 Código de Vestimenta',
+        'strengths': '💪 Fortalezas y Debilidades',
+        'wordsearch': '🔤 Sopa de Letras'
     };
 
-    const info = examInfo[examType];
-    titleEl.textContent = info.title;
-    infoEl.textContent = info.info;
-    preview.style.display = 'block';
+    if (count > 0 && summaryEl && summaryListEl) {
+        summaryEl.style.display = 'block';
+        const selectedExams = Array.from(checkboxes).map(cb => cb.value);
+        summaryListEl.innerHTML = selectedExams.map(exam =>
+            `<div style="padding: 0.25rem 0;">✓ ${examNames[exam] || exam}</div>`
+        ).join('');
+    } else if (summaryEl) {
+        summaryEl.style.display = 'none';
+    }
 }
 
-// Guardar asignación de código a examen existente
-function saveAssignExam() {
-    const examType = document.getElementById('existingExamType').value;
+// Limpiar selección de exámenes
+function clearExamSelection() {
+    const checkboxes = document.querySelectorAll('input[name="examSelection"]');
+    checkboxes.forEach(cb => cb.checked = false);
+    updateExamSelectionCount();
+    document.getElementById('assignExamTitle').value = '';
+    document.getElementById('assignExamDescription').value = '';
+    showToast('Selección limpiada', 'info');
+}
+
+// Generar código único para múltiples exámenes
+function generateMultiExamCode() {
+    const checkboxes = document.querySelectorAll('input[name="examSelection"]:checked');
+    const selectedExams = Array.from(checkboxes).map(cb => cb.value);
     const customTitle = document.getElementById('assignExamTitle').value.trim();
     const description = document.getElementById('assignExamDescription').value.trim();
 
-    if (!examType) {
-        showToast('Selecciona un tipo de examen', 'error');
+    if (selectedExams.length === 0) {
+        showToast('❌ Selecciona al menos un examen', 'error');
         return;
     }
 
-    // Mapeo de tipos a funciones de examen
-    const examMapping = {
-        'quiz_easy': {
-            title: customTitle || 'Cuestionario - Nivel Fácil',
-            questions: questionsEasy,
-            timeLimit: 900,
-            examFunction: 'startQuiz',
-            examDifficulty: 'easy'
-        },
-        'quiz_hard': {
-            title: customTitle || 'Cuestionario - Nivel Difícil',
-            questions: questionsHard,
-            timeLimit: 900,
-            examFunction: 'startQuiz',
-            examDifficulty: 'hard'
-        },
-        'cv_errors': {
-            title: customTitle || 'Detectar Errores en CV',
-            questions: [],
-            timeLimit: 600,
-            examFunction: 'startCVErrors',
-            examType: 'cv_errors'
-        },
-        'cv_builder': {
-            title: customTitle || 'Constructor de CV',
-            questions: [],
-            timeLimit: 1200,
-            examFunction: 'startCVBuilder',
-            examType: 'cv_builder'
-        },
-        'interview': {
-            title: customTitle || 'Simulador de Entrevista',
-            questions: [],
-            timeLimit: 1800,
-            examFunction: 'startInterview',
-            examType: 'interview'
-        },
-        'strengths': {
-            title: customTitle || 'Test de Fortalezas y Debilidades',
-            questions: strengthsQuestions,
-            timeLimit: 900,
-            examFunction: 'startStrengthsTest',
-            examType: 'strengths'
-        },
-        'wordsearch': {
-            title: customTitle || 'Sopa de Letras Laboral',
-            questions: [],
-            timeLimit: 600,
-            examFunction: 'startWordSearch',
-            examType: 'wordsearch'
-        }
+    // Generar código único
+    const code = 'MULTI-' + Date.now().toString(36).toUpperCase();
+
+    // Nombres de exámenes para el mensaje
+    const examNames = {
+        'quiz_easy': 'Cuestionario PRE-TEST',
+        'quiz_hard': 'Cuestionario POST-TEST',
+        'cv_errors': 'Detectar Errores en CV',
+        'cv_builder': 'Constructor de CV',
+        'interview': 'Simulador de Entrevista',
+        'personality': 'Test de Personalidad',
+        'formal': 'Test Formal/Informal',
+        'dresscode': 'Código de Vestimenta',
+        'strengths': 'Fortalezas y Debilidades',
+        'wordsearch': 'Sopa de Letras'
     };
 
-    const examData = examMapping[examType];
+    const examsList = selectedExams.map(e => examNames[e]).join(', ');
+    const finalTitle = customTitle || `Paquete de ${selectedExams.length} Exámenes`;
 
-    // Generar código único
-    const code = 'EXAM-' + Date.now().toString(36).toUpperCase();
+    // Guardar en localStorage
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '{}');
 
     examCodes[code] = {
         code: code,
-        title: examData.title,
-        description: description || 'Examen asignado del sistema',
-        questions: examData.questions,
-        timeLimit: examData.timeLimit,
+        title: finalTitle,
+        description: description || `Paquete con ${selectedExams.length} evaluaciones`,
+        exams: selectedExams, // Array de exámenes incluidos
+        isMultiExam: true,
+        examCount: selectedExams.length,
         createdAt: new Date().toISOString(),
-        createdBy: 'admin',
-        isSystemExam: true,
-        examType: examType,
-        examFunction: examData.examFunction,
-        examDifficulty: examData.examDifficulty || null
+        createdBy: 'admin'
     };
 
     localStorage.setItem('examCodes', JSON.stringify(examCodes));
 
-    showToast(`Código generado exitosamente: ${code}`, 'success');
-    alert(`Código de Examen Generado\n\nCódigo: ${code}\nExamen: ${examData.title}\n\nComparte este código con tus estudiantes para que accedan al examen.`);
+    showToast(`✅ Código generado exitosamente: ${code}`, 'success');
 
-    cancelAssignExam();
+    // Mostrar alerta con el código
+    const alertMessage = `
+╔═══════════════════════════════════╗
+     CÓDIGO GENERADO EXITOSAMENTE
+╚═══════════════════════════════════╝
+
+🎫 Código: ${code}
+
+📋 Título: ${finalTitle}
+
+✅ Exámenes incluidos (${selectedExams.length}):
+${selectedExams.map(e => '  • ' + examNames[e]).join('\n')}
+
+💡 Comparte este código con tus estudiantes.
+   Podrán acceder a TODOS los exámenes con un solo código.
+`;
+
+    alert(alertMessage);
+
+    // Limpiar formulario y recargar lista
+    clearExamSelection();
     loadExamCodesList();
 }
 
