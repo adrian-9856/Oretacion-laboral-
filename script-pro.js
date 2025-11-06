@@ -2838,6 +2838,261 @@ if (typeof module !== 'undefined' && module.exports) {
 }
 
 // ========================================
+// FUNCIONES DE PANTALLA DE DESAFÍOS
+// ========================================
+
+function showChallengesScreen() {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión primero', 'warning');
+        return;
+    }
+
+    // Actualizar nombre de usuario
+    if (document.getElementById('userName4')) {
+        document.getElementById('userName4').textContent = currentUser.name;
+    }
+
+    // Actualizar estadísticas del usuario
+    if (document.getElementById('userLevel')) {
+        document.getElementById('userLevel').textContent = userChallengeData.level;
+    }
+    if (document.getElementById('userXP')) {
+        document.getElementById('userXP').textContent = userChallengeData.xp + ' XP';
+    }
+    if (document.getElementById('userBadges')) {
+        document.getElementById('userBadges').textContent = userChallengeData.badges.length;
+    }
+    if (document.getElementById('userStreak')) {
+        document.getElementById('userStreak').textContent = userChallengeData.streak + ' días';
+    }
+
+    // Actualizar barra de progreso de nivel
+    const xpProgress = getXPProgress();
+    if (document.getElementById('currentLevelDisplay')) {
+        document.getElementById('currentLevelDisplay').textContent = userChallengeData.level;
+    }
+    if (document.getElementById('currentXPDisplay')) {
+        document.getElementById('currentXPDisplay').textContent = xpProgress.progress;
+    }
+    if (document.getElementById('nextLevelXP')) {
+        document.getElementById('nextLevelXP').textContent = xpProgress.required;
+    }
+    if (document.getElementById('levelProgressFill')) {
+        document.getElementById('levelProgressFill').style.width = xpProgress.percentage + '%';
+    }
+
+    // Renderizar desafíos diarios
+    renderDailyChallenges();
+
+    // Renderizar desafíos semanales
+    renderWeeklyChallenges();
+
+    // Renderizar ranking
+    renderLeaderboard();
+
+    // Renderizar badges
+    renderBadges();
+
+    // Actualizar notificación de desafíos pendientes
+    updateChallengesNotification();
+
+    showScreen('challengesScreen');
+}
+
+function showChallengeTab(tabName) {
+    // Remover active de todos los tabs
+    document.querySelectorAll('.challenge-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.challenge-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Activar tab seleccionado
+    const tabs = document.querySelectorAll('.challenge-tab');
+    const contents = document.querySelectorAll('.challenge-tab-content');
+
+    if (tabName === 'daily') {
+        tabs[0].classList.add('active');
+        document.getElementById('dailyChallenges')?.classList.add('active');
+        renderDailyChallenges();
+    } else if (tabName === 'weekly') {
+        tabs[1].classList.add('active');
+        document.getElementById('weeklyChallenges')?.classList.add('active');
+        renderWeeklyChallenges();
+    } else if (tabName === 'leaderboard') {
+        tabs[2].classList.add('active');
+        document.getElementById('leaderboardContent')?.classList.add('active');
+        renderLeaderboard();
+    } else if (tabName === 'badges') {
+        tabs[3].classList.add('active');
+        document.getElementById('badgesContent')?.classList.add('active');
+        renderBadges();
+    }
+}
+
+function renderDailyChallenges() {
+    const grid = document.getElementById('dailyChallengesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = dailyChallenges.map(challenge => {
+        const progress = userChallengeData.dailyProgress[challenge.id] || 0;
+        const percentage = Math.min((progress / challenge.target) * 100, 100);
+        const completed = progress >= challenge.target;
+
+        return `
+            <div class="challenge-card ${completed ? 'completed' : ''}">
+                <div class="challenge-icon">${challenge.icon}</div>
+                <div class="challenge-info">
+                    <h4>${challenge.title}</h4>
+                    <p>${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="challenge-progress-bar">
+                            <div class="challenge-progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="challenge-progress-text">${progress}/${challenge.target}</span>
+                    </div>
+                    <div class="challenge-reward">
+                        <span>⭐ ${challenge.xp} XP</span>
+                        ${completed ? '<span class="completed-badge">✓ Completado</span>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderWeeklyChallenges() {
+    const grid = document.getElementById('weeklyChallengesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = weeklyChallenges.map(challenge => {
+        const progress = userChallengeData.weeklyProgress[challenge.id] || 0;
+        const percentage = Math.min((progress / challenge.target) * 100, 100);
+        const completed = progress >= challenge.target;
+
+        return `
+            <div class="challenge-card ${completed ? 'completed' : ''}">
+                <div class="challenge-icon">${challenge.icon}</div>
+                <div class="challenge-info">
+                    <h4>${challenge.title}</h4>
+                    <p>${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="challenge-progress-bar">
+                            <div class="challenge-progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                        <span class="challenge-progress-text">${progress}/${challenge.target}</span>
+                    </div>
+                    <div class="challenge-reward">
+                        <span>⭐ ${challenge.xp} XP</span>
+                        ${completed ? '<span class="completed-badge">✓ Completado</span>' : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function renderLeaderboard() {
+    // Obtener todos los usuarios con sus datos
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const leaderboardData = users.map(user => {
+        const userData = JSON.parse(localStorage.getItem(`challenge_data_${user.email}`) || '{}');
+        return {
+            name: user.name,
+            email: user.email,
+            xp: userData.xp || 0,
+            level: userData.level || 1,
+            badges: (userData.badges || []).length
+        };
+    }).sort((a, b) => b.xp - a.xp);
+
+    // Actualizar podio (top 3)
+    if (leaderboardData[0]) {
+        const podium1 = document.getElementById('podium1');
+        if (podium1) {
+            podium1.querySelector('.podium-user').textContent = leaderboardData[0].name;
+            podium1.querySelector('.podium-xp').textContent = leaderboardData[0].xp + ' XP';
+        }
+    }
+    if (leaderboardData[1]) {
+        const podium2 = document.getElementById('podium2');
+        if (podium2) {
+            podium2.querySelector('.podium-user').textContent = leaderboardData[1].name;
+            podium2.querySelector('.podium-xp').textContent = leaderboardData[1].xp + ' XP';
+        }
+    }
+    if (leaderboardData[2]) {
+        const podium3 = document.getElementById('podium3');
+        if (podium3) {
+            podium3.querySelector('.podium-user').textContent = leaderboardData[2].name;
+            podium3.querySelector('.podium-xp').textContent = leaderboardData[2].xp + ' XP';
+        }
+    }
+
+    // Tabla de ranking
+    const tbody = document.getElementById('leaderboardTableBody');
+    if (tbody) {
+        tbody.innerHTML = leaderboardData.map((user, index) => {
+            const isCurrentUser = user.email === currentUser?.email;
+            return `
+                <tr ${isCurrentUser ? 'class="current-user-row"' : ''}>
+                    <td>${index + 1}</td>
+                    <td>${user.name} ${isCurrentUser ? '(Tú)' : ''}</td>
+                    <td>Nivel ${user.level}</td>
+                    <td>${user.xp} XP</td>
+                    <td>${user.badges}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Actualizar ranking del usuario actual
+    if (currentUser) {
+        const userRank = leaderboardData.findIndex(u => u.email === currentUser.email) + 1;
+        if (document.getElementById('userRank')) {
+            document.getElementById('userRank').textContent = userRank > 0 ? `#${userRank}` : '#-';
+        }
+    }
+}
+
+function renderBadges() {
+    const grid = document.getElementById('badgesGrid');
+    if (!grid) return;
+
+    grid.innerHTML = availableBadges.map(badge => {
+        const unlocked = userChallengeData.badges.includes(badge.id);
+
+        return `
+            <div class="badge-card ${unlocked ? 'unlocked' : 'locked'}">
+                <div class="badge-icon">${badge.icon}</div>
+                <div class="badge-info">
+                    <h4>${badge.name}</h4>
+                    <p>${badge.description}</p>
+                    ${unlocked ? '<span class="badge-status">✓ Desbloqueada</span>' : '<span class="badge-status">🔒 Bloqueada</span>'}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateChallengesNotification() {
+    const notification = document.getElementById('challengesNotification');
+    if (!notification) return;
+
+    // Contar desafíos pendientes
+    let pendingCount = 0;
+
+    dailyChallenges.forEach(challenge => {
+        const progress = userChallengeData.dailyProgress[challenge.id] || 0;
+        if (progress < challenge.target) pendingCount++;
+    });
+
+    notification.textContent = pendingCount;
+    notification.style.display = pendingCount > 0 ? 'flex' : 'none';
+}
+
+// ========================================
 // CREADOR DE AVATAR PRO - DICEBEAR API
 // ========================================
 
@@ -3473,12 +3728,12 @@ function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
 
-    // Cargar avatar si el usuario está logueado
+    // Cargar avatar PRO si el usuario está logueado
     if (currentUser) {
-        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
-        if (savedAvatar) {
-            currentAvatar = JSON.parse(savedAvatar);
-            updateUserAvatar();
+        const savedAvatarPro = localStorage.getItem(`avatar_pro_${currentUser.email}`);
+        if (savedAvatarPro) {
+            avatarConfig = JSON.parse(savedAvatarPro);
+            updateUserAvatarPro();
         }
     }
 }
