@@ -386,7 +386,7 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
         showScreen('welcomeScreen');
         showToast(`¡Bienvenido ${user.name}!`, 'success');
     } else {
-        showToast('❌ Correo o contraseña incorrectos', 'error');
+        showToast('Correo o contraseña incorrectos', 'error');
     }
 });
 
@@ -402,7 +402,7 @@ document.getElementById('adminLoginForm')?.addEventListener('submit', function(e
         loadDashboardData();
         showToast('Acceso concedido al panel de administrador', 'success');
     } else {
-        showToast('❌ Credenciales incorrectas', 'error');
+        showToast('Credenciales incorrectas', 'error');
     }
 });
 
@@ -423,7 +423,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     
     if (users.find(u => u.email === userData.email)) {
-        showToast('❌ Este correo ya está registrado', 'error');
+        showToast('Este correo ya está registrado', 'error');
         return;
     }
     
@@ -550,7 +550,7 @@ function selectTest(type) {
     currentTestType = type;
     currentDifficulty = type === 'pre' ? 'easy' : 'hard';
     
-    const badge = type === 'pre' ? '📝 PRE-TEST' : '✅ POST-TEST';
+    const badge = type === 'pre' ? 'PRE-TEST' : 'POST-TEST';
     if (document.getElementById('testTypeBadge')) {
         document.getElementById('testTypeBadge').textContent = badge;
     }
@@ -690,7 +690,7 @@ function nextQuestion() {
     const questions = currentDifficulty === 'easy' ? questionsEasy : questionsHard;
     
     if (quizAnswers[currentQuizQuestion] === undefined) {
-        showToast('⚠️ Por favor selecciona una respuesta antes de continuar', 'warning');
+        showToast('Por favor selecciona una respuesta antes de continuar', 'warning');
         return;
     }
     
@@ -5304,19 +5304,60 @@ function validateExamCode() {
     const errorDiv = document.getElementById('codeExamError');
 
     if (!code) {
-        errorDiv.textContent = '⚠️ Por favor ingresa un código';
+        errorDiv.textContent = 'Por favor ingresa un código';
         errorDiv.style.display = 'block';
         return;
     }
 
     if (!examCodes[code]) {
-        errorDiv.textContent = '❌ Código inválido. Verifica con tu profesor.';
+        errorDiv.textContent = 'Código inválido. Verifica con tu profesor.';
         errorDiv.style.display = 'block';
         return;
     }
 
     currentCodeExam = examCodes[code];
-    startCodeExam();
+
+    // Si es un examen del sistema, redirigir a la función correspondiente
+    if (currentCodeExam.isSystemExam) {
+        startSystemExam(currentCodeExam);
+    } else {
+        // Examen personalizado
+        startCodeExam();
+    }
+}
+
+function startSystemExam(examData) {
+    showToast(`Iniciando: ${examData.title}`, 'success');
+
+    // Configurar dificultad si aplica
+    if (examData.examDifficulty) {
+        currentDifficulty = examData.examDifficulty;
+    }
+
+    // Redirigir según el tipo de examen
+    switch (examData.examFunction) {
+        case 'startQuiz':
+            currentDifficulty = examData.examDifficulty;
+            startQuiz();
+            break;
+        case 'startCVErrors':
+            startCVErrors();
+            break;
+        case 'startCVBuilder':
+            startCVBuilder();
+            break;
+        case 'startInterview':
+            startInterview();
+            break;
+        case 'startStrengthsTest':
+            startStrengthsTest();
+            break;
+        case 'startWordSearch':
+            startWordSearch();
+            break;
+        default:
+            showToast('Tipo de examen no reconocido', 'error');
+    }
 }
 
 function startCodeExam() {
@@ -5658,17 +5699,25 @@ function loadStrengthsQuestion() {
     `;
 
     question.options.forEach((option, index) => {
-        const emoji = option.type === 'fortaleza' ? '💪' : option.type === 'debilidad' ? '⚠️' : '➖';
         html += `
-            <div class="option-card" onclick="selectStrengthsOption(${index})">
+            <div class="option-card" data-index="${index}">
                 <div class="option-radio" id="strengthsRadio${index}"></div>
-                <div class="option-text">${emoji} ${option.text}</div>
+                <div class="option-text">${option.text}</div>
             </div>
         `;
     });
 
     html += '</div>';
     container.innerHTML = html;
+
+    // Agregar event listeners a las opciones
+    const optionCards = container.querySelectorAll('.option-card');
+    optionCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const index = parseInt(this.getAttribute('data-index'));
+            selectStrengthsOption(index);
+        });
+    });
 
     // Restaurar respuesta si existe
     if (strengthsAnswers[currentStrengthsQuestion] !== undefined) {
@@ -5761,7 +5810,182 @@ let newExamQuestions = [];
 
 function showExamCodesManager() {
     showScreen('examCodesManagerScreen');
+    switchExamTab('create');
     loadExamCodesList();
+}
+
+// Cambiar entre pestañas de examen
+function switchExamTab(tab) {
+    // Ocultar todos los contenidos de tabs
+    document.querySelectorAll('.exam-tab-content').forEach(content => {
+        content.style.display = 'none';
+        content.classList.remove('active');
+    });
+
+    // Remover active de todos los botones
+    document.querySelectorAll('.exam-tab').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    // Activar la pestaña seleccionada
+    if (tab === 'create') {
+        document.getElementById('createExamForm').style.display = 'block';
+        document.getElementById('createExamForm').classList.add('active');
+        event.target.classList.add('active');
+    } else if (tab === 'assign') {
+        document.getElementById('assignExamForm').style.display = 'block';
+        document.getElementById('assignExamForm').classList.add('active');
+        event.target.classList.add('active');
+    }
+}
+
+// Actualizar vista previa del examen seleccionado
+function updateExamPreview() {
+    const examType = document.getElementById('existingExamType').value;
+    const preview = document.getElementById('examPreview');
+    const titleEl = document.getElementById('examPreviewTitle');
+    const infoEl = document.getElementById('examPreviewInfo');
+
+    if (!examType) {
+        preview.style.display = 'none';
+        return;
+    }
+
+    const examInfo = {
+        'quiz_easy': {
+            title: 'Cuestionario - Nivel Fácil (PRE-TEST)',
+            info: `${questionsEasy.length} preguntas de opción múltiple. Tiempo: 15 minutos. Cubre conceptos básicos de orientación laboral.`
+        },
+        'quiz_hard': {
+            title: 'Cuestionario - Nivel Difícil (POST-TEST)',
+            info: `${questionsHard.length} preguntas de opción múltiple. Tiempo: 15 minutos. Evaluación avanzada de competencias laborales.`
+        },
+        'cv_errors': {
+            title: 'Detectar Errores en CV',
+            info: '10 errores a encontrar en un currículum. Tiempo: 10 minutos. Desarrolla habilidades de revisión de documentos.'
+        },
+        'cv_builder': {
+            title: 'Constructor de CV',
+            info: 'Formulario interactivo para crear un CV completo. Tiempo: 20 minutos. Evalúa capacidad de redacción profesional.'
+        },
+        'interview': {
+            title: 'Simulador de Entrevista',
+            info: '8 preguntas de entrevista con grabación de audio opcional. Evalúa habilidades de comunicación.'
+        },
+        'strengths': {
+            title: 'Test de Fortalezas y Debilidades',
+            info: `${strengthsQuestions.length} preguntas de autoevaluación. Tiempo: 15 minutos. Ayuda a identificar áreas de mejora.`
+        },
+        'wordsearch': {
+            title: 'Sopa de Letras Laboral',
+            info: 'Encuentra 15 palabras relacionadas con el mundo laboral. Tiempo: 10 minutos. Actividad lúdica educativa.'
+        }
+    };
+
+    const info = examInfo[examType];
+    titleEl.textContent = info.title;
+    infoEl.textContent = info.info;
+    preview.style.display = 'block';
+}
+
+// Guardar asignación de código a examen existente
+function saveAssignExam() {
+    const examType = document.getElementById('existingExamType').value;
+    const customTitle = document.getElementById('assignExamTitle').value.trim();
+    const description = document.getElementById('assignExamDescription').value.trim();
+
+    if (!examType) {
+        showToast('Selecciona un tipo de examen', 'error');
+        return;
+    }
+
+    // Mapeo de tipos a funciones de examen
+    const examMapping = {
+        'quiz_easy': {
+            title: customTitle || 'Cuestionario - Nivel Fácil',
+            questions: questionsEasy,
+            timeLimit: 900,
+            examFunction: 'startQuiz',
+            examDifficulty: 'easy'
+        },
+        'quiz_hard': {
+            title: customTitle || 'Cuestionario - Nivel Difícil',
+            questions: questionsHard,
+            timeLimit: 900,
+            examFunction: 'startQuiz',
+            examDifficulty: 'hard'
+        },
+        'cv_errors': {
+            title: customTitle || 'Detectar Errores en CV',
+            questions: [],
+            timeLimit: 600,
+            examFunction: 'startCVErrors',
+            examType: 'cv_errors'
+        },
+        'cv_builder': {
+            title: customTitle || 'Constructor de CV',
+            questions: [],
+            timeLimit: 1200,
+            examFunction: 'startCVBuilder',
+            examType: 'cv_builder'
+        },
+        'interview': {
+            title: customTitle || 'Simulador de Entrevista',
+            questions: [],
+            timeLimit: 1800,
+            examFunction: 'startInterview',
+            examType: 'interview'
+        },
+        'strengths': {
+            title: customTitle || 'Test de Fortalezas y Debilidades',
+            questions: strengthsQuestions,
+            timeLimit: 900,
+            examFunction: 'startStrengthsTest',
+            examType: 'strengths'
+        },
+        'wordsearch': {
+            title: customTitle || 'Sopa de Letras Laboral',
+            questions: [],
+            timeLimit: 600,
+            examFunction: 'startWordSearch',
+            examType: 'wordsearch'
+        }
+    };
+
+    const examData = examMapping[examType];
+
+    // Generar código único
+    const code = 'EXAM-' + Date.now().toString(36).toUpperCase();
+
+    examCodes[code] = {
+        code: code,
+        title: examData.title,
+        description: description || 'Examen asignado del sistema',
+        questions: examData.questions,
+        timeLimit: examData.timeLimit,
+        createdAt: new Date().toISOString(),
+        createdBy: 'admin',
+        isSystemExam: true,
+        examType: examType,
+        examFunction: examData.examFunction,
+        examDifficulty: examData.examDifficulty || null
+    };
+
+    localStorage.setItem('examCodes', JSON.stringify(examCodes));
+
+    showToast(`Código generado exitosamente: ${code}`, 'success');
+    alert(`Código de Examen Generado\n\nCódigo: ${code}\nExamen: ${examData.title}\n\nComparte este código con tus estudiantes para que accedan al examen.`);
+
+    cancelAssignExam();
+    loadExamCodesList();
+}
+
+// Cancelar asignación
+function cancelAssignExam() {
+    document.getElementById('existingExamType').value = '';
+    document.getElementById('assignExamTitle').value = '';
+    document.getElementById('assignExamDescription').value = '';
+    document.getElementById('examPreview').style.display = 'none';
 }
 
 function showCreateExamForm() {
@@ -5964,6 +6188,11 @@ window.updateCorrectAnswer = updateCorrectAnswer;
 window.saveNewExam = saveNewExam;
 window.copyExamCode = copyExamCode;
 window.confirmDeleteExam = confirmDeleteExam;
+window.switchExamTab = switchExamTab;
+window.updateExamPreview = updateExamPreview;
+window.saveAssignExam = saveAssignExam;
+window.cancelAssignExam = cancelAssignExam;
+window.startSystemExam = startSystemExam;
 
 // ========================================
 // SISTEMA DE PERFILES DE USUARIO
@@ -6157,8 +6386,8 @@ function loadUsersGrid() {
                     <h3>${user.name} ${user.lastName}</h3>
                     <p>${user.email}</p>
                     <div class="user-card-stats">
-                        <span>📊 ${userResults.length} pruebas</span>
-                        <span>⭐ ${avgScore}% promedio</span>
+                        <span>${userResults.length} pruebas</span>
+                        <span>${avgScore}% promedio</span>
                     </div>
                 </div>
             </div>
@@ -6194,8 +6423,8 @@ function filterUsers() {
                     <h3>${user.name} ${user.lastName}</h3>
                     <p>${user.email}</p>
                     <div class="user-card-stats">
-                        <span>📊 ${userResults.length} pruebas</span>
-                        <span>⭐ ${avgScore}% promedio</span>
+                        <span>${userResults.length} pruebas</span>
+                        <span>${avgScore}% promedio</span>
                     </div>
                 </div>
             </div>

@@ -277,19 +277,19 @@
         </nav>
         <div class="container">
             <div class="dashboard-header">
-                <h1>Crear Nuevo Examen</h1>
-                <button class="btn-action" onclick="showCreateExamForm()">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 4v16m8-8H4"/>
-                    </svg>
-                    Nuevo Examen
-                </button>
+                <h1>Gestión de Exámenes por Código</h1>
             </div>
 
-            <!-- Formulario de crear examen -->
-            <div id="createExamForm" style="display: none; margin-bottom: 2rem;">
+            <!-- Tabs para seleccionar tipo de acción -->
+            <div class="exam-tabs">
+                <button class="exam-tab active" onclick="switchExamTab('create')">Crear Examen Nuevo</button>
+                <button class="exam-tab" onclick="switchExamTab('assign')">Asignar Código a Examen Existente</button>
+            </div>
+
+            <!-- Formulario de crear examen nuevo -->
+            <div id="createExamForm" class="exam-tab-content active" style="margin-bottom: 2rem;">
                 <div class="quiz-card">
-                    <h3>📝 Crear Examen Personalizado</h3>
+                    <h3>Crear Examen Personalizado</h3>
                     <div class="form-group">
                         <label>Título del Examen:</label>
                         <input type="text" id="examTitle" placeholder="Ej: Evaluación de Competencias Laborales">
@@ -315,9 +315,52 @@
                 </div>
             </div>
 
+            <!-- Formulario de asignar código a examen existente -->
+            <div id="assignExamForm" class="exam-tab-content" style="margin-bottom: 2rem; display: none;">
+                <div class="quiz-card">
+                    <h3>Asignar Código a Examen Existente</h3>
+                    <p>Selecciona un tipo de examen existente del sistema y genera un código de acceso para tus estudiantes.</p>
+
+                    <div class="form-group">
+                        <label>Tipo de Examen:</label>
+                        <select id="existingExamType" onchange="updateExamPreview()">
+                            <option value="">-- Selecciona un examen --</option>
+                            <option value="quiz_easy">Cuestionario - Nivel Fácil (PRE-TEST)</option>
+                            <option value="quiz_hard">Cuestionario - Nivel Difícil (POST-TEST)</option>
+                            <option value="cv_errors">Detectar Errores en CV</option>
+                            <option value="cv_builder">Constructor de CV</option>
+                            <option value="interview">Simulador de Entrevista</option>
+                            <option value="strengths">Test de Fortalezas y Debilidades</option>
+                            <option value="wordsearch">Sopa de Letras Laboral</option>
+                        </select>
+                    </div>
+
+                    <div id="examPreview" style="display: none; background: #f5f5f5; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                        <h4>Vista Previa del Examen:</h4>
+                        <p id="examPreviewTitle"></p>
+                        <p id="examPreviewInfo"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Título Personalizado (opcional):</label>
+                        <input type="text" id="assignExamTitle" placeholder="Ej: Evaluación Grupo A - Semana 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Descripción (opcional):</label>
+                        <textarea id="assignExamDescription" placeholder="Notas o instrucciones adicionales..." rows="3"></textarea>
+                    </div>
+
+                    <div class="quiz-navigation" style="margin-top: 1rem;">
+                        <button class="btn-nav secondary" onclick="cancelAssignExam()">Cancelar</button>
+                        <button class="btn-nav primary" onclick="saveAssignExam()">Generar Código</button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Lista de exámenes creados -->
             <div class="table-container">
-                <h2>Exámenes Creados</h2>
+                <h2>Códigos de Examen Activos</h2>
                 <table class="results-table">
                     <thead>
                         <tr>
