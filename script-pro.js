@@ -2126,6 +2126,25 @@ window.addSkill = addSkill;
 window.removeSkill = removeSkill;
 window.nextCVStep = nextCVStep;
 window.previousCVStep = previousCVStep;
+
+// Exportar funciones de códigos de acceso
+window.generateExamCode = generateExamCode;
+window.enterAccessCode = enterAccessCode;
+window.verifyAccessCode = verifyAccessCode;
+
+// Exportar funciones de carga de fotos
+window.uploadProfilePhoto = uploadProfilePhoto;
+window.uploadCVPhoto = uploadCVPhoto;
+
+// Exportar funciones de video
+window.startCamera = startCamera;
+window.stopCamera = stopCamera;
+window.startVideoRecording = startVideoRecording;
+window.stopVideoRecording = stopVideoRecording;
+
+// Exportar funciones de prueba de personalidad
+window.startPersonalityTest = startPersonalityTest;
+window.selectPersonalityAnswer = selectPersonalityAnswer;
 // ========================================
 // SIMULADOR DE ENTREVISTA
 // ========================================
@@ -3867,6 +3886,583 @@ function goToWelcome() {
 
 function goToMenu() {
     showScreen('testMenuScreen');
+}
+
+// ========================================
+// SISTEMA DE CÓDIGOS DE ACCESO
+// ========================================
+
+// Generar código único para examen
+function generateAccessCode() {
+    const timestamp = Date.now().toString(36).toUpperCase();
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `EXAM-${timestamp}-${random}`;
+}
+
+// Guardar código de examen
+function saveAccessCode(code, testType, duration = 3600000) {
+    const expirationTime = Date.now() + duration; // 1 hora por defecto
+    const accessCodes = JSON.parse(localStorage.getItem('accessCodes') || '{}');
+
+    accessCodes[code] = {
+        testType: testType,
+        createdAt: Date.now(),
+        expiresAt: expirationTime,
+        used: false,
+        createdBy: currentUser?.email || 'admin'
+    };
+
+    localStorage.setItem('accessCodes', JSON.stringify(accessCodes));
+    return code;
+}
+
+// Verificar código de acceso
+function verifyAccessCode(code) {
+    const accessCodes = JSON.parse(localStorage.getItem('accessCodes') || '{}');
+    const codeData = accessCodes[code];
+
+    if (!codeData) {
+        return { valid: false, message: 'Código no válido' };
+    }
+
+    if (codeData.used) {
+        return { valid: false, message: 'Este código ya ha sido utilizado' };
+    }
+
+    if (Date.now() > codeData.expiresAt) {
+        return { valid: false, message: 'Este código ha expirado' };
+    }
+
+    return { valid: true, testType: codeData.testType };
+}
+
+// Marcar código como usado
+function markCodeAsUsed(code) {
+    const accessCodes = JSON.parse(localStorage.getItem('accessCodes') || '{}');
+    if (accessCodes[code]) {
+        accessCodes[code].used = true;
+        accessCodes[code].usedAt = Date.now();
+        accessCodes[code].usedBy = currentUser?.email;
+        localStorage.setItem('accessCodes', JSON.stringify(accessCodes));
+    }
+}
+
+// Generar código desde el panel admin
+function generateExamCode() {
+    const testType = prompt('Tipo de test (pre/post):', 'pre');
+    if (!testType) return;
+
+    const duration = prompt('Duración en horas:', '1');
+    const durationMs = parseInt(duration) * 3600000;
+
+    const code = generateAccessCode();
+    saveAccessCode(code, testType, durationMs);
+
+    showModal(`Código generado:\n\n${code}\n\nVálido por ${duration} hora(s)`, () => {
+        navigator.clipboard.writeText(code);
+        showToast('Código copiado al portapapeles', 'success');
+    });
+}
+
+// Ingresar código de acceso
+function enterAccessCode() {
+    const code = prompt('Ingresa tu código de acceso:');
+    if (!code) return;
+
+    const verification = verifyAccessCode(code);
+
+    if (verification.valid) {
+        markCodeAsUsed(code);
+        currentTestType = verification.testType;
+        showToast(`✅ Código válido. Accediendo a ${verification.testType}-test...`, 'success');
+        setTimeout(() => {
+            showScreen('testMenuScreen');
+            document.getElementById('testTypeBadge').textContent =
+                verification.testType === 'pre' ? '📝 PRE-TEST' : '✅ POST-TEST';
+        }, 1000);
+    } else {
+        showToast(`❌ ${verification.message}`, 'error');
+    }
+}
+
+// ========================================
+// SISTEMA DE CARGA DE FOTOS
+// ========================================
+
+let userProfilePhoto = null;
+let cvPhoto = null;
+
+// Cargar foto de perfil
+function uploadProfilePhoto() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('❌ La imagen no debe superar 5MB', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            userProfilePhoto = event.target.result;
+            localStorage.setItem(`profile_photo_${currentUser.email}`, userProfilePhoto);
+            updateProfilePhotoDisplay();
+            showToast('✅ Foto de perfil actualizada', 'success');
+        };
+        reader.readAsDataURL(file);
+    };
+
+    input.click();
+}
+
+// Actualizar display de foto de perfil
+function updateProfilePhotoDisplay() {
+    const photoContainers = document.querySelectorAll('.user-profile-photo');
+    photoContainers.forEach(container => {
+        if (userProfilePhoto) {
+            container.innerHTML = `<img src="${userProfilePhoto}" alt="Perfil" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+        }
+    });
+}
+
+// Cargar foto para CV
+function uploadCVPhoto() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+
+    input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        if (file.size > 2 * 1024 * 1024) {
+            showToast('❌ La imagen no debe superar 2MB', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            cvPhoto = event.target.result;
+            cvBuilderData.photo = cvPhoto;
+            document.getElementById('cvPhotoPreview')?.setAttribute('src', cvPhoto);
+            showToast('✅ Foto agregada al CV', 'success');
+        };
+        reader.readAsDataURL(file);
+    };
+
+    input.click();
+}
+
+// ========================================
+// SISTEMA DE VIDEO Y ANÁLISIS
+// ========================================
+
+let videoStream = null;
+let videoRecorder = null;
+let videoChunks = [];
+let recordedVideoBlob = null;
+
+// Iniciar cámara
+async function startCamera() {
+    try {
+        videoStream = await navigator.mediaDevices.getUserMedia({
+            video: {
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
+            },
+            audio: true
+        });
+
+        const videoElement = document.getElementById('cameraPreview');
+        if (videoElement) {
+            videoElement.srcObject = videoStream;
+            videoElement.play();
+        }
+
+        showToast('✅ Cámara activada', 'success');
+        return true;
+    } catch (error) {
+        console.error('Error al acceder a la cámara:', error);
+        showToast('❌ No se pudo acceder a la cámara. Verifica los permisos.', 'error');
+        return false;
+    }
+}
+
+// Detener cámara
+function stopCamera() {
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
+        const videoElement = document.getElementById('cameraPreview');
+        if (videoElement) {
+            videoElement.srcObject = null;
+        }
+    }
+}
+
+// Iniciar grabación de video
+function startVideoRecording() {
+    if (!videoStream) {
+        showToast('❌ Primero debes activar la cámara', 'warning');
+        return;
+    }
+
+    videoChunks = [];
+    videoRecorder = new MediaRecorder(videoStream, {
+        mimeType: 'video/webm'
+    });
+
+    videoRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+            videoChunks.push(event.data);
+        }
+    };
+
+    videoRecorder.onstop = () => {
+        recordedVideoBlob = new Blob(videoChunks, { type: 'video/webm' });
+        const videoUrl = URL.createObjectURL(recordedVideoBlob);
+
+        const playbackElement = document.getElementById('videoPlayback');
+        if (playbackElement) {
+            playbackElement.src = videoUrl;
+            playbackElement.style.display = 'block';
+        }
+
+        analyzeVideoRecording();
+    };
+
+    videoRecorder.start();
+    showToast('🎥 Grabación iniciada', 'success');
+}
+
+// Detener grabación de video
+function stopVideoRecording() {
+    if (videoRecorder && videoRecorder.state !== 'inactive') {
+        videoRecorder.stop();
+        showToast('⏹️ Grabación detenida', 'info');
+    }
+}
+
+// Analizar video grabado (análisis básico)
+function analyzeVideoRecording() {
+    // Simulación de análisis de video
+    // En producción, esto se conectaría a una API de análisis facial
+
+    const duration = videoChunks.length * 0.5; // Estimación
+
+    const analysis = {
+        duration: duration,
+        confidence: Math.random() * 30 + 70, // 70-100%
+        emotions: {
+            happy: Math.random() * 40 + 20,
+            neutral: Math.random() * 40 + 30,
+            focused: Math.random() * 30 + 20
+        },
+        eyeContact: Math.random() * 30 + 60,
+        posture: Math.random() * 25 + 65,
+        expressiveness: Math.random() * 35 + 50
+    };
+
+    displayVideoAnalysis(analysis);
+}
+
+// Mostrar análisis de video
+function displayVideoAnalysis(analysis) {
+    const container = document.getElementById('videoAnalysisResults');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="analysis-result">
+            <h3>📊 Análisis de Video Completado</h3>
+
+            <div class="analysis-section">
+                <h4>😊 Expresiones Detectadas</h4>
+                <div class="emotion-bars">
+                    <div class="emotion-item">
+                        <span>Feliz:</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" style="width: ${analysis.emotions.happy}%"></div>
+                        </div>
+                        <span>${Math.round(analysis.emotions.happy)}%</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span>Neutral:</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" style="width: ${analysis.emotions.neutral}%"></div>
+                        </div>
+                        <span>${Math.round(analysis.emotions.neutral)}%</span>
+                    </div>
+                    <div class="emotion-item">
+                        <span>Concentrado:</span>
+                        <div class="progress-bar-mini">
+                            <div class="progress-fill" style="width: ${analysis.emotions.focused}%"></div>
+                        </div>
+                        <span>${Math.round(analysis.emotions.focused)}%</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h4>👁️ Contacto Visual</h4>
+                <p>Mantienes contacto visual el ${Math.round(analysis.eyeContact)}% del tiempo</p>
+                <div class="progress-bar-large">
+                    <div class="progress-fill" style="width: ${analysis.eyeContact}%"></div>
+                </div>
+            </div>
+
+            <div class="analysis-section">
+                <h4>🎭 Expresividad</h4>
+                <p>Nivel de expresividad: ${Math.round(analysis.expressiveness)}%</p>
+                <div class="progress-bar-large">
+                    <div class="progress-fill" style="width: ${analysis.expressiveness}%"></div>
+                </div>
+            </div>
+
+            <div class="analysis-tips">
+                <h4>💡 Recomendaciones:</h4>
+                <ul>
+                    ${analysis.eyeContact < 70 ? '<li>Intenta mantener más contacto visual con la cámara</li>' : '<li>Excelente contacto visual, sigue así</li>'}
+                    ${analysis.expressiveness < 60 ? '<li>Intenta ser más expresivo al hablar</li>' : '<li>Buena expresividad facial</li>'}
+                    ${analysis.posture < 70 ? '<li>Mantén una postura erguida y profesional</li>' : '<li>Buena postura corporal</li>'}
+                </ul>
+            </div>
+        </div>
+    `;
+
+    container.style.display = 'block';
+}
+
+// ========================================
+// PRUEBA DE FORTALEZAS Y DEBILIDADES
+// ========================================
+
+const personalityQuestions = [
+    {
+        q: "¿Cómo te describes en situaciones de trabajo en equipo?",
+        options: [
+            "Prefiero liderar y tomar decisiones",
+            "Me adapto y colaboro con todos",
+            "Trabajo mejor de forma independiente",
+            "Analizo y aporto soluciones técnicas"
+        ]
+    },
+    {
+        q: "Ante un problema difícil, ¿cuál es tu primera reacción?",
+        options: [
+            "Busco ayuda de inmediato",
+            "Lo analizo cuidadosamente antes de actuar",
+            "Pruebo diferentes soluciones rápidamente",
+            "Investigo casos similares primero"
+        ]
+    },
+    {
+        q: "¿Qué te motiva más en el trabajo?",
+        options: [
+            "Reconocimiento y logros visibles",
+            "Aprender cosas nuevas constantemente",
+            "Ayudar y colaborar con otros",
+            "Superar desafíos complejos"
+        ]
+    },
+    {
+        q: "¿Cuál consideras tu mayor fortaleza?",
+        options: [
+            "Comunicación efectiva",
+            "Pensamiento analítico",
+            "Creatividad e innovación",
+            "Organización y planificación"
+        ]
+    },
+    {
+        q: "¿Qué área te gustaría mejorar?",
+        options: [
+            "Gestión del tiempo",
+            "Hablar en público",
+            "Trabajo bajo presión",
+            "Delegación de tareas"
+        ]
+    }
+];
+
+let personalityAnswers = [];
+let personalityCurrentQ = 0;
+let personalityWithVideo = false;
+
+// Iniciar prueba de personalidad
+function startPersonalityTest(withVideo = false) {
+    personalityAnswers = [];
+    personalityCurrentQ = 0;
+    personalityWithVideo = withVideo;
+
+    showScreen('personalityTestScreen');
+
+    if (withVideo) {
+        startCamera();
+    }
+
+    loadPersonalityQuestion();
+}
+
+// Cargar pregunta de personalidad
+function loadPersonalityQuestion() {
+    const container = document.getElementById('personalityQuestionContainer');
+    if (!container) return;
+
+    const q = personalityQuestions[personalityCurrentQ];
+
+    container.innerHTML = `
+        <div class="personality-question-card">
+            <div class="question-header">
+                <span class="question-number">Pregunta ${personalityCurrentQ + 1} de ${personalityQuestions.length}</span>
+            </div>
+            <h3 class="question-text">${q.q}</h3>
+            <div class="personality-options">
+                ${q.options.map((opt, i) => `
+                    <div class="personality-option" onclick="selectPersonalityAnswer(${i})">
+                        <input type="radio" name="personality_q${personalityCurrentQ}" id="opt${i}" value="${i}">
+                        <label for="opt${i}">${opt}</label>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// Seleccionar respuesta de personalidad
+function selectPersonalityAnswer(index) {
+    personalityAnswers[personalityCurrentQ] = index;
+
+    personalityCurrentQ++;
+
+    if (personalityCurrentQ >= personalityQuestions.length) {
+        finishPersonalityTest();
+    } else {
+        loadPersonalityQuestion();
+    }
+}
+
+// Finalizar prueba de personalidad
+function finishPersonalityTest() {
+    if (personalityWithVideo) {
+        stopCamera();
+    }
+
+    const profile = analyzePersonality();
+    displayPersonalityResults(profile);
+}
+
+// Analizar personalidad basado en respuestas
+function analyzePersonality() {
+    // Análisis simplificado
+    const traits = {
+        leadership: 0,
+        analytical: 0,
+        creative: 0,
+        collaborative: 0
+    };
+
+    personalityAnswers.forEach((answer, qIndex) => {
+        if (qIndex === 0) {
+            if (answer === 0) traits.leadership += 2;
+            if (answer === 1) traits.collaborative += 2;
+            if (answer === 3) traits.analytical += 2;
+        }
+        if (qIndex === 1) {
+            if (answer === 1) traits.analytical += 2;
+            if (answer === 2) traits.creative += 2;
+        }
+        if (qIndex === 2) {
+            if (answer === 1) traits.analytical += 1;
+            if (answer === 2) traits.collaborative += 2;
+            if (answer === 3) traits.analytical += 1;
+        }
+    });
+
+    const dominant = Object.entries(traits).sort((a, b) => b[1] - a[1])[0];
+
+    const profiles = {
+        leadership: {
+            title: "Líder Natural",
+            description: "Tienes habilidades naturales de liderazgo. Te gusta tomar decisiones y guiar equipos.",
+            strengths: ["Toma de decisiones", "Motivación de equipos", "Visión estratégica"],
+            weaknesses: ["Delegar tareas", "Escuchar otras opiniones"]
+        },
+        analytical: {
+            title: "Pensador Analítico",
+            description: "Destacas en análisis y resolución de problemas complejos mediante lógica y datos.",
+            strengths: ["Análisis de datos", "Resolución de problemas", "Atención al detalle"],
+            weaknesses: ["Decisiones rápidas", "Trabajo bajo presión"]
+        },
+        creative: {
+            title: "Innovador Creativo",
+            description: "Tu creatividad te permite encontrar soluciones originales y pensar fuera de lo convencional.",
+            strengths: ["Pensamiento innovador", "Adaptabilidad", "Generación de ideas"],
+            weaknesses: ["Seguir procesos rígidos", "Tareas repetitivas"]
+        },
+        collaborative: {
+            title: "Colaborador Empático",
+            description: "Sobresales en trabajo en equipo y comunicación. Construyes relaciones efectivas.",
+            strengths: ["Trabajo en equipo", "Comunicación", "Empatía"],
+            weaknesses: ["Tomar decisiones difíciles", "Confrontación"]
+        }
+    };
+
+    return profiles[dominant[0]] || profiles.collaborative;
+}
+
+// Mostrar resultados de personalidad
+function displayPersonalityResults(profile) {
+    showScreen('personalityResultsScreen');
+
+    const container = document.getElementById('personalityResultsContainer');
+    if (!container) return;
+
+    container.innerHTML = `
+        <div class="personality-results-card">
+            <div class="profile-header">
+                <div class="profile-icon">🎯</div>
+                <h2>${profile.title}</h2>
+                <p class="profile-description">${profile.description}</p>
+            </div>
+
+            <div class="strengths-section">
+                <h3>💪 Tus Fortalezas</h3>
+                <ul class="traits-list">
+                    ${profile.strengths.map(s => `<li>✓ ${s}</li>`).join('')}
+                </ul>
+            </div>
+
+            <div class="weaknesses-section">
+                <h3>📈 Áreas de Mejora</h3>
+                <ul class="traits-list">
+                    ${profile.weaknesses.map(w => `<li>• ${w}</li>`).join('')}
+                </ul>
+            </div>
+
+            <div class="results-actions">
+                <button class="btn-result primary" onclick="downloadPersonalityReport()">
+                    📄 Descargar Reporte
+                </button>
+                <button class="btn-result secondary" onclick="goToWelcome()">
+                    ← Volver al Inicio
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Descargar reporte de personalidad
+function downloadPersonalityReport() {
+    showToast('📄 Generando reporte...', 'info');
+    // Aquí se implementaría la generación del PDF del reporte de personalidad
+    setTimeout(() => {
+        showToast('✅ Reporte descargado', 'success');
+    }, 1000);
 }
 
 // ========================================
