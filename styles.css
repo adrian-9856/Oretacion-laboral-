@@ -3920,6 +3920,96 @@ body.dark-theme .modal-content {
 }
 
 /* ========================================
+   ESTILOS PARA OPCIONES DE TESTS
+   ======================================== */
+
+.option-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: var(--white);
+    border: 2px solid var(--gray-300);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 0.75rem;
+}
+
+.option-card:hover {
+    border-color: var(--primary);
+    background: #f0f7ff;
+    transform: translateX(5px);
+}
+
+.option-card.selected {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-color: #4facfe;
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.option-radio {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--gray-400);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.option-radio::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    width: 12px;
+    height: 12px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.option-card.selected .option-radio {
+    border-color: white;
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.option-card.selected .option-radio::after {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.option-text {
+    flex: 1;
+    line-height: 1.5;
+}
+
+/* Dark theme para opciones */
+.dark-theme .option-card {
+    background: #2d3436;
+    border-color: #4a5568;
+    color: #dfe6e9;
+}
+
+.dark-theme .option-card:hover {
+    border-color: #4facfe;
+    background: #34495e;
+}
+
+.dark-theme .option-card.selected {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    border-color: #4facfe;
+    color: white;
+}
+
+.dark-theme .option-radio {
+    border-color: #718096;
+}
+
+/* ========================================
    PERFIL DE USUARIO
    ======================================== */
 

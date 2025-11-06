@@ -5153,6 +5153,11 @@ function displayWordsList() {
 }
 
 function startSelection(e) {
+    // No permitir seleccionar celdas ya encontradas
+    if (e.target.classList.contains('ws-found')) {
+        return;
+    }
+
     isSelecting = true;
     selectedCells = [e.target];
     e.target.classList.add('ws-selected');
@@ -5160,6 +5165,11 @@ function startSelection(e) {
 
 function continueSelection(e) {
     if (!isSelecting) return;
+
+    // No permitir seleccionar celdas ya encontradas
+    if (e.target.classList.contains('ws-found')) {
+        return;
+    }
 
     if (!selectedCells.includes(e.target)) {
         selectedCells.push(e.target);
