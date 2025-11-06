@@ -600,6 +600,10 @@ function startTest(testType) {
         startFormalInformalTest();
     } else if (testType === 'dress-code') {
         startDressCodeTest();
+    } else if (testType === 'wordsearch') {
+        startWordSearch();
+    } else if (testType === 'strengths') {
+        showScreen('strengthsScreen');
     }
 }
 // ========================================
@@ -4965,3 +4969,994 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// ========================================
+// NUEVAS FUNCIONALIDADES
+// ========================================
+
+// ========================================
+// 1. SOPA DE LETRAS
+// ========================================
+
+const wordSearchWords = [
+    'TRABAJO', 'EMPLEO', 'CARRERA', 'CURRICULUM', 'ENTREVISTA',
+    'HABILIDAD', 'EXPERIENCIA', 'EDUCACION', 'PROFESIONAL', 'OBJETIVO',
+    'COMPETENCIA', 'LIDERAZGO', 'EQUIPO', 'COMUNICACION', 'RESPONSABLE'
+];
+
+let wordSearchGrid = [];
+let wordSearchSize = 15;
+let wordsFoundList = [];
+let wordSearchScore = 0;
+let isSelecting = false;
+let selectedCells = [];
+let wordSearchStartTime;
+
+function startWordSearch() {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión', 'error');
+        return;
+    }
+
+    // Reiniciar variables
+    wordsFoundList = [];
+    wordSearchScore = 0;
+    selectedCells = [];
+    isSelecting = false;
+
+    // Actualizar badges
+    const badge = document.getElementById('testTypeBadgeWS');
+    if (badge) {
+        badge.textContent = currentTestType === 'pre' ? 'PRE-TEST' : 'POST-TEST';
+        badge.className = `test-badge ${currentTestType}`;
+    }
+
+    // Generar sopa de letras
+    generateWordSearch();
+    displayWordSearch();
+    displayWordsList();
+
+    // Iniciar temporizador
+    remainingTime = 600; // 10 minutos
+    startCountdown('wordSearchTimer');
+    wordSearchStartTime = Date.now();
+
+    showScreen('wordSearchScreen');
+}
+
+function generateWordSearch() {
+    // Crear grilla vacía
+    wordSearchGrid = Array(wordSearchSize).fill(null).map(() =>
+        Array(wordSearchSize).fill('')
+    );
+
+    // Colocar palabras
+    wordSearchWords.forEach(word => {
+        let placed = false;
+        let attempts = 0;
+
+        while (!placed && attempts < 100) {
+            const direction = Math.floor(Math.random() * 8); // 8 direcciones
+            const row = Math.floor(Math.random() * wordSearchSize);
+            const col = Math.floor(Math.random() * wordSearchSize);
+
+            if (canPlaceWord(word, row, col, direction)) {
+                placeWord(word, row, col, direction);
+                placed = true;
+            }
+            attempts++;
+        }
+    });
+
+    // Rellenar espacios vacíos con letras aleatorias
+    for (let i = 0; i < wordSearchSize; i++) {
+        for (let j = 0; j < wordSearchSize; j++) {
+            if (wordSearchGrid[i][j] === '') {
+                wordSearchGrid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+            }
+        }
+    }
+}
+
+function canPlaceWord(word, row, col, direction) {
+    const directions = [
+        [0, 1],   // Horizontal derecha
+        [0, -1],  // Horizontal izquierda
+        [1, 0],   // Vertical abajo
+        [-1, 0],  // Vertical arriba
+        [1, 1],   // Diagonal abajo-derecha
+        [-1, -1], // Diagonal arriba-izquierda
+        [1, -1],  // Diagonal abajo-izquierda
+        [-1, 1]   // Diagonal arriba-derecha
+    ];
+
+    const [dx, dy] = directions[direction];
+
+    for (let i = 0; i < word.length; i++) {
+        const newRow = row + (i * dx);
+        const newCol = col + (i * dy);
+
+        if (newRow < 0 || newRow >= wordSearchSize ||
+            newCol < 0 || newCol >= wordSearchSize) {
+            return false;
+        }
+
+        if (wordSearchGrid[newRow][newCol] !== '' &&
+            wordSearchGrid[newRow][newCol] !== word[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function placeWord(word, row, col, direction) {
+    const directions = [
+        [0, 1], [0, -1], [1, 0], [-1, 0],
+        [1, 1], [-1, -1], [1, -1], [-1, 1]
+    ];
+
+    const [dx, dy] = directions[direction];
+
+    for (let i = 0; i < word.length; i++) {
+        const newRow = row + (i * dx);
+        const newCol = col + (i * dy);
+        wordSearchGrid[newRow][newCol] = word[i];
+    }
+}
+
+function displayWordSearch() {
+    const container = document.getElementById('wordSearchGrid');
+    container.innerHTML = '';
+
+    for (let i = 0; i < wordSearchSize; i++) {
+        for (let j = 0; j < wordSearchSize; j++) {
+            const cell = document.createElement('div');
+            cell.className = 'ws-cell';
+            cell.textContent = wordSearchGrid[i][j];
+            cell.dataset.row = i;
+            cell.dataset.col = j;
+
+            cell.addEventListener('mousedown', startSelection);
+            cell.addEventListener('mouseenter', continueSelection);
+            cell.addEventListener('mouseup', endSelection);
+
+            container.appendChild(cell);
+        }
+    }
+
+    // Eventos táctiles para móviles
+    container.addEventListener('touchstart', handleTouchStart);
+    container.addEventListener('touchmove', handleTouchMove);
+    container.addEventListener('touchend', handleTouchEnd);
+}
+
+function displayWordsList() {
+    const container = document.getElementById('wordsList');
+    container.innerHTML = '';
+
+    wordSearchWords.forEach(word => {
+        const wordDiv = document.createElement('div');
+        wordDiv.className = 'word-item';
+        wordDiv.textContent = word;
+        wordDiv.dataset.word = word;
+        container.appendChild(wordDiv);
+    });
+
+    document.getElementById('totalWords').textContent = wordSearchWords.length;
+    document.getElementById('wordsFound').textContent = wordsFoundList.length;
+    document.getElementById('wsScore').textContent = wordSearchScore;
+}
+
+function startSelection(e) {
+    isSelecting = true;
+    selectedCells = [e.target];
+    e.target.classList.add('ws-selected');
+}
+
+function continueSelection(e) {
+    if (!isSelecting) return;
+
+    if (!selectedCells.includes(e.target)) {
+        selectedCells.push(e.target);
+        e.target.classList.add('ws-selected');
+    }
+}
+
+function endSelection() {
+    if (!isSelecting) return;
+    isSelecting = false;
+
+    checkSelectedWord();
+
+    // Limpiar selección
+    selectedCells.forEach(cell => {
+        if (!cell.classList.contains('ws-found')) {
+            cell.classList.remove('ws-selected');
+        }
+    });
+    selectedCells = [];
+}
+
+function handleTouchStart(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (element && element.classList.contains('ws-cell')) {
+        startSelection({ target: element });
+    }
+}
+
+function handleTouchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (element && element.classList.contains('ws-cell')) {
+        continueSelection({ target: element });
+    }
+}
+
+function handleTouchEnd(e) {
+    e.preventDefault();
+    endSelection();
+}
+
+function checkSelectedWord() {
+    if (selectedCells.length < 3) return;
+
+    const word = selectedCells.map(cell => cell.textContent).join('');
+    const reverseWord = word.split('').reverse().join('');
+
+    let foundWord = null;
+    if (wordSearchWords.includes(word)) {
+        foundWord = word;
+    } else if (wordSearchWords.includes(reverseWord)) {
+        foundWord = reverseWord;
+    }
+
+    if (foundWord && !wordsFoundList.includes(foundWord)) {
+        wordsFoundList.push(foundWord);
+        wordSearchScore += 100;
+
+        // Marcar celdas como encontradas
+        selectedCells.forEach(cell => {
+            cell.classList.add('ws-found');
+            cell.classList.remove('ws-selected');
+        });
+
+        // Marcar palabra en la lista
+        const wordItem = document.querySelector(`.word-item[data-word="${foundWord}"]`);
+        if (wordItem) {
+            wordItem.classList.add('word-found');
+        }
+
+        // Actualizar stats
+        document.getElementById('wordsFound').textContent = wordsFoundList.length;
+        document.getElementById('wsScore').textContent = wordSearchScore;
+
+        showToast(`¡Encontraste: ${foundWord}! +100 puntos`, 'success');
+
+        // Verificar si terminó
+        if (wordsFoundList.length === wordSearchWords.length) {
+            setTimeout(() => finishWordSearch(), 500);
+        }
+    }
+}
+
+function finishWordSearch() {
+    clearInterval(countdownInterval);
+
+    const timeElapsed = Math.floor((Date.now() - wordSearchStartTime) / 1000);
+    const timeBonus = Math.max(0, (600 - timeElapsed) * 2); // Bonus por tiempo
+    const finalScore = wordSearchScore + timeBonus;
+
+    const percentage = Math.round((finalScore / (wordSearchWords.length * 100 + 1200)) * 100);
+
+    const result = {
+        user: currentUser.name,
+        email: currentUser.email,
+        testType: currentTestType,
+        test: 'Sopa de Letras',
+        score: percentage,
+        correctAnswers: wordsFoundList.length,
+        totalQuestions: wordSearchWords.length,
+        time: timeElapsed,
+        isPractice: isPracticeMode
+    };
+
+    lastTestResult = result;
+
+    if (!isPracticeMode) {
+        saveResult(result);
+        sendToGoogleSheets(result, 'resultado');
+    }
+
+    showResults(percentage, 'Sopa de Letras');
+}
+
+// ========================================
+// 2. SISTEMA DE EXÁMENES POR CÓDIGO
+// ========================================
+
+let examCodes = JSON.parse(localStorage.getItem('examCodes') || '{}');
+let currentCodeExam = null;
+let currentCodeExamQuestion = 0;
+let codeExamAnswers = [];
+let codeExamStartTime;
+
+function showCodeExamInput() {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión', 'error');
+        return;
+    }
+
+    document.getElementById('examCodeInput').value = '';
+    document.getElementById('codeExamError').style.display = 'none';
+    showScreen('codeExamInputScreen');
+}
+
+function validateExamCode() {
+    const code = document.getElementById('examCodeInput').value.trim().toUpperCase();
+    const errorDiv = document.getElementById('codeExamError');
+
+    if (!code) {
+        errorDiv.textContent = '⚠️ Por favor ingresa un código';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    if (!examCodes[code]) {
+        errorDiv.textContent = '❌ Código inválido. Verifica con tu profesor.';
+        errorDiv.style.display = 'block';
+        return;
+    }
+
+    currentCodeExam = examCodes[code];
+    startCodeExam();
+}
+
+function startCodeExam() {
+    currentCodeExamQuestion = 0;
+    codeExamAnswers = [];
+
+    // Actualizar título
+    document.getElementById('codeExamTitle').textContent = currentCodeExam.title;
+
+    // Actualizar badge
+    const badge = document.getElementById('testTypeBadgeCE');
+    if (badge) {
+        badge.textContent = currentTestType === 'pre' ? 'PRE-TEST' : 'POST-TEST';
+        badge.className = `test-badge ${currentTestType}`;
+    }
+
+    // Iniciar temporizador
+    remainingTime = currentCodeExam.timeLimit || 900; // 15 minutos por defecto
+    startCountdown('codeExamTimer');
+    codeExamStartTime = Date.now();
+
+    loadCodeExamQuestion();
+    showScreen('codeExamScreen');
+}
+
+function loadCodeExamQuestion() {
+    const question = currentCodeExam.questions[currentCodeExamQuestion];
+    const container = document.getElementById('codeExamQuestionContainer');
+
+    document.getElementById('codeExamCurrentQ').textContent = currentCodeExamQuestion + 1;
+    document.getElementById('codeExamTotalQ').textContent = currentCodeExam.questions.length;
+
+    const progress = ((currentCodeExamQuestion / currentCodeExam.questions.length) * 100);
+    document.getElementById('codeExamProgress').textContent = Math.round(progress);
+    document.getElementById('codeExamProgressBar').style.width = progress + '%';
+
+    let html = `
+        <h3 class="question-title">${question.q}</h3>
+        <div class="options-container">
+    `;
+
+    question.options.forEach((option, index) => {
+        html += `
+            <div class="option-card" onclick="selectCodeExamOption(${index})">
+                <div class="option-radio" id="codeExamRadio${index}"></div>
+                <div class="option-text">${option}</div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // Restaurar respuesta si existe
+    if (codeExamAnswers[currentCodeExamQuestion] !== undefined) {
+        selectCodeExamOption(codeExamAnswers[currentCodeExamQuestion], false);
+    }
+}
+
+function selectCodeExamOption(index, save = true) {
+    // Limpiar selección anterior
+    document.querySelectorAll('#codeExamQuestionContainer .option-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.querySelectorAll('#codeExamQuestionContainer .option-radio').forEach(radio => {
+        radio.classList.remove('selected');
+    });
+
+    // Seleccionar nueva opción
+    const cards = document.querySelectorAll('#codeExamQuestionContainer .option-card');
+    const radios = document.querySelectorAll('#codeExamQuestionContainer .option-radio');
+    cards[index].classList.add('selected');
+    radios[index].classList.add('selected');
+
+    if (save) {
+        codeExamAnswers[currentCodeExamQuestion] = index;
+    }
+}
+
+function nextCodeExamQuestion() {
+    if (codeExamAnswers[currentCodeExamQuestion] === undefined) {
+        showToast('Selecciona una respuesta', 'error');
+        return;
+    }
+
+    if (currentCodeExamQuestion < currentCodeExam.questions.length - 1) {
+        currentCodeExamQuestion++;
+        loadCodeExamQuestion();
+    } else {
+        finishCodeExam();
+    }
+}
+
+function finishCodeExam() {
+    clearInterval(countdownInterval);
+
+    let correct = 0;
+    codeExamAnswers.forEach((answer, index) => {
+        if (answer === currentCodeExam.questions[index].correct) {
+            correct++;
+        }
+    });
+
+    const score = Math.round((correct / currentCodeExam.questions.length) * 100);
+    const timeElapsed = Math.floor((Date.now() - codeExamStartTime) / 1000);
+
+    const result = {
+        user: currentUser.name,
+        email: currentUser.email,
+        testType: currentTestType,
+        test: currentCodeExam.title,
+        score: score,
+        correctAnswers: correct,
+        totalQuestions: currentCodeExam.questions.length,
+        time: timeElapsed,
+        isPractice: isPracticeMode,
+        examCode: currentCodeExam.code
+    };
+
+    lastTestResult = result;
+
+    if (!isPracticeMode) {
+        saveResult(result);
+        sendToGoogleSheets(result, 'resultado');
+    }
+
+    showResults(score, currentCodeExam.title);
+}
+
+// FUNCIONES DE ADMINISTRADOR PARA CREAR EXÁMENES
+
+function createExamCode(examData) {
+    // Generar código único
+    const code = 'EXAM-' + Date.now().toString(36).toUpperCase();
+
+    examCodes[code] = {
+        code: code,
+        title: examData.title,
+        description: examData.description,
+        questions: examData.questions,
+        timeLimit: examData.timeLimit || 900,
+        createdAt: new Date().toISOString(),
+        createdBy: 'admin'
+    };
+
+    localStorage.setItem('examCodes', JSON.stringify(examCodes));
+    return code;
+}
+
+function deleteExamCode(code) {
+    delete examCodes[code];
+    localStorage.setItem('examCodes', JSON.stringify(examCodes));
+}
+
+function getExamCodes() {
+    return examCodes;
+}
+
+// ========================================
+// 3. TEST DE FORTALEZAS Y DEBILIDADES
+// ========================================
+
+const strengthsQuestions = [
+    {
+        q: "¿Cómo te describes en situaciones de trabajo bajo presión?",
+        options: [
+            { text: "Me mantengo calmado y enfocado", type: "fortaleza", score: 5 },
+            { text: "Me estreso pero logro completar las tareas", type: "neutral", score: 3 },
+            { text: "Me cuesta manejar la presión", type: "debilidad", score: 1 },
+            { text: "Prefiero evitar situaciones de alta presión", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan bien trabajas en equipo?",
+        options: [
+            { text: "Excelente, me gusta colaborar y escuchar ideas", type: "fortaleza", score: 5 },
+            { text: "Bien, aunque a veces prefiero trabajar solo", type: "neutral", score: 3 },
+            { text: "Me cuesta adaptarme a los demás", type: "debilidad", score: 1 },
+            { text: "Prefiero trabajar individualmente siempre", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo manejas las críticas constructivas?",
+        options: [
+            { text: "Las acepto y las uso para mejorar", type: "fortaleza", score: 5 },
+            { text: "Me molestan pero trato de aprender", type: "neutral", score: 3 },
+            { text: "Me afectan negativamente", type: "debilidad", score: 1 },
+            { text: "Las tomo de forma personal", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan organizado eres con tus tareas?",
+        options: [
+            { text: "Muy organizado, planifico todo con anticipación", type: "fortaleza", score: 5 },
+            { text: "Medianamente organizado", type: "neutral", score: 3 },
+            { text: "Desorganizado, a veces olvido cosas", type: "debilidad", score: 1 },
+            { text: "Muy desorganizado, me cuesta priorizar", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo es tu comunicación con los demás?",
+        options: [
+            { text: "Excelente, me expreso clara y efectivamente", type: "fortaleza", score: 5 },
+            { text: "Buena, aunque a veces me cuesta explicarme", type: "neutral", score: 3 },
+            { text: "Regular, tengo dificultades para comunicarme", type: "debilidad", score: 1 },
+            { text: "Muy tímido, evito hablar en público", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo reaccionas ante los cambios?",
+        options: [
+            { text: "Me adapto rápidamente a nuevas situaciones", type: "fortaleza", score: 5 },
+            { text: "Me toma tiempo pero me adapto", type: "neutral", score: 3 },
+            { text: "Me cuesta adaptarme a los cambios", type: "debilidad", score: 1 },
+            { text: "Prefiero mantener la rutina siempre", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan proactivo eres?",
+        options: [
+            { text: "Muy proactivo, tomo iniciativa constantemente", type: "fortaleza", score: 5 },
+            { text: "A veces tomo iniciativa", type: "neutral", score: 3 },
+            { text: "Espero instrucciones antes de actuar", type: "debilidad", score: 1 },
+            { text: "Rara vez tomo la iniciativa", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo manejas los conflictos?",
+        options: [
+            { text: "Los resuelvo mediante diálogo y compromiso", type: "fortaleza", score: 5 },
+            { text: "Trato de resolverlos aunque me incomoden", type: "neutral", score: 3 },
+            { text: "Me cuesta enfrentar conflictos", type: "debilidad", score: 1 },
+            { text: "Los evito completamente", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan responsable eres con tus compromisos?",
+        options: [
+            { text: "Muy responsable, siempre cumplo", type: "fortaleza", score: 5 },
+            { text: "Generalmente cumplo mis compromisos", type: "neutral", score: 3 },
+            { text: "A veces olvido mis compromisos", type: "debilidad", score: 1 },
+            { text: "Me cuesta cumplir con responsabilidades", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo describes tu nivel de creatividad?",
+        options: [
+            { text: "Muy creativo, siempre propongo nuevas ideas", type: "fortaleza", score: 5 },
+            { text: "Moderadamente creativo", type: "neutral", score: 3 },
+            { text: "Poco creativo, prefiero seguir métodos establecidos", type: "debilidad", score: 1 },
+            { text: "No me considero creativo", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan puntual eres?",
+        options: [
+            { text: "Siempre llego a tiempo o antes", type: "fortaleza", score: 5 },
+            { text: "Generalmente soy puntual", type: "neutral", score: 3 },
+            { text: "A menudo llego tarde", type: "debilidad", score: 1 },
+            { text: "Tengo problemas serios de puntualidad", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo manejas múltiples tareas simultáneas?",
+        options: [
+            { text: "Muy bien, puedo hacer multitasking efectivamente", type: "fortaleza", score: 5 },
+            { text: "Razonablemente bien", type: "neutral", score: 3 },
+            { text: "Me cuesta manejar varias tareas a la vez", type: "debilidad", score: 1 },
+            { text: "Prefiero hacer una tarea a la vez", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan bien aceptas responsabilidades de liderazgo?",
+        options: [
+            { text: "Me siento cómodo liderando equipos", type: "fortaleza", score: 5 },
+            { text: "Puedo liderar si es necesario", type: "neutral", score: 3 },
+            { text: "Prefiero no liderar", type: "debilidad", score: 1 },
+            { text: "Me incomoda mucho liderar", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Cómo describes tu capacidad de aprendizaje?",
+        options: [
+            { text: "Aprendo rápido y me gusta adquirir nuevas habilidades", type: "fortaleza", score: 5 },
+            { text: "Aprendo a un ritmo normal", type: "neutral", score: 3 },
+            { text: "Me toma tiempo aprender cosas nuevas", type: "debilidad", score: 1 },
+            { text: "Tengo dificultades para aprender", type: "debilidad", score: 1 }
+        ]
+    },
+    {
+        q: "¿Qué tan bien manejas el estrés?",
+        options: [
+            { text: "Muy bien, tengo buenas técnicas de manejo", type: "fortaleza", score: 5 },
+            { text: "Razonablemente bien", type: "neutral", score: 3 },
+            { text: "El estrés me afecta significativamente", type: "debilidad", score: 1 },
+            { text: "Tengo grandes problemas con el estrés", type: "debilidad", score: 1 }
+        ]
+    }
+];
+
+let currentStrengthsQuestion = 0;
+let strengthsAnswers = [];
+let strengthsStartTime;
+
+function startStrengthsTest() {
+    currentStrengthsQuestion = 0;
+    strengthsAnswers = [];
+
+    // Actualizar badge
+    const badge = document.getElementById('testTypeBadgeSWT');
+    if (badge) {
+        badge.textContent = currentTestType === 'pre' ? 'PRE-TEST' : 'POST-TEST';
+        badge.className = `test-badge ${currentTestType}`;
+    }
+
+    // Iniciar temporizador
+    remainingTime = 1200; // 20 minutos
+    startCountdown('strengthsTimer');
+    strengthsStartTime = Date.now();
+
+    loadStrengthsQuestion();
+    showScreen('strengthsTestScreen');
+}
+
+function loadStrengthsQuestion() {
+    const question = strengthsQuestions[currentStrengthsQuestion];
+    const container = document.getElementById('strengthsQuestionContainer');
+
+    document.getElementById('strengthsCurrentQ').textContent = currentStrengthsQuestion + 1;
+    document.getElementById('strengthsTotalQ').textContent = strengthsQuestions.length;
+
+    const progress = ((currentStrengthsQuestion / strengthsQuestions.length) * 100);
+    document.getElementById('strengthsProgress').textContent = Math.round(progress);
+    document.getElementById('strengthsProgressBar').style.width = progress + '%';
+
+    let html = `
+        <h3 class="question-title">${question.q}</h3>
+        <div class="options-container">
+    `;
+
+    question.options.forEach((option, index) => {
+        const emoji = option.type === 'fortaleza' ? '💪' : option.type === 'debilidad' ? '⚠️' : '➖';
+        html += `
+            <div class="option-card" onclick="selectStrengthsOption(${index})">
+                <div class="option-radio" id="strengthsRadio${index}"></div>
+                <div class="option-text">${emoji} ${option.text}</div>
+            </div>
+        `;
+    });
+
+    html += '</div>';
+    container.innerHTML = html;
+
+    // Restaurar respuesta si existe
+    if (strengthsAnswers[currentStrengthsQuestion] !== undefined) {
+        selectStrengthsOption(strengthsAnswers[currentStrengthsQuestion], false);
+    }
+}
+
+function selectStrengthsOption(index, save = true) {
+    // Limpiar selección anterior
+    document.querySelectorAll('#strengthsQuestionContainer .option-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.querySelectorAll('#strengthsQuestionContainer .option-radio').forEach(radio => {
+        radio.classList.remove('selected');
+    });
+
+    // Seleccionar nueva opción
+    const cards = document.querySelectorAll('#strengthsQuestionContainer .option-card');
+    const radios = document.querySelectorAll('#strengthsQuestionContainer .option-radio');
+    cards[index].classList.add('selected');
+    radios[index].classList.add('selected');
+
+    if (save) {
+        strengthsAnswers[currentStrengthsQuestion] = index;
+    }
+}
+
+function nextStrengthsQuestion() {
+    if (strengthsAnswers[currentStrengthsQuestion] === undefined) {
+        showToast('Selecciona una respuesta', 'error');
+        return;
+    }
+
+    if (currentStrengthsQuestion < strengthsQuestions.length - 1) {
+        currentStrengthsQuestion++;
+        loadStrengthsQuestion();
+    } else {
+        finishStrengthsTest();
+    }
+}
+
+function finishStrengthsTest() {
+    clearInterval(countdownInterval);
+
+    let totalScore = 0;
+    let fortalezas = 0;
+    let debilidades = 0;
+
+    strengthsAnswers.forEach((answerIndex, questionIndex) => {
+        const option = strengthsQuestions[questionIndex].options[answerIndex];
+        totalScore += option.score;
+
+        if (option.type === 'fortaleza') fortalezas++;
+        else if (option.type === 'debilidad') debilidades++;
+    });
+
+    const maxScore = strengthsQuestions.length * 5;
+    const percentage = Math.round((totalScore / maxScore) * 100);
+    const timeElapsed = Math.floor((Date.now() - strengthsStartTime) / 1000);
+
+    const result = {
+        user: currentUser.name,
+        email: currentUser.email,
+        testType: currentTestType,
+        test: 'Fortalezas y Debilidades',
+        score: percentage,
+        correctAnswers: fortalezas,
+        totalQuestions: strengthsQuestions.length,
+        time: timeElapsed,
+        isPractice: isPracticeMode,
+        fortalezas: fortalezas,
+        debilidades: debilidades
+    };
+
+    lastTestResult = result;
+
+    if (!isPracticeMode) {
+        saveResult(result);
+        sendToGoogleSheets(result, 'resultado');
+    }
+
+    showResults(percentage, 'Fortalezas y Debilidades');
+}
+
+// ========================================
+// PANEL DE ADMINISTRACIÓN DE EXÁMENES
+// ========================================
+
+let newExamQuestions = [];
+
+function showExamCodesManager() {
+    showScreen('examCodesManagerScreen');
+    loadExamCodesList();
+}
+
+function showCreateExamForm() {
+    document.getElementById('createExamForm').style.display = 'block';
+    newExamQuestions = [];
+    document.getElementById('questionsContainer').innerHTML = '';
+    document.getElementById('examTitle').value = '';
+    document.getElementById('examDescription').value = '';
+    document.getElementById('examTimeLimit').value = '15';
+
+    // Agregar una pregunta por defecto
+    addQuestionToExam();
+}
+
+function cancelCreateExam() {
+    document.getElementById('createExamForm').style.display = 'none';
+    newExamQuestions = [];
+}
+
+function addQuestionToExam() {
+    const questionIndex = newExamQuestions.length;
+    newExamQuestions.push({
+        q: '',
+        options: ['', '', '', ''],
+        correct: 0
+    });
+
+    const container = document.getElementById('questionsContainer');
+    const questionDiv = document.createElement('div');
+    questionDiv.className = 'quiz-card';
+    questionDiv.style.marginBottom = '1rem';
+    questionDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h4>Pregunta ${questionIndex + 1}</h4>
+            ${questionIndex > 0 ? `<button class="btn-nav secondary" onclick="removeQuestion(${questionIndex})">Eliminar</button>` : ''}
+        </div>
+        <div class="form-group">
+            <label>Pregunta:</label>
+            <input type="text" id="question_${questionIndex}" placeholder="Escribe tu pregunta aquí..." onchange="updateQuestionText(${questionIndex}, this.value)">
+        </div>
+        <div class="form-group">
+            <label>Opciones de respuesta:</label>
+            ${[0, 1, 2, 3].map(optIndex => `
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+                    <input type="radio" name="correct_${questionIndex}" value="${optIndex}" ${optIndex === 0 ? 'checked' : ''} onchange="updateCorrectAnswer(${questionIndex}, ${optIndex})">
+                    <input type="text" id="option_${questionIndex}_${optIndex}" placeholder="Opción ${optIndex + 1}" style="flex: 1;" onchange="updateOption(${questionIndex}, ${optIndex}, this.value)">
+                </div>
+            `).join('')}
+            <small>Selecciona el círculo de la respuesta correcta</small>
+        </div>
+    `;
+    container.appendChild(questionDiv);
+}
+
+function removeQuestion(index) {
+    newExamQuestions.splice(index, 1);
+    renderQuestionsForm();
+}
+
+function renderQuestionsForm() {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+    newExamQuestions.forEach((q, index) => {
+        addQuestionToExam();
+        document.getElementById(`question_${index}`).value = q.q;
+        q.options.forEach((opt, optIndex) => {
+            document.getElementById(`option_${index}_${optIndex}`).value = opt;
+        });
+        document.querySelector(`input[name="correct_${index}"][value="${q.correct}"]`).checked = true;
+    });
+}
+
+function updateQuestionText(index, value) {
+    newExamQuestions[index].q = value;
+}
+
+function updateOption(questionIndex, optionIndex, value) {
+    newExamQuestions[questionIndex].options[optionIndex] = value;
+}
+
+function updateCorrectAnswer(questionIndex, correctIndex) {
+    newExamQuestions[questionIndex].correct = correctIndex;
+}
+
+function saveNewExam() {
+    const title = document.getElementById('examTitle').value.trim();
+    const description = document.getElementById('examDescription').value.trim();
+    const timeLimit = parseInt(document.getElementById('examTimeLimit').value) * 60; // Convertir a segundos
+
+    if (!title) {
+        showToast('Ingresa un título para el examen', 'error');
+        return;
+    }
+
+    if (newExamQuestions.length === 0) {
+        showToast('Agrega al menos una pregunta', 'error');
+        return;
+    }
+
+    // Validar que todas las preguntas estén completas
+    for (let i = 0; i < newExamQuestions.length; i++) {
+        const q = newExamQuestions[i];
+        if (!q.q.trim()) {
+            showToast(`La pregunta ${i + 1} está vacía`, 'error');
+            return;
+        }
+        for (let j = 0; j < q.options.length; j++) {
+            if (!q.options[j].trim()) {
+                showToast(`La opción ${j + 1} de la pregunta ${i + 1} está vacía`, 'error');
+                return;
+            }
+        }
+    }
+
+    const examData = {
+        title: title,
+        description: description,
+        questions: newExamQuestions,
+        timeLimit: timeLimit
+    };
+
+    const code = createExamCode(examData);
+
+    showToast(`Examen creado exitosamente. Código: ${code}`, 'success');
+
+    // Mostrar el código en un modal o alert
+    alert(`¡Examen creado exitosamente!\n\nCódigo del examen: ${code}\n\nComparte este código con tus estudiantes para que puedan realizar el examen.`);
+
+    cancelCreateExam();
+    loadExamCodesList();
+}
+
+function loadExamCodesList() {
+    const tbody = document.getElementById('examCodesTableBody');
+    const codes = getExamCodes();
+
+    if (Object.keys(codes).length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay exámenes creados</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = Object.values(codes).map(exam => {
+        const date = new Date(exam.createdAt).toLocaleDateString();
+        const time = Math.round(exam.timeLimit / 60);
+
+        return `
+            <tr>
+                <td><strong>${exam.code}</strong></td>
+                <td>${exam.title}</td>
+                <td>${exam.questions.length}</td>
+                <td>${time} min</td>
+                <td>${date}</td>
+                <td>
+                    <button class="btn-nav secondary" style="padding: 0.3rem 0.6rem; font-size: 0.85rem;" onclick="copyExamCode('${exam.code}')">Copiar Código</button>
+                    <button class="btn-nav secondary" style="padding: 0.3rem 0.6rem; font-size: 0.85rem; background: #ff4757;" onclick="confirmDeleteExam('${exam.code}')">Eliminar</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function copyExamCode(code) {
+    navigator.clipboard.writeText(code).then(() => {
+        showToast(`Código ${code} copiado al portapapeles`, 'success');
+    }).catch(() => {
+        prompt('Copia este código:', code);
+    });
+}
+
+function confirmDeleteExam(code) {
+    if (confirm(`¿Estás seguro de eliminar el examen con código ${code}?`)) {
+        deleteExamCode(code);
+        showToast('Examen eliminado', 'success');
+        loadExamCodesList();
+    }
+}
+
+// Exportar funciones
+window.startWordSearch = startWordSearch;
+window.finishWordSearch = finishWordSearch;
+window.showCodeExamInput = showCodeExamInput;
+window.validateExamCode = validateExamCode;
+window.nextCodeExamQuestion = nextCodeExamQuestion;
+window.selectCodeExamOption = selectCodeExamOption;
+window.createExamCode = createExamCode;
+window.deleteExamCode = deleteExamCode;
+window.getExamCodes = getExamCodes;
+window.startStrengthsTest = startStrengthsTest;
+window.loadStrengthsQuestion = loadStrengthsQuestion;
+window.nextStrengthsQuestion = nextStrengthsQuestion;
+window.selectStrengthsOption = selectStrengthsOption;
+window.showExamCodesManager = showExamCodesManager;
+window.showCreateExamForm = showCreateExamForm;
+window.cancelCreateExam = cancelCreateExam;
+window.addQuestionToExam = addQuestionToExam;
+window.removeQuestion = removeQuestion;
+window.updateQuestionText = updateQuestionText;
+window.updateOption = updateOption;
+window.updateCorrectAnswer = updateCorrectAnswer;
+window.saveNewExam = saveNewExam;
+window.copyExamCode = copyExamCode;
+window.confirmDeleteExam = confirmDeleteExam;

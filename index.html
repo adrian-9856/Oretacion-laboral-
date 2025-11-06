@@ -127,6 +127,12 @@
             <div class="dashboard-header">
                 <h1>Dashboard de Administración</h1>
                 <div class="dashboard-actions">
+                    <button class="btn-action" onclick="showExamCodesManager()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                        Gestionar Exámenes
+                    </button>
                     <button class="btn-action" onclick="exportToExcel()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14-7l-5-5m0 0L7 8m5-5v12"/>
@@ -216,6 +222,82 @@
                         </tr>
                     </thead>
                     <tbody id="resultsTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- GESTIÓN DE EXÁMENES POR CÓDIGO -->
+    <div class="screen" id="examCodesManagerScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                    <span>Gestión de Exámenes por Código</span>
+                </div>
+                <div class="nav-user">
+                    <span class="admin-badge">👑 ADMIN</span>
+                    <button class="btn-logout" onclick="showScreen('adminDashboard')">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Crear Nuevo Examen</h1>
+                <button class="btn-action" onclick="showCreateExamForm()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Nuevo Examen
+                </button>
+            </div>
+
+            <!-- Formulario de crear examen -->
+            <div id="createExamForm" style="display: none; margin-bottom: 2rem;">
+                <div class="quiz-card">
+                    <h3>📝 Crear Examen Personalizado</h3>
+                    <div class="form-group">
+                        <label>Título del Examen:</label>
+                        <input type="text" id="examTitle" placeholder="Ej: Evaluación de Competencias Laborales">
+                    </div>
+                    <div class="form-group">
+                        <label>Descripción:</label>
+                        <textarea id="examDescription" placeholder="Descripción breve del examen..." rows="3"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Tiempo Límite (minutos):</label>
+                        <input type="number" id="examTimeLimit" value="15" min="1" max="120">
+                    </div>
+
+                    <h4>Preguntas</h4>
+                    <div id="questionsContainer"></div>
+
+                    <button class="btn-nav secondary" onclick="addQuestionToExam()">+ Agregar Pregunta</button>
+
+                    <div class="quiz-navigation" style="margin-top: 1rem;">
+                        <button class="btn-nav secondary" onclick="cancelCreateExam()">Cancelar</button>
+                        <button class="btn-nav primary" onclick="saveNewExam()">Guardar y Generar Código</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de exámenes creados -->
+            <div class="table-container">
+                <h2>Exámenes Creados</h2>
+                <table class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Título</th>
+                            <th>Preguntas</th>
+                            <th>Tiempo</th>
+                            <th>Fecha Creación</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="examCodesTableBody"></tbody>
                 </table>
             </div>
         </div>
@@ -402,6 +484,42 @@
     </div>
     <h3>Simulador de Entrevista</h3>
     <p>Practica respuestas a preguntas comunes</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- SOPA DE LETRAS -->
+                <div class="test-card modern" onclick="startTest('wordsearch')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+    </div>
+    <h3>Sopa de Letras</h3>
+    <p>Encuentra palabras de orientación laboral</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- EXAMEN POR CÓDIGO -->
+                <div class="test-card modern" onclick="showCodeExamInput()">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+        </svg>
+    </div>
+    <h3>Examen por Código</h3>
+    <p>Ingresa el código de tu examen</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- FORTALEZAS Y DEBILIDADES -->
+                <div class="test-card modern" onclick="startTest('strengths')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+    </div>
+    <h3>Fortalezas y Debilidades</h3>
+    <p>Evalúa tus competencias personales</p>
     <button class="test-start-btn">Iniciar →</button>
 </div>
             </div>
@@ -1115,6 +1233,186 @@
         </div>
     </div>
 </div>
+
+    <!-- SOPA DE LETRAS -->
+    <div class="screen" id="wordSearchScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Sopa de Letras - Orientación Laboral</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeWS"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="wordSearchTimer">10:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="wordsearch-layout">
+                <div class="wordsearch-sidebar">
+                    <h3>🔍 Palabras a encontrar</h3>
+                    <div id="wordsList" class="words-list"></div>
+                    <div class="wordsearch-stats">
+                        <div class="stat-item">
+                            <strong>Encontradas:</strong> <span id="wordsFound">0</span>/<span id="totalWords">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>Puntuación:</strong> <span id="wsScore">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wordsearch-main">
+                    <div id="wordSearchGrid" class="wordsearch-grid"></div>
+                    <div class="wordsearch-instructions">
+                        <p>💡 Haz clic y arrastra para seleccionar palabras (horizontal, vertical o diagonal)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAMEN POR CÓDIGO -->
+    <div class="screen" id="codeExamInputScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Examen por Código</div>
+                <div class="nav-user">
+                    <button class="btn-logout" onclick="showScreen('testMenuScreen')">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <h2>📝 Ingresa el Código del Examen</h2>
+                <p>Tu profesor o administrador te ha proporcionado un código único para realizar este examen.</p>
+                <div class="form-group">
+                    <label>Código del Examen:</label>
+                    <input type="text" id="examCodeInput" placeholder="Ej: EXAM-2024-ABC123" style="text-transform: uppercase;">
+                </div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="showScreen('testMenuScreen')">Cancelar</button>
+                    <button class="btn-nav primary" onclick="validateExamCode()">Iniciar Examen</button>
+                </div>
+                <div id="codeExamError" style="color: #ff4757; margin-top: 1rem; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAMEN POR CÓDIGO - PANTALLA DE EJECUCIÓN -->
+    <div class="screen" id="codeExamScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span id="codeExamTitle">Examen por Código</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeCE"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="codeExamTimer">15:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <div class="quiz-progress-section">
+                    <div class="progress-info">
+                        <span>Pregunta <strong id="codeExamCurrentQ">1</strong> de <strong id="codeExamTotalQ">10</strong></span>
+                        <span class="progress-percentage"><span id="codeExamProgress">0</span>%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="codeExamProgressBar"></div>
+                    </div>
+                </div>
+                <div id="codeExamQuestionContainer"></div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-nav primary" id="codeExamNextBtn" onclick="nextCodeExamQuestion()">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORTALEZAS Y DEBILIDADES -->
+    <div class="screen" id="strengthsScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Test de Fortalezas y Debilidades</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeSW"></span>
+                    <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <!-- Video Explicativo -->
+            <div class="video-section" style="margin-bottom: 2rem;">
+                <div class="quiz-card">
+                    <h3>📹 Video Explicativo: ¿Qué son las Fortalezas y Debilidades?</h3>
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;">
+                        <iframe
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 8px;"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Fortalezas y Debilidades en el Ámbito Laboral"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        📌 <strong>Nota:</strong> Te recomendamos ver el video antes de comenzar el test para entender mejor
+                        cómo identificar tus fortalezas y debilidades en el contexto laboral.
+                    </p>
+                    <button class="btn-nav primary" onclick="startStrengthsTest()" style="width: 100%; margin-top: 1rem;">
+                        Comenzar Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORTALEZAS Y DEBILIDADES - TEST -->
+    <div class="screen" id="strengthsTestScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Test de Fortalezas y Debilidades</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeSWT"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="strengthsTimer">20:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <div class="quiz-progress-section">
+                    <div class="progress-info">
+                        <span>Pregunta <strong id="strengthsCurrentQ">1</strong> de <strong id="strengthsTotalQ">15</strong></span>
+                        <span class="progress-percentage"><span id="strengthsProgress">0</span>%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="strengthsProgressBar"></div>
+                    </div>
+                </div>
+                <div id="strengthsQuestionContainer"></div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-nav primary" id="strengthsNextBtn" onclick="nextStrengthsQuestion()">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 <!-- Botón flotante para crear avatar -->
 <button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
