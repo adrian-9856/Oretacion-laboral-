@@ -1851,20 +1851,139 @@ function saveCVStepData() {
             address: document.getElementById('cvAddress')?.value.trim()
         };
     }
-    
+
     if (cvBuilderStep === 1) {
         cvBuilderData.objective = document.getElementById('cvObjective')?.value.trim();
     }
-    
+
+    if (cvBuilderStep === 2) {
+        // Guardar todas las experiencias laborales
+        cvBuilderData.experience = [];
+        const experienceItems = document.querySelectorAll('#experienceList .cv-item-form');
+        experienceItems.forEach(item => {
+            const id = item.id.replace('experience-', '');
+            const position = document.getElementById(`expPosition-${id}`)?.value.trim();
+            const company = document.getElementById(`expCompany-${id}`)?.value.trim();
+            const period = document.getElementById(`expPeriod-${id}`)?.value.trim();
+            const description = document.getElementById(`expDescription-${id}`)?.value.trim();
+
+            if (position || company) {
+                cvBuilderData.experience.push({
+                    position: position || 'Sin especificar',
+                    company: company || 'Sin especificar',
+                    period: period || 'Sin especificar',
+                    description: description || ''
+                });
+            }
+        });
+    }
+
+    if (cvBuilderStep === 3) {
+        // Guardar toda la educación
+        cvBuilderData.education = [];
+        const educationItems = document.querySelectorAll('#educationList .cv-item-form');
+        educationItems.forEach(item => {
+            const id = item.id.replace('education-', '');
+            const degree = document.getElementById(`eduDegree-${id}`)?.value.trim();
+            const institution = document.getElementById(`eduInstitution-${id}`)?.value.trim();
+            const year = document.getElementById(`eduYear-${id}`)?.value.trim();
+
+            if (degree || institution) {
+                cvBuilderData.education.push({
+                    degree: degree || 'Sin especificar',
+                    institution: institution || 'Sin especificar',
+                    year: year || 'Sin especificar'
+                });
+            }
+        });
+    }
+
     if (cvBuilderStep === 5) {
         cvBuilderData.references = document.getElementById('cvReferences')?.value.trim();
     }
 }
 
+// Funciones para manejar Experiencia Laboral
+function addExperience() {
+    const experienceList = document.getElementById('experienceList');
+    if (!experienceList) return;
+
+    const id = Date.now();
+    const experienceItem = document.createElement('div');
+    experienceItem.className = 'cv-item-form';
+    experienceItem.id = `experience-${id}`;
+    experienceItem.innerHTML = `
+        <div class="form-group">
+            <label>Puesto</label>
+            <input type="text" id="expPosition-${id}" placeholder="Ej: Asistente Administrativo">
+        </div>
+        <div class="form-group">
+            <label>Empresa</label>
+            <input type="text" id="expCompany-${id}" placeholder="Ej: Empresa XYZ">
+        </div>
+        <div class="form-group">
+            <label>Período</label>
+            <input type="text" id="expPeriod-${id}" placeholder="Ej: Enero 2020 - Presente">
+        </div>
+        <div class="form-group">
+            <label>Descripción</label>
+            <textarea id="expDescription-${id}" rows="3" placeholder="Describe tus responsabilidades y logros..."></textarea>
+        </div>
+        <button type="button" class="btn-remove" onclick="removeExperience(${id})">
+            Eliminar
+        </button>
+    `;
+    experienceList.appendChild(experienceItem);
+}
+
+function removeExperience(id) {
+    const item = document.getElementById(`experience-${id}`);
+    if (item) {
+        item.remove();
+    }
+}
+
+// Funciones para manejar Educación
+function addEducation() {
+    const educationList = document.getElementById('educationList');
+    if (!educationList) return;
+
+    const id = Date.now();
+    const educationItem = document.createElement('div');
+    educationItem.className = 'cv-item-form';
+    educationItem.id = `education-${id}`;
+    educationItem.innerHTML = `
+        <div class="form-group">
+            <label>Título/Grado</label>
+            <input type="text" id="eduDegree-${id}" placeholder="Ej: Bachillerato en Ciencias">
+        </div>
+        <div class="form-group">
+            <label>Institución</label>
+            <input type="text" id="eduInstitution-${id}" placeholder="Ej: Colegio Nacional">
+        </div>
+        <div class="form-group">
+            <label>Año</label>
+            <input type="text" id="eduYear-${id}" placeholder="Ej: 2015-2020">
+        </div>
+        <button type="button" class="btn-remove" onclick="removeEducation(${id})">
+            Eliminar
+        </button>
+    `;
+    educationList.appendChild(educationItem);
+}
+
+function removeEducation(id) {
+    const item = document.getElementById(`education-${id}`);
+    if (item) {
+        item.remove();
+    }
+}
+
+// Funciones para manejar Habilidades
 function addSkill() {
     const input = document.getElementById('cvSkillInput');
     const skill = input.value.trim();
-    
+
     if (skill && !cvBuilderData.skills.includes(skill)) {
         cvBuilderData.skills.push(skill);
         input.value = '';
@@ -1880,7 +1999,7 @@ function removeSkill(index) {
 function renderSkills() {
     const container = document.getElementById('skillsList');
     if (!container) return;
-    
+
     container.innerHTML = cvBuilderData.skills.map((skill, i) => `
         <span class="skill-tag">
             ${skill}
@@ -1999,6 +2118,10 @@ function finishCVBuilder() {
 
 window.startErrorDetection = startErrorDetection;
 window.startCVBuilder = startCVBuilder;
+window.addExperience = addExperience;
+window.removeExperience = removeExperience;
+window.addEducation = addEducation;
+window.removeEducation = removeEducation;
 window.addSkill = addSkill;
 window.removeSkill = removeSkill;
 window.nextCVStep = nextCVStep;
