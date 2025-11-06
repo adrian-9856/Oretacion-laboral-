@@ -819,19 +819,22 @@ function loadUserProgress() {
 function loadDashboardData() {
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const results = getResults();
-    
+
     document.getElementById('totalUsers').textContent = users.length;
     document.getElementById('totalTests').textContent = results.length;
-    
+
     const scores = results.map(r => r.score);
     const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     document.getElementById('avgScore').textContent = avgScore + '%';
-    
+
     const times = results.map(r => r.time);
     const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
     document.getElementById('avgTime').textContent = avgTime + 's';
-    
+
     loadResultsTable(results);
+
+    // Cargar gráficas
+    setTimeout(() => createCharts(), 100);
 }
 
 function loadResultsTable(results) {
@@ -865,6 +868,7 @@ function loadResultsTable(results) {
 
 function refreshDashboard() {
     loadDashboardData();
+    createCharts();
     showToast('Dashboard actualizado', 'success');
 }
 
@@ -5960,3 +5964,613 @@ window.updateCorrectAnswer = updateCorrectAnswer;
 window.saveNewExam = saveNewExam;
 window.copyExamCode = copyExamCode;
 window.confirmDeleteExam = confirmDeleteExam;
+
+// ========================================
+// SISTEMA DE PERFILES DE USUARIO
+// ========================================
+
+function showUserProfile() {
+    if (!currentUser) {
+        showToast('Debes iniciar sesión', 'error');
+        return;
+    }
+
+    // Cargar información del usuario
+    document.getElementById('profileUserName').textContent = `${currentUser.name} ${currentUser.lastName}`;
+    document.getElementById('profileUserEmail').textContent = currentUser.email;
+    document.getElementById('profilePhone').textContent = currentUser.phone || '-';
+    document.getElementById('profileAge').textContent = currentUser.age || '-';
+
+    const registeredDate = new Date(currentUser.registeredAt);
+    document.getElementById('profileRegistered').textContent = registeredDate.toLocaleDateString();
+
+    // Cargar foto de perfil
+    const profilePhoto = localStorage.getItem(`profilePhoto_${currentUser.email}`);
+    if (profilePhoto) {
+        document.getElementById('userProfilePhoto').src = profilePhoto;
+    } else {
+        // Usar avatar por defecto
+        document.getElementById('userProfilePhoto').src = `https://api.dicebear.com/7.x/avataaars/svg?seed=${currentUser.email}`;
+    }
+
+    // Calcular estadísticas
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const userResults = allResults.filter(r => r.email === currentUser.email && !r.isPractice);
+
+    document.getElementById('profileTestsCompleted').textContent = userResults.length;
+
+    if (userResults.length > 0) {
+        const avgScore = Math.round(userResults.reduce((sum, r) => sum + r.score, 0) / userResults.length);
+        const bestScore = Math.max(...userResults.map(r => r.score));
+        document.getElementById('profileAvgScore').textContent = avgScore + '%';
+        document.getElementById('profileBestScore').textContent = bestScore + '%';
+    } else {
+        document.getElementById('profileAvgScore').textContent = '0%';
+        document.getElementById('profileBestScore').textContent = '0%';
+    }
+
+    // Cargar historial de actividades
+    loadUserActivityHistory();
+
+    showScreen('userProfileScreen');
+}
+
+function loadUserActivityHistory() {
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const userResults = allResults.filter(r => r.email === currentUser.email)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    const container = document.getElementById('userActivityHistory');
+
+    if (userResults.length === 0) {
+        container.innerHTML = '<p class="no-data">No hay actividades registradas</p>';
+        return;
+    }
+
+    container.innerHTML = userResults.map(result => {
+        const date = new Date(result.timestamp);
+        const timeStr = formatTime(result.time);
+        const scoreClass = result.score >= CONFIG.PASSING_SCORE ? 'success' : 'danger';
+
+        return `
+            <div class="activity-item">
+                <div class="activity-icon ${scoreClass}">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        ${result.score >= CONFIG.PASSING_SCORE
+                            ? '<path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                            : '<path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>'
+                        }
+                    </svg>
+                </div>
+                <div class="activity-content">
+                    <h4>${result.test}</h4>
+                    <p>Tipo: ${result.testType === 'pre' ? 'PRE-TEST' : 'POST-TEST'} | Puntuación: <strong>${result.score}%</strong> | Tiempo: ${timeStr}</p>
+                    <span class="activity-date">${date.toLocaleString()}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function uploadProfilePhoto(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+        showToast('Por favor selecciona una imagen válida', 'error');
+        return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+        showToast('La imagen es muy grande. Máximo 5MB', 'error');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const imageData = e.target.result;
+        localStorage.setItem(`profilePhoto_${currentUser.email}`, imageData);
+        document.getElementById('userProfilePhoto').src = imageData;
+        showToast('Foto de perfil actualizada', 'success');
+    };
+    reader.readAsDataURL(file);
+}
+
+function changeUserPassword() {
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        showToast('Completa todos los campos', 'error');
+        return;
+    }
+
+    if (currentPassword !== currentUser.password) {
+        showToast('La contraseña actual es incorrecta', 'error');
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        showToast('La nueva contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        showToast('Las contraseñas nuevas no coinciden', 'error');
+        return;
+    }
+
+    // Actualizar contraseña
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.email === currentUser.email);
+
+    if (userIndex !== -1) {
+        users[userIndex].password = newPassword;
+        currentUser.password = newPassword;
+        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+        showToast('Contraseña actualizada exitosamente', 'success');
+
+        // Limpiar campos
+        document.getElementById('currentPassword').value = '';
+        document.getElementById('newPassword').value = '';
+        document.getElementById('confirmPassword').value = '';
+    }
+}
+
+// ========================================
+// GESTIÓN DE USUARIOS (ADMIN)
+// ========================================
+
+let selectedUser = null;
+
+function showUsersManagement() {
+    showScreen('usersManagementScreen');
+    loadUsersGrid();
+}
+
+function loadUsersGrid() {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const container = document.getElementById('usersGrid');
+
+    if (users.length === 0) {
+        container.innerHTML = '<p class="no-data">No hay usuarios registrados</p>';
+        return;
+    }
+
+    container.innerHTML = users.map(user => {
+        const userResults = allResults.filter(r => r.email === user.email && !r.isPractice);
+        const avgScore = userResults.length > 0
+            ? Math.round(userResults.reduce((sum, r) => sum + r.score, 0) / userResults.length)
+            : 0;
+
+        const profilePhoto = localStorage.getItem(`profilePhoto_${user.email}`) ||
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
+
+        return `
+            <div class="user-card" onclick='showUserDetail(${JSON.stringify(user).replace(/'/g, "&apos;")})'>
+                <img src="${profilePhoto}" alt="${user.name}" class="user-card-photo">
+                <div class="user-card-info">
+                    <h3>${user.name} ${user.lastName}</h3>
+                    <p>${user.email}</p>
+                    <div class="user-card-stats">
+                        <span>📊 ${userResults.length} pruebas</span>
+                        <span>⭐ ${avgScore}% promedio</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function filterUsers() {
+    const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const filtered = users.filter(user =>
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.lastName.toLowerCase().includes(searchTerm) ||
+        user.email.toLowerCase().includes(searchTerm)
+    );
+
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const container = document.getElementById('usersGrid');
+
+    container.innerHTML = filtered.map(user => {
+        const userResults = allResults.filter(r => r.email === user.email && !r.isPractice);
+        const avgScore = userResults.length > 0
+            ? Math.round(userResults.reduce((sum, r) => sum + r.score, 0) / userResults.length)
+            : 0;
+
+        const profilePhoto = localStorage.getItem(`profilePhoto_${user.email}`) ||
+            `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
+
+        return `
+            <div class="user-card" onclick='showUserDetail(${JSON.stringify(user).replace(/'/g, "&apos;")})'>
+                <img src="${profilePhoto}" alt="${user.name}" class="user-card-photo">
+                <div class="user-card-info">
+                    <h3>${user.name} ${user.lastName}</h3>
+                    <p>${user.email}</p>
+                    <div class="user-card-stats">
+                        <span>📊 ${userResults.length} pruebas</span>
+                        <span>⭐ ${avgScore}% promedio</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function showUserDetail(user) {
+    selectedUser = user;
+
+    const profilePhoto = localStorage.getItem(`profilePhoto_${user.email}`) ||
+        `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
+
+    document.getElementById('modalUserPhoto').src = profilePhoto;
+    document.getElementById('modalUserName').textContent = user.name + ' ' + user.lastName;
+    document.getElementById('modalUserEmail').textContent = user.email;
+    document.getElementById('modalUserFullName').textContent = user.name + ' ' + user.lastName;
+    document.getElementById('modalUserPhone').textContent = user.phone || '-';
+    document.getElementById('modalUserAge').textContent = user.age || '-';
+
+    const registeredDate = new Date(user.registeredAt);
+    document.getElementById('modalUserRegistered').textContent = registeredDate.toLocaleDateString();
+
+    // Cargar resultados
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const userResults = allResults.filter(r => r.email === user.email && !r.isPractice);
+    document.getElementById('modalUserTests').textContent = userResults.length;
+
+    loadUserResultsInModal(user.email);
+
+    document.getElementById('userDetailModal').style.display = 'flex';
+}
+
+function closeUserDetailModal() {
+    document.getElementById('userDetailModal').style.display = 'none';
+    selectedUser = null;
+}
+
+function switchUserDetailTab(tab) {
+    // Remover active de todos los tabs
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+    // Activar tab seleccionado
+    event.target.classList.add('active');
+    document.getElementById(`userDetailTab${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
+}
+
+function loadUserResultsInModal(email) {
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const userResults = allResults.filter(r => r.email === email && !r.isPractice)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    const container = document.getElementById('modalUserResults');
+
+    if (userResults.length === 0) {
+        container.innerHTML = '<p class="no-data">No hay resultados registrados</p>';
+        return;
+    }
+
+    container.innerHTML = `
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>Prueba</th>
+                    <th>Tipo</th>
+                    <th>Puntuación</th>
+                    <th>Tiempo</th>
+                    <th>Fecha</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${userResults.map(result => {
+                    const date = new Date(result.timestamp);
+                    const timeStr = formatTime(result.time);
+                    const scoreClass = result.score >= CONFIG.PASSING_SCORE ? 'success' : 'danger';
+
+                    return `
+                        <tr>
+                            <td>${result.test}</td>
+                            <td><span class="test-badge ${result.testType}">${result.testType === 'pre' ? 'PRE' : 'POST'}</span></td>
+                            <td><span class="score-badge ${scoreClass}">${result.score}%</span></td>
+                            <td>${timeStr}</td>
+                            <td>${date.toLocaleString()}</td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+function adminChangeUserPassword() {
+    if (!selectedUser) return;
+
+    const newPassword = document.getElementById('adminNewPassword').value;
+
+    if (!newPassword) {
+        showToast('Ingresa una nueva contraseña', 'error');
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.email === selectedUser.email);
+
+    if (userIndex !== -1) {
+        users[userIndex].password = newPassword;
+        localStorage.setItem('users', JSON.stringify(users));
+
+        showToast(`Contraseña actualizada para ${selectedUser.name}`, 'success');
+        document.getElementById('adminNewPassword').value = '';
+    }
+}
+
+function confirmDeleteUser() {
+    if (!selectedUser) return;
+
+    if (confirm(`¿Estás seguro de eliminar al usuario ${selectedUser.name} ${selectedUser.lastName}?\n\nEsta acción eliminará todos sus datos y resultados.`)) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const filteredUsers = users.filter(u => u.email !== selectedUser.email);
+        localStorage.setItem('users', JSON.stringify(filteredUsers));
+
+        // Eliminar resultados del usuario
+        const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+        const filteredResults = allResults.filter(r => r.email !== selectedUser.email);
+        localStorage.setItem('results', JSON.stringify(filteredResults));
+
+        // Eliminar foto de perfil
+        localStorage.removeItem(`profilePhoto_${selectedUser.email}`);
+
+        showToast('Usuario eliminado', 'success');
+        closeUserDetailModal();
+        loadUsersGrid();
+    }
+}
+
+// ========================================
+// GRÁFICAS Y ESTADÍSTICAS
+// ========================================
+
+function createCharts() {
+    createScoresDistributionChart();
+    createTestsTypeChart();
+    createTopUsersChart();
+    createActivityChart();
+}
+
+function createScoresDistributionChart() {
+    const canvas = document.getElementById('scoresChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+
+    // Agrupar por rangos de puntuación
+    const ranges = {
+        '0-20': 0,
+        '21-40': 0,
+        '41-60': 0,
+        '61-80': 0,
+        '81-100': 0
+    };
+
+    allResults.forEach(r => {
+        if (r.score <= 20) ranges['0-20']++;
+        else if (r.score <= 40) ranges['21-40']++;
+        else if (r.score <= 60) ranges['41-60']++;
+        else if (r.score <= 80) ranges['61-80']++;
+        else ranges['81-100']++;
+    });
+
+    drawBarChart(ctx, Object.keys(ranges), Object.values(ranges), '#E86C4A');
+}
+
+function createTestsTypeChart() {
+    const canvas = document.getElementById('testsTypeChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+
+    const testTypes = {};
+    allResults.forEach(r => {
+        testTypes[r.test] = (testTypes[r.test] || 0) + 1;
+    });
+
+    const labels = Object.keys(testTypes).slice(0, 5);
+    const values = Object.values(testTypes).slice(0, 5);
+
+    drawPieChart(ctx, labels, values);
+}
+
+function createTopUsersChart() {
+    const canvas = document.getElementById('topUsersChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+
+    const userScores = {};
+    allResults.forEach(r => {
+        if (!userScores[r.user]) {
+            userScores[r.user] = { total: 0, count: 0 };
+        }
+        userScores[r.user].total += r.score;
+        userScores[r.user].count++;
+    });
+
+    const topUsers = Object.entries(userScores)
+        .map(([name, data]) => ({ name, avg: data.total / data.count }))
+        .sort((a, b) => b.avg - a.avg)
+        .slice(0, 5);
+
+    const labels = topUsers.map(u => u.name.split(' ')[0]);
+    const values = topUsers.map(u => Math.round(u.avg));
+
+    drawBarChart(ctx, labels, values, '#2A9D8F');
+}
+
+function createActivityChart() {
+    const canvas = document.getElementById('activityChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+
+    const last7Days = {};
+    const today = new Date();
+
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+        last7Days[dateStr] = 0;
+    }
+
+    allResults.forEach(r => {
+        const date = new Date(r.timestamp);
+        const dateStr = date.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' });
+        if (last7Days.hasOwnProperty(dateStr)) {
+            last7Days[dateStr]++;
+        }
+    });
+
+    drawLineChart(ctx, Object.keys(last7Days), Object.values(last7Days), '#F4A261');
+}
+
+// Funciones auxiliares para dibujar gráficas
+
+function drawBarChart(ctx, labels, values, color) {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    const barWidth = width / labels.length - 20;
+    const maxValue = Math.max(...values, 1);
+    const padding = 40;
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = '#333';
+    ctx.font = '12px Inter';
+
+    labels.forEach((label, i) => {
+        const barHeight = (values[i] / maxValue) * (height - padding - 20);
+        const x = i * (barWidth + 20) + 10;
+        const y = height - barHeight - padding;
+
+        // Dibujar barra
+        ctx.fillStyle = color;
+        ctx.fillRect(x, y, barWidth, barHeight);
+
+        // Dibujar etiqueta
+        ctx.fillStyle = '#333';
+        ctx.textAlign = 'center';
+        ctx.fillText(label, x + barWidth / 2, height - 10);
+
+        // Dibujar valor
+        ctx.fillText(values[i], x + barWidth / 2, y - 5);
+    });
+}
+
+function drawPieChart(ctx, labels, values) {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    const centerX = width / 2;
+    const centerY = height / 2 - 10;
+    const radius = Math.min(width, height) / 3;
+
+    const colors = ['#E86C4A', '#F4A261', '#2A9D8F', '#264653', '#E76F51'];
+    const total = values.reduce((a, b) => a + b, 0);
+
+    ctx.clearRect(0, 0, width, height);
+
+    let currentAngle = -Math.PI / 2;
+
+    values.forEach((value, i) => {
+        const sliceAngle = (value / total) * 2 * Math.PI;
+
+        ctx.fillStyle = colors[i % colors.length];
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fill();
+
+        currentAngle += sliceAngle;
+    });
+
+    // Leyenda
+    ctx.font = '11px Inter';
+    ctx.textAlign = 'left';
+    const legendY = height - 30;
+    const legendX = 10;
+
+    labels.forEach((label, i) => {
+        if (i < 3) {
+            ctx.fillStyle = colors[i];
+            ctx.fillRect(legendX + (i * 130), legendY, 10, 10);
+            ctx.fillStyle = '#333';
+            ctx.fillText(label.substring(0, 12), legendX + (i * 130) + 15, legendY + 9);
+        }
+    });
+}
+
+function drawLineChart(ctx, labels, values, color) {
+    const width = ctx.canvas.width;
+    const height = ctx.canvas.height;
+    const padding = 40;
+    const maxValue = Math.max(...values, 1);
+    const stepX = (width - padding * 2) / (labels.length - 1);
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.fillStyle = '#333';
+    ctx.font = '11px Inter';
+
+    // Dibujar línea
+    ctx.beginPath();
+    values.forEach((value, i) => {
+        const x = padding + i * stepX;
+        const y = height - padding - (value / maxValue) * (height - padding * 2);
+
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+
+        // Dibujar punto
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Dibujar etiqueta
+        ctx.fillStyle = '#333';
+        ctx.textAlign = 'center';
+        ctx.fillText(labels[i], x, height - 10);
+        ctx.fillText(values[i], x, y - 10);
+    });
+
+    ctx.strokeStyle = color;
+    ctx.stroke();
+}
+
+// Exportar funciones
+window.showUserProfile = showUserProfile;
+window.uploadProfilePhoto = uploadProfilePhoto;
+window.changeUserPassword = changeUserPassword;
+window.showUsersManagement = showUsersManagement;
+window.filterUsers = filterUsers;
+window.showUserDetail = showUserDetail;
+window.closeUserDetailModal = closeUserDetailModal;
+window.switchUserDetailTab = switchUserDetailTab;
+window.adminChangeUserPassword = adminChangeUserPassword;
+window.confirmDeleteUser = confirmDeleteUser;
+window.createCharts = createCharts;
