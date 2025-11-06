@@ -694,6 +694,97 @@
         </div>
     </div>
 </div>
+
+<!-- TEST DE PERSONALIDAD -->
+<div class="screen" id="personalityTestScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>🧠 Test de Personalidad Laboral</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge6"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="personality-test-card">
+            <!-- Camera preview si está habilitado -->
+            <div class="camera-section" id="cameraSection" style="display: none;">
+                <video id="cameraPreview" autoplay playsinline muted></video>
+            </div>
+
+            <!-- Contenedor de preguntas -->
+            <div id="personalityQuestionContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- RESULTADOS DE PERSONALIDAD -->
+<div class="screen" id="personalityResultsScreen">
+    <div class="results-wrapper">
+        <div class="results-card">
+            <div id="personalityResultsContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TEST DE COMUNICACIÓN FORMAL/INFORMAL -->
+<div class="screen" id="formalInformalTestScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>💼 Trabajos Formales e Informales</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge7"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="quiz-card">
+            <div id="formalInformalQuestionContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TEST DE CÓDIGO DE VESTIMENTA -->
+<div class="screen" id="dressCodeTestScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>👔 Código de Vestimenta Profesional</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge8"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="quiz-card">
+            <div id="dressCodeQuestionContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- VIDEO PLAYBACK (para entrevistas grabadas) -->
+<div class="screen" id="videoPlaybackScreen" style="display: none;">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>📹 Revisión de Video</span></div>
+            <div class="nav-user">
+                <button class="btn-logout" onclick="goToMenu()">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="video-review-card">
+            <h2>Tu Entrevista Grabada</h2>
+            <div class="video-container">
+                <video id="videoPlayback" controls></video>
+            </div>
+            <div id="videoAnalysisResults" class="analysis-section"></div>
+        </div>
+    </div>
+</div>
+
 <!-- DESAFÍOS Y COMPETENCIAS -->
 <div class="screen" id="challengesScreen">
     <nav class="navbar">
