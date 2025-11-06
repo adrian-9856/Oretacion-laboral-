@@ -280,99 +280,244 @@
                 <h1>Gestión de Exámenes por Código</h1>
             </div>
 
+            <!-- Estadísticas de códigos -->
+            <div class="stats-grid" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Códigos Activos</p>
+                        <p class="stat-value" id="totalActiveCodes">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Códigos Usados</p>
+                        <p class="stat-value" id="totalUsedCodes">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Generados</p>
+                        <p class="stat-value" id="totalGeneratedCodes">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Exámenes en Códigos</p>
+                        <p class="stat-value" id="totalExamsInCodes">0</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Formulario de asignar códigos a exámenes -->
             <div id="assignExamForm" style="margin-bottom: 2rem;">
-                <div class="quiz-card">
-                    <h3>📋 Generar Código para Exámenes</h3>
-                    <p>Selecciona uno o varios exámenes del sistema y genera un código único de acceso para tus estudiantes.</p>
+                <div class="code-generator-card">
+                    <div class="card-header-gradient">
+                        <h3>✨ Generar Código para Exámenes</h3>
+                        <p>Crea códigos de acceso únicos para tus estudiantes</p>
+                    </div>
 
                     <div class="form-group">
-                        <label><strong>Exámenes a Incluir:</strong> (selecciona uno o más)</label>
-                        <div style="background: #f8f9fa; border: 2px solid #e2e8f0; border-radius: 8px; padding: 1rem; max-height: 350px; overflow-y: auto;">
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="quiz_easy" style="margin-right: 10px;">
-                                📝 Cuestionario - Nivel Fácil (PRE-TEST)
+                        <label class="form-label-modern"><strong>📚 Exámenes a Incluir:</strong></label>
+                        <div class="exams-checkbox-container">
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="quiz_easy" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">📝 Cuestionario - Nivel Fácil (PRE-TEST)</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="quiz_hard" style="margin-right: 10px;">
-                                📝 Cuestionario - Nivel Difícil (POST-TEST)
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="quiz_hard" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">📝 Cuestionario - Nivel Difícil (POST-TEST)</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="cv_errors" style="margin-right: 10px;">
-                                🔍 Detectar Errores en CV
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="cv_errors" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🔍 Detectar Errores en CV</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="cv_builder" style="margin-right: 10px;">
-                                📄 Constructor de CV
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="cv_builder" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">📄 Constructor de CV</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="interview" style="margin-right: 10px;">
-                                🎭 Simulador de Entrevista
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="interview" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🎭 Simulador de Entrevista</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="personality" style="margin-right: 10px;">
-                                🧠 Test de Personalidad Laboral
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="personality" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🧠 Test de Personalidad Laboral</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="formal" style="margin-right: 10px;">
-                                💼 Test Formal/Informal
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="formal" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">💼 Test Formal/Informal</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="dresscode" style="margin-right: 10px;">
-                                👔 Código de Vestimenta
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="dresscode" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">👔 Código de Vestimenta</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer; border-bottom: 1px solid #e2e8f0;">
-                                <input type="checkbox" name="examSelection" value="strengths" style="margin-right: 10px;">
-                                💪 Test de Fortalezas y Debilidades
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="strengths" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">💪 Test de Fortalezas y Debilidades</span>
                             </label>
-                            <label style="display: block; padding: 0.5rem; cursor: pointer;">
-                                <input type="checkbox" name="examSelection" value="wordsearch" style="margin-right: 10px;">
-                                🔤 Sopa de Letras Laboral
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="wordsearch" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🔤 Sopa de Letras Laboral</span>
                             </label>
                         </div>
-                        <div style="margin-top: 0.5rem; padding: 0.5rem; background: #e0f2fe; border-radius: 4px; font-size: 0.9em;">
+                        <div class="selected-count-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                             <strong id="selectedCount">0</strong> exámenes seleccionados
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label>Título del Paquete (opcional):</label>
-                        <input type="text" id="assignExamTitle" placeholder="Ej: Evaluación Completa Grupo A - Semana 1">
+                        <label class="form-label-modern">📝 Título del Paquete:</label>
+                        <input type="text" id="assignExamTitle" class="input-modern" placeholder="Ej: Evaluación Completa Grupo A - Semana 1">
                     </div>
 
                     <div class="form-group">
-                        <label>Descripción (opcional):</label>
-                        <textarea id="assignExamDescription" placeholder="Notas o instrucciones adicionales..." rows="3"></textarea>
+                        <label class="form-label-modern">💬 Descripción:</label>
+                        <textarea id="assignExamDescription" class="input-modern" placeholder="Notas o instrucciones adicionales para tus estudiantes..." rows="3"></textarea>
                     </div>
 
-                    <div id="examSummary" style="display: none; background: #f0fdf4; border: 2px solid #86efac; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
-                        <h4 style="color: #166534; margin-bottom: 0.5rem;">✓ Resumen del Paquete:</h4>
+                    <div id="examSummary" style="display: none;" class="exam-summary-card">
+                        <h4>✓ Resumen del Paquete</h4>
                         <div id="examSummaryList"></div>
                     </div>
 
-                    <div class="quiz-navigation" style="margin-top: 1rem;">
-                        <button class="btn-nav secondary" onclick="clearExamSelection()">Limpiar Selección</button>
-                        <button class="btn-nav primary" onclick="generateMultiExamCode()">🎫 Generar Código Único</button>
+                    <div class="form-actions">
+                        <button class="btn-modern secondary" onclick="clearExamSelection()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Limpiar
+                        </button>
+                        <button class="btn-modern primary" onclick="generateMultiExamCode()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                            </svg>
+                            Generar Código
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- Lista de exámenes creados -->
-            <div class="table-container">
-                <h2>Códigos de Examen Activos</h2>
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Código</th>
-                            <th>Título</th>
-                            <th>Preguntas</th>
-                            <th>Tiempo</th>
-                            <th>Fecha Creación</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="examCodesTableBody"></tbody>
-                </table>
+            <div class="table-container modern-table">
+                <div class="table-header">
+                    <h2>📋 Códigos de Examen Generados</h2>
+                    <button class="btn-modern secondary small" onclick="loadExamCodesList()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+                <div class="table-scroll">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Título</th>
+                                <th>Exámenes</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="examCodesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar código generado -->
+    <div id="codeGeneratedModal" class="modal-overlay" onclick="closeCodeModal(event)">
+        <div class="modal-content code-modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeCodeModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="modal-header-success">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h2>¡Código Generado Exitosamente!</h2>
+                <p>Comparte este código con tus estudiantes</p>
+            </div>
+
+            <div class="code-display-card">
+                <label>🎫 Código de Acceso:</label>
+                <div class="code-value">
+                    <span id="modalCodeValue">MULTI-XXXXXXXX</span>
+                    <button class="btn-copy" onclick="copyCodeToClipboard()" title="Copiar código">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="code-details">
+                <div class="detail-item">
+                    <span class="detail-label">📋 Título:</span>
+                    <span class="detail-value" id="modalCodeTitle">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📚 Exámenes incluidos:</span>
+                    <span class="detail-value" id="modalCodeExams">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📅 Fecha de creación:</span>
+                    <span class="detail-value" id="modalCodeDate">-</span>
+                </div>
+            </div>
+
+            <div class="exams-list-modal" id="modalExamsList"></div>
+
+            <div class="modal-actions">
+                <button class="btn-modern secondary" onclick="closeCodeModal()">Cerrar</button>
+                <button class="btn-modern primary" onclick="copyCodeAndClose()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    Copiar y Cerrar
+                </button>
             </div>
         </div>
     </div>

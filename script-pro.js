@@ -6034,6 +6034,7 @@ let newExamQuestions = [];
 function showExamCodesManager() {
     showScreen('examCodesManagerScreen');
     loadExamCodesList();
+    updateCodeStats();
 
     // Configurar listeners para los checkboxes
     setTimeout(() => {
@@ -6053,7 +6054,16 @@ function updateExamSelectionCount() {
     const summaryEl = document.getElementById('examSummary');
     const summaryListEl = document.getElementById('examSummaryList');
 
-    if (countEl) countEl.textContent = count;
+    if (countEl) {
+        countEl.textContent = count;
+
+        // Animar el contador
+        const badge = document.querySelector('.selected-count-badge');
+        if (badge) {
+            badge.style.transform = 'scale(1.1)';
+            setTimeout(() => badge.style.transform = 'scale(1)', 200);
+        }
+    }
 
     const examNames = {
         'quiz_easy': '📝 Cuestionario PRE-TEST',
@@ -6132,35 +6142,115 @@ function generateMultiExamCode() {
         isMultiExam: true,
         examCount: selectedExams.length,
         createdAt: new Date().toISOString(),
-        createdBy: 'admin'
+        createdBy: 'admin',
+        used: false
     };
 
     localStorage.setItem('examCodes', JSON.stringify(examCodes));
 
     showToast(`✅ Código generado exitosamente: ${code}`, 'success');
 
-    // Mostrar alerta con el código
-    const alertMessage = `
-╔═══════════════════════════════════╗
-     CÓDIGO GENERADO EXITOSAMENTE
-╚═══════════════════════════════════╝
-
-🎫 Código: ${code}
-
-📋 Título: ${finalTitle}
-
-✅ Exámenes incluidos (${selectedExams.length}):
-${selectedExams.map(e => '  • ' + examNames[e]).join('\n')}
-
-💡 Comparte este código con tus estudiantes.
-   Podrán acceder a TODOS los exámenes con un solo código.
-`;
-
-    alert(alertMessage);
+    // Mostrar modal moderno con el código
+    showCodeGeneratedModal(code, finalTitle, selectedExams, examNames);
 
     // Limpiar formulario y recargar lista
     clearExamSelection();
     loadExamCodesList();
+    updateCodeStats();
+}
+
+// Mostrar modal con código generado
+function showCodeGeneratedModal(code, title, exams, examNames) {
+    const modal = document.getElementById('codeGeneratedModal');
+    const codeValue = document.getElementById('modalCodeValue');
+    const codeTitle = document.getElementById('modalCodeTitle');
+    const codeExams = document.getElementById('modalCodeExams');
+    const codeDate = document.getElementById('modalCodeDate');
+    const examsList = document.getElementById('modalExamsList');
+
+    // Actualizar valores
+    codeValue.textContent = code;
+    codeTitle.textContent = title;
+    codeExams.textContent = exams.length;
+    codeDate.textContent = new Date().toLocaleString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // Crear lista de exámenes
+    examsList.innerHTML = '<h4>📚 Lista de Exámenes:</h4>' +
+        exams.map(e => `<div class="exam-item-modal">✓ ${examNames[e]}</div>`).join('');
+
+    // Mostrar modal con animación
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+}
+
+// Cerrar modal de código
+function closeCodeModal(event) {
+    if (event && event.target !== event.currentTarget) return;
+
+    const modal = document.getElementById('codeGeneratedModal');
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+}
+
+// Copiar código al portapapeles
+function copyCodeToClipboard() {
+    const codeValue = document.getElementById('modalCodeValue').textContent;
+
+    navigator.clipboard.writeText(codeValue).then(() => {
+        showToast('📋 Código copiado al portapapeles', 'success');
+
+        // Cambiar ícono temporalmente
+        const btn = event.target.closest('.btn-copy');
+        const originalHTML = btn.innerHTML;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>`;
+
+        setTimeout(() => {
+            btn.innerHTML = originalHTML;
+        }, 2000);
+    }).catch(err => {
+        showToast('❌ Error al copiar código', 'error');
+    });
+}
+
+// Copiar código y cerrar modal
+function copyCodeAndClose() {
+    copyCodeToClipboard();
+    setTimeout(() => closeCodeModal(), 1000);
+}
+
+// Actualizar contador de exámenes seleccionados (alias para compatibilidad)
+function updateSelectedCount() {
+    updateExamSelectionCount();
+}
+
+// Actualizar estadísticas de códigos
+function updateCodeStats() {
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '{}');
+    const codesArray = Object.values(examCodes);
+
+    const totalCodes = codesArray.length;
+    const usedCodes = codesArray.filter(c => c.used).length;
+    const activeCodes = totalCodes - usedCodes;
+    const totalExams = codesArray.reduce((sum, c) => sum + (c.examCount || 0), 0);
+
+    // Actualizar en el DOM si existen los elementos
+    const totalActiveEl = document.getElementById('totalActiveCodes');
+    const totalUsedEl = document.getElementById('totalUsedCodes');
+    const totalGeneratedEl = document.getElementById('totalGeneratedCodes');
+    const totalExamsEl = document.getElementById('totalExamsInCodes');
+
+    if (totalActiveEl) totalActiveEl.textContent = activeCodes;
+    if (totalUsedEl) totalUsedEl.textContent = usedCodes;
+    if (totalGeneratedEl) totalGeneratedEl.textContent = totalCodes;
+    if (totalExamsEl) totalExamsEl.textContent = totalExams;
 }
 
 // Cancelar asignación
@@ -6303,31 +6393,91 @@ function saveNewExam() {
 
 function loadExamCodesList() {
     const tbody = document.getElementById('examCodesTableBody');
-    const codes = getExamCodes();
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '{}');
+    const allCodes = Object.values(examCodes);
 
-    if (Object.keys(codes).length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay exámenes creados</td></tr>';
+    if (allCodes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 2rem; color: var(--gray-500);">No hay códigos generados aún</td></tr>';
         return;
     }
 
-    tbody.innerHTML = Object.values(codes).map(exam => {
-        const date = new Date(exam.createdAt).toLocaleDateString();
-        const time = Math.round(exam.timeLimit / 60);
+    tbody.innerHTML = allCodes.map(codeData => {
+        const date = new Date(codeData.createdAt).toLocaleDateString('es-ES', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric'
+        });
+
+        const statusBadge = codeData.used
+            ? '<span style="padding: 0.25rem 0.75rem; background: #fca5a5; color: #991b1b; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">USADO</span>'
+            : '<span style="padding: 0.25rem 0.75rem; background: #86efac; color: #166534; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">ACTIVO</span>';
 
         return `
-            <tr>
-                <td><strong>${exam.code}</strong></td>
-                <td>${exam.title}</td>
-                <td>${exam.questions.length}</td>
-                <td>${time} min</td>
+            <tr style="transition: background 0.2s ease;">
+                <td>
+                    <strong style="font-family: 'Courier New', monospace; color: var(--primary); font-size: 0.9rem;">${codeData.code}</strong>
+                </td>
+                <td style="max-width: 250px;">
+                    <div style="font-weight: 600; color: var(--gray-900);">${codeData.title}</div>
+                    ${codeData.description ? `<div style="font-size: 0.85rem; color: var(--gray-600); margin-top: 0.25rem;">${codeData.description}</div>` : ''}
+                </td>
+                <td>
+                    <span style="font-weight: 600; color: var(--primary);">${codeData.examCount || 0}</span> examen${(codeData.examCount || 0) !== 1 ? 'es' : ''}
+                </td>
+                <td>${statusBadge}</td>
                 <td>${date}</td>
                 <td>
-                    <button class="btn-nav secondary" style="padding: 0.3rem 0.6rem; font-size: 0.85rem;" onclick="copyExamCode('${exam.code}')">Copiar Código</button>
-                    <button class="btn-nav secondary" style="padding: 0.3rem 0.6rem; font-size: 0.85rem; background: #ff4757;" onclick="confirmDeleteExam('${exam.code}')">Eliminar</button>
+                    <div style="display: flex; gap: 0.5rem; justify-content: center;">
+                        <button class="btn-modern secondary small" onclick="copyExamCode('${codeData.code}')" title="Copiar código">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                            </svg>
+                        </button>
+                        <button class="btn-modern secondary small" onclick="viewCodeDetails('${codeData.code}')" title="Ver detalles">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                        </button>
+                        ${!codeData.used ? `
+                        <button class="btn-modern secondary small" onclick="confirmDeleteExam('${codeData.code}')" title="Eliminar" style="color: #dc2626;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                            </svg>
+                        </button>
+                        ` : ''}
+                    </div>
                 </td>
             </tr>
         `;
     }).join('');
+}
+
+// Ver detalles de un código
+function viewCodeDetails(code) {
+    const examCodes = JSON.parse(localStorage.getItem('examCodes') || '{}');
+    const codeData = examCodes[code];
+
+    if (!codeData) {
+        showToast('❌ Código no encontrado', 'error');
+        return;
+    }
+
+    const examNames = {
+        'quiz_easy': 'Cuestionario PRE-TEST',
+        'quiz_hard': 'Cuestionario POST-TEST',
+        'cv_errors': 'Detectar Errores en CV',
+        'cv_builder': 'Constructor de CV',
+        'interview': 'Simulador de Entrevista',
+        'personality': 'Test de Personalidad',
+        'formal': 'Test Formal/Informal',
+        'dresscode': 'Código de Vestimenta',
+        'strengths': 'Fortalezas y Debilidades',
+        'wordsearch': 'Sopa de Letras'
+    };
+
+    showCodeGeneratedModal(code, codeData.title, codeData.exams || [], examNames);
 }
 
 function copyExamCode(code) {
