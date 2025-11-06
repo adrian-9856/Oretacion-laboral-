@@ -579,7 +579,7 @@ function showProgress() {
 
 function startTest(testType) {
     startTime = Date.now();
-    
+
     if (testType === 'quiz') {
         currentQuizQuestion = 0;
         quizAnswers = [];
@@ -591,6 +591,15 @@ function startTest(testType) {
         startErrorDetection();
     } else if (testType === 'builder') {
         startCVBuilder();
+    } else if (testType === 'interview') {
+        startInterviewSimulator();
+    } else if (testType === 'personality') {
+        const withVideo = confirm('¿Deseas activar la cámara para análisis de video?');
+        startPersonalityTest(withVideo);
+    } else if (testType === 'formal-informal') {
+        startFormalInformalTest();
+    } else if (testType === 'dress-code') {
+        startDressCodeTest();
     }
 }
 // ========================================
@@ -2145,6 +2154,17 @@ window.stopVideoRecording = stopVideoRecording;
 // Exportar funciones de prueba de personalidad
 window.startPersonalityTest = startPersonalityTest;
 window.selectPersonalityAnswer = selectPersonalityAnswer;
+
+// Exportar funciones de nuevos exámenes
+window.startFormalInformalTest = startFormalInformalTest;
+window.selectFormalInformalAnswer = selectFormalInformalAnswer;
+window.nextFormalInformalQuestion = nextFormalInformalQuestion;
+window.previousFormalInformalQuestion = previousFormalInformalQuestion;
+
+window.startDressCodeTest = startDressCodeTest;
+window.selectDressCodeAnswer = selectDressCodeAnswer;
+window.nextDressCodeQuestion = nextDressCodeQuestion;
+window.previousDressCodeQuestion = previousDressCodeQuestion;
 // ========================================
 // SIMULADOR DE ENTREVISTA
 // ========================================
@@ -2465,26 +2485,6 @@ function finishInterviewSimulator() {
     }
     
     showResults(scorePercentage, 'Simulador de Entrevista Laboral');
-}
-
-// Actualizar la función startTest para incluir interview
-function startTest(testType) {
-    startTime = Date.now();
-    
-    if (testType === 'quiz') {
-        currentQuizQuestion = 0;
-        quizAnswers = [];
-        remainingTime = CONFIG.QUIZ_TIME_LIMIT;
-        showScreen('quizScreen');
-        loadQuestion();
-        startCountdown();
-    } else if (testType === 'errors') {
-        startErrorDetection();
-    } else if (testType === 'builder') {
-        startCVBuilder();
-    } else if (testType === 'interview') {
-        startInterviewSimulator();
-    }
 }
 
 // Exportar funciones
@@ -4463,6 +4463,463 @@ function downloadPersonalityReport() {
     setTimeout(() => {
         showToast('✅ Reporte descargado', 'success');
     }, 1000);
+}
+
+// ========================================
+// EXAMEN: TRABAJOS FORMALES E INFORMALES
+// ========================================
+
+const formalInformalQuestions = [
+    {
+        q: "¿Qué caracteriza a un trabajo formal?",
+        options: [
+            "No tiene contrato escrito",
+            "Tiene contrato, prestaciones y seguridad social",
+            "Se paga en efectivo sin recibo",
+            "No tiene horario fijo"
+        ],
+        correct: 1,
+        explanation: "Un trabajo formal se caracteriza por tener contrato laboral, prestaciones de ley y seguridad social."
+    },
+    {
+        q: "¿Cuál es un ejemplo de trabajo informal?",
+        options: [
+            "Empleado de banco con contrato",
+            "Maestro de escuela pública",
+            "Vendedor ambulante sin registro",
+            "Contador en empresa registrada"
+        ],
+        correct: 2,
+        explanation: "Los vendedores ambulantes sin registro fiscal son ejemplo clásico de trabajo informal."
+    },
+    {
+        q: "¿Qué ventaja tiene el trabajo formal?",
+        options: [
+            "Puedes trabajar sin horario",
+            "No pagas impuestos",
+            "Tienes acceso a créditos y pensión",
+            "Ganas más dinero siempre"
+        ],
+        correct: 2,
+        explanation: "El trabajo formal te da acceso a seguridad social, créditos bancarios, ahorro para el retiro y pensión."
+    },
+    {
+        q: "¿Qué riesgo tiene el trabajo informal?",
+        options: [
+            "Pagar demasiados impuestos",
+            "No tener protección laboral ni prestaciones",
+            "Ganar demasiado dinero",
+            "Trabajar muy pocas horas"
+        ],
+        correct: 1,
+        explanation: "El trabajo informal no ofrece protección legal, prestaciones, ni seguridad social."
+    },
+    {
+        q: "¿Qué es el IMSS o IGSS?",
+        options: [
+            "Un tipo de impuesto",
+            "Instituto de seguridad social para trabajadores formales",
+            "Una empresa privada",
+            "Un sindicato de trabajadores"
+        ],
+        correct: 1,
+        explanation: "El IMSS (México) o IGSS (Guatemala) es el instituto que brinda seguridad social a trabajadores formales."
+    },
+    {
+        q: "¿Cuál NO es una prestación del trabajo formal?",
+        options: [
+            "Aguinaldo",
+            "Vacaciones pagadas",
+            "Trabajar sin jefe",
+            "Prima vacacional"
+        ],
+        correct: 2,
+        explanation: "Trabajar sin jefe no es una prestación. Las prestaciones incluyen aguinaldo, vacaciones, prima vacacional, etc."
+    },
+    {
+        q: "¿Qué documento comprueba un empleo formal?",
+        options: [
+            "Foto con el jefe",
+            "Contrato laboral escrito",
+            "Mensaje de WhatsApp",
+            "Promesa verbal"
+        ],
+        correct: 1,
+        explanation: "El contrato laboral por escrito es el documento legal que comprueba un empleo formal."
+    },
+    {
+        q: "¿Qué sucede si un trabajo formal te despide injustificadamente?",
+        options: [
+            "No pasa nada",
+            "Tienes derecho a indemnización",
+            "Pierdes todo",
+            "Te multan"
+        ],
+        correct: 1,
+        explanation: "En el trabajo formal, tienes derecho a indemnización por despido injustificado."
+    },
+    {
+        q: "¿Qué es la economía informal?",
+        options: [
+            "Empresas registradas que pagan impuestos",
+            "Actividades económicas fuera del marco legal",
+            "Bancos internacionales",
+            "Tiendas departamentales"
+        ],
+        correct: 1,
+        explanation: "La economía informal incluye actividades económicas que operan fuera del marco legal y fiscal."
+    },
+    {
+        q: "¿Cómo se llama el pago mensual en un trabajo formal?",
+        options: [
+            "Propina",
+            "Salario o sueldo con recibo de nómina",
+            "Comisión sin documentar",
+            "Dinero en efectivo sin registro"
+        ],
+        correct: 1,
+        explanation: "En un trabajo formal, el pago mensual se llama salario o sueldo y viene con recibo de nómina oficial."
+    }
+];
+
+let formalInformalCurrentQ = 0;
+let formalInformalAnswers = [];
+let formalInformalStartTime = 0;
+
+// Iniciar examen de trabajos formales/informales
+function startFormalInformalTest() {
+    formalInformalCurrentQ = 0;
+    formalInformalAnswers = [];
+    formalInformalStartTime = Date.now();
+
+    showScreen('formalInformalTestScreen');
+    loadFormalInformalQuestion();
+}
+
+// Cargar pregunta
+function loadFormalInformalQuestion() {
+    const container = document.getElementById('formalInformalQuestionContainer');
+    if (!container) return;
+
+    const q = formalInformalQuestions[formalInformalCurrentQ];
+
+    container.innerHTML = `
+        <div class="question-progress">
+            <span>Pregunta ${formalInformalCurrentQ + 1} de ${formalInformalQuestions.length}</span>
+            <div class="progress-bar-mini">
+                <div class="progress-fill" style="width: ${((formalInformalCurrentQ + 1) / formalInformalQuestions.length) * 100}%"></div>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <h3 class="question-text">${q.q}</h3>
+            <div class="options-grid">
+                ${q.options.map((opt, i) => `
+                    <div class="option-card ${formalInformalAnswers[formalInformalCurrentQ] === i ? 'selected' : ''}"
+                         onclick="selectFormalInformalAnswer(${i})">
+                        <div class="option-letter">${String.fromCharCode(65 + i)}</div>
+                        <div class="option-text">${opt}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="question-navigation">
+                ${formalInformalCurrentQ > 0 ?
+                    `<button class="btn-nav secondary" onclick="previousFormalInformalQuestion()">← Anterior</button>` :
+                    '<div></div>'}
+                <button class="btn-nav primary" onclick="nextFormalInformalQuestion()">
+                    ${formalInformalCurrentQ === formalInformalQuestions.length - 1 ? 'Finalizar' : 'Siguiente →'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Seleccionar respuesta
+function selectFormalInformalAnswer(index) {
+    formalInformalAnswers[formalInformalCurrentQ] = index;
+    loadFormalInformalQuestion();
+}
+
+// Siguiente pregunta
+function nextFormalInformalQuestion() {
+    if (formalInformalAnswers[formalInformalCurrentQ] === undefined) {
+        showToast('⚠️ Por favor selecciona una respuesta', 'warning');
+        return;
+    }
+
+    formalInformalCurrentQ++;
+
+    if (formalInformalCurrentQ >= formalInformalQuestions.length) {
+        finishFormalInformalTest();
+    } else {
+        loadFormalInformalQuestion();
+    }
+}
+
+// Pregunta anterior
+function previousFormalInformalQuestion() {
+    if (formalInformalCurrentQ > 0) {
+        formalInformalCurrentQ--;
+        loadFormalInformalQuestion();
+    }
+}
+
+// Finalizar examen
+function finishFormalInformalTest() {
+    let correct = 0;
+    formalInformalQuestions.forEach((q, i) => {
+        if (formalInformalAnswers[i] === q.correct) correct++;
+    });
+
+    const score = Math.round((correct / formalInformalQuestions.length) * 100);
+    const timeElapsed = Math.floor((Date.now() - formalInformalStartTime) / 1000);
+
+    if (!isPracticeMode) {
+        incrementAttempts(currentTestType);
+    }
+
+    const result = {
+        user: currentUser.name,
+        email: currentUser.email,
+        testType: currentTestType,
+        difficulty: currentDifficulty,
+        test: 'Trabajos Formales e Informales',
+        score: score,
+        correctAnswers: correct,
+        totalQuestions: formalInformalQuestions.length,
+        time: timeElapsed,
+        isPractice: isPracticeMode
+    };
+
+    lastTestResult = result;
+
+    if (!isPracticeMode) {
+        saveResult(result);
+        sendToGoogleSheets(result, 'resultado');
+    }
+
+    showResults(score, 'Trabajos Formales e Informales');
+}
+
+// ========================================
+// EXAMEN: CÓDIGO DE VESTIMENTA FORMAL
+// ========================================
+
+const dressCodeScenarios = [
+    {
+        scenario: "Entrevista de trabajo en una empresa corporativa",
+        image: "👔",
+        question: "¿Qué vestimenta es apropiada?",
+        options: [
+            { text: "Traje formal, camisa y corbata", correct: true, feedback: "¡Excelente! Para entrevistas corporativas es esencial vestir formalmente." },
+            { text: "Jeans y camiseta deportiva", correct: false, feedback: "Demasiado casual. Las empresas corporativas esperan vestimenta formal." },
+            { text: "Short y sandalias", correct: false, feedback: "Totalmente inapropiado para una entrevista formal." },
+            { text: "Ropa deportiva", correct: false, feedback: "La ropa deportiva no es apropiada para entrevistas de trabajo." }
+        ]
+    },
+    {
+        scenario: "Primer día de trabajo en una oficina",
+        image: "🏢",
+        question: "¿Cómo debes vestir?",
+        options: [
+            { text: "Ropa de playa", correct: false, feedback: "Completamente inapropiado para una oficina." },
+            { text: "Vestimenta business casual (pantalón de vestir, camisa)", correct: true, feedback: "¡Correcto! Business casual es apropiado para la mayoría de oficinas." },
+            { text: "Pijama", correct: false, feedback: "El pijama es solo para casa, nunca para el trabajo." },
+            { text: "Disfraz", correct: false, feedback: "Los disfraces no son apropiados para el trabajo (excepto eventos especiales)." }
+        ]
+    },
+    {
+        scenario: "Reunión importante con clientes",
+        image: "🤝",
+        question: "¿Qué vestimenta proyecta profesionalismo?",
+        options: [
+            { text: "Sudadera con capucha", correct: false, feedback: "Demasiado casual para una reunión con clientes." },
+            { text: "Traje completo y zapatos formales", correct: true, feedback: "¡Perfecto! Un traje completo proyecta profesionalismo y respeto." },
+            { text: "Shorts y flip-flops", correct: false, feedback: "Totalmente inapropiado para una reunión de negocios." },
+            { text: "Ropa arrugada y sucia", correct: false, feedback: "La apariencia descuidada proyecta falta de profesionalismo." }
+        ]
+    },
+    {
+        scenario: "Trabajo en call center / atención telefónica",
+        image: "📞",
+        question: "¿Qué nivel de formalidad se requiere?",
+        options: [
+            { text: "Business casual (aunque no te vean, la actitud importa)", correct: true, feedback: "¡Correcto! Vestir bien ayuda a tu actitud y profesionalismo, aunque sea telefónico." },
+            { text: "Cualquier cosa, nadie me ve", correct: false, feedback: "La vestimenta afecta tu actitud y profesionalismo." },
+            { text: "Ropa de dormir", correct: false, feedback: "Mantener estándares profesionales mejora tu desempeño." },
+            { text: "No importa la vestimenta", correct: false, feedback: "Tu vestimenta influye en cómo te sientes y trabajas." }
+        ]
+    },
+    {
+        scenario: "Trabajo en restaurante de alta categoría",
+        image: "🍽️",
+        question: "¿Qué vestimenta se requiere?",
+        options: [
+            { text: "Uniforme impecable, planchado y limpio", correct: true, feedback: "¡Exacto! En servicios de alta categoría la imagen es fundamental." },
+            { text: "Ropa casual de calle", correct: false, feedback: "Los restaurantes formales exigen uniformes específicos." },
+            { text: "Ropa deportiva", correct: false, feedback: "Inapropiado para un ambiente formal de servicio." },
+            { text: "Lo que quieras", correct: false, feedback: "Los restaurantes tienen códigos de vestimenta estrictos." }
+        ]
+    },
+    {
+        scenario: "Evento de networking profesional",
+        image: "🎯",
+        question: "¿Cómo debes vestir?",
+        options: [
+            { text: "Casual elegante (smart casual)", correct: true, feedback: "¡Correcto! Smart casual es ideal para networking." },
+            { text: "Pijama de diseñador", correct: false, feedback: "Aunque sea de diseñador, un pijama no es apropiado." },
+            { text: "Ropa de gimnasio", correct: false, feedback: "La ropa deportiva no es apropiada para eventos profesionales." },
+            { text: "Traje de baño", correct: false, feedback: "Totalmente inapropiado para un evento profesional." }
+        ]
+    },
+    {
+        scenario: "Presentación ante directivos de la empresa",
+        image: "📊",
+        question: "¿Qué vestimenta es esencial?",
+        options: [
+            { text: "Camiseta con estampados", correct: false, feedback: "Demasiado informal para presentar ante directivos." },
+            { text: "Traje oscuro, camisa clara, corbata conservadora", correct: true, feedback: "¡Excelente! Esta es la vestimenta ideal para presentaciones ejecutivas." },
+            { text: "Jeans rotos y zapatillas", correct: false, feedback: "Completamente inapropiado para el ámbito ejecutivo." },
+            { text: "Ropa con manchas", correct: false, feedback: "La apariencia descuidada es inaceptable en el ámbito ejecutivo." }
+        ]
+    },
+    {
+        scenario: "Video conferencia importante",
+        image: "💻",
+        question: "¿Qué debes considerar?",
+        options: [
+            { text: "Solo vestir bien de la cintura para arriba", correct: false, feedback: "Aunque tentador, debes estar completamente presentable por si necesitas pararte." },
+            { text: "Vestir completamente profesional como si fuera presencial", correct: true, feedback: "¡Correcto! Siempre debes estar completamente presentable en videollamadas." },
+            { text: "Pijama completa", correct: false, feedback: "Las videollamadas laborales requieren vestimenta profesional." },
+            { text: "Sin camisa", correct: false, feedback: "Totalmente inapropiado, incluso en videollamadas." }
+        ]
+    }
+];
+
+let dressCodeCurrentQ = 0;
+let dressCodeAnswers = [];
+let dressCodeStartTime = 0;
+
+// Iniciar examen de código de vestimenta
+function startDressCodeTest() {
+    dressCodeCurrentQ = 0;
+    dressCodeAnswers = [];
+    dressCodeStartTime = Date.now();
+
+    showScreen('dressCodeTestScreen');
+    loadDressCodeQuestion();
+}
+
+// Cargar pregunta de vestimenta
+function loadDressCodeQuestion() {
+    const container = document.getElementById('dressCodeQuestionContainer');
+    if (!container) return;
+
+    const scenario = dressCodeScenarios[dressCodeCurrentQ];
+
+    container.innerHTML = `
+        <div class="scenario-progress">
+            <span>Escenario ${dressCodeCurrentQ + 1} de ${dressCodeScenarios.length}</span>
+        </div>
+
+        <div class="scenario-card">
+            <div class="scenario-icon">${scenario.image}</div>
+            <h2 class="scenario-title">${scenario.scenario}</h2>
+            <h3 class="scenario-question">${scenario.question}</h3>
+
+            <div class="dress-options">
+                ${scenario.options.map((opt, i) => `
+                    <div class="dress-option ${dressCodeAnswers[dressCodeCurrentQ] === i ? 'selected' : ''}"
+                         onclick="selectDressCodeAnswer(${i})">
+                        <div class="option-content">
+                            <div class="option-radio ${dressCodeAnswers[dressCodeCurrentQ] === i ? 'checked' : ''}"></div>
+                            <div class="option-label">${opt.text}</div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="scenario-navigation">
+                ${dressCodeCurrentQ > 0 ?
+                    `<button class="btn-nav secondary" onclick="previousDressCodeQuestion()">← Anterior</button>` :
+                    '<div></div>'}
+                <button class="btn-nav primary" onclick="nextDressCodeQuestion()">
+                    ${dressCodeCurrentQ === dressCodeScenarios.length - 1 ? 'Finalizar' : 'Siguiente →'}
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Seleccionar respuesta
+function selectDressCodeAnswer(index) {
+    dressCodeAnswers[dressCodeCurrentQ] = index;
+    loadDressCodeQuestion();
+}
+
+// Siguiente pregunta
+function nextDressCodeQuestion() {
+    if (dressCodeAnswers[dressCodeCurrentQ] === undefined) {
+        showToast('⚠️ Por favor selecciona una opción', 'warning');
+        return;
+    }
+
+    dressCodeCurrentQ++;
+
+    if (dressCodeCurrentQ >= dressCodeScenarios.length) {
+        finishDressCodeTest();
+    } else {
+        loadDressCodeQuestion();
+    }
+}
+
+// Pregunta anterior
+function previousDressCodeQuestion() {
+    if (dressCodeCurrentQ > 0) {
+        dressCodeCurrentQ--;
+        loadDressCodeQuestion();
+    }
+}
+
+// Finalizar examen
+function finishDressCodeTest() {
+    let correct = 0;
+    dressCodeScenarios.forEach((scenario, i) => {
+        const selectedOption = dressCodeAnswers[i];
+        if (selectedOption !== undefined && scenario.options[selectedOption].correct) {
+            correct++;
+        }
+    });
+
+    const score = Math.round((correct / dressCodeScenarios.length) * 100);
+    const timeElapsed = Math.floor((Date.now() - dressCodeStartTime) / 1000);
+
+    if (!isPracticeMode) {
+        incrementAttempts(currentTestType);
+    }
+
+    const result = {
+        user: currentUser.name,
+        email: currentUser.email,
+        testType: currentTestType,
+        difficulty: currentDifficulty,
+        test: 'Código de Vestimenta Profesional',
+        score: score,
+        correctAnswers: correct,
+        totalQuestions: dressCodeScenarios.length,
+        time: timeElapsed,
+        isPractice: isPracticeMode
+    };
+
+    lastTestResult = result;
+
+    if (!isPracticeMode) {
+        saveResult(result);
+        sendToGoogleSheets(result, 'resultado');
+    }
+
+    showResults(score, 'Código de Vestimenta Profesional');
 }
 
 // ========================================
