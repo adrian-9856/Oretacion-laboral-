@@ -578,15 +578,6 @@ function enablePracticeMode() {
 // NAVEGACIÓN
 // ========================================
 
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const screen = document.getElementById(screenId);
-    if (screen) {
-        screen.classList.add('active');
-        window.scrollTo(0, 0);
-    }
-}
-
 function selectTest(type) {
     if (!canTakeTest(type) && !isPracticeMode) {
         showToast(`❌ Has alcanzado el límite de ${CONFIG.MAX_ATTEMPTS} intentos para este test`, 'error');
@@ -1689,10 +1680,129 @@ function startErrorDetection() {
     foundErrors = [];
     errorsToFind.forEach(e => e.found = false);
     remainingTime = CONFIG.CV_ERRORS_TIME_LIMIT;
-    
+
+    // Intentar cargar el CV del usuario
+    if (currentUser) {
+        const userCVKey = `userCV_${currentUser.email}`;
+        const savedCV = localStorage.getItem(userCVKey);
+
+        if (savedCV) {
+            // Si el usuario tiene un CV guardado, generar errores en ese CV
+            try {
+                const userCV = JSON.parse(savedCV);
+                generateErrorsFromUserCV(userCV);
+            } catch (e) {
+                console.error('Error al cargar CV del usuario:', e);
+                // Si hay error, usar el CV predeterminado
+            }
+        }
+    }
+
     showScreen('errorDetectionScreen');
     loadCVWithErrors();
     startErrorTimer();
+}
+
+// Función para generar errores en el CV del usuario
+function generateErrorsFromUserCV(userCV) {
+    // Crear una copia del CV del usuario con errores
+    const cvData = {
+        nombre: userCV.personalInfo.name || "Usuario",
+        email: userCV.personalInfo.email || "usuario@email.com",
+        telefono: userCV.personalInfo.phone || "+502 1234-5678",
+        direccion: userCV.personalInfo.address || "Ciudad, País",
+        objetivo: userCV.objective || "Objetivo profesional",
+        experiencia: userCV.experience.map(exp => ({
+            puesto: exp.position,
+            empresa: exp.company,
+            periodo: exp.period,
+            descripcion: exp.description
+        })),
+        educacion: userCV.education.map(edu => ({
+            titulo: edu.degree,
+            institucion: edu.institution,
+            año: edu.year
+        })),
+        habilidades: userCV.skills || [],
+        referencias: userCV.references || "Disponibles a solicitud"
+    };
+
+    // Generar errores aleatorios en el CV del usuario
+    const possibleErrors = [];
+
+    // Error en email (cambiar @ por typo)
+    if (cvData.email.includes('@')) {
+        const emailError = cvData.email.replace('@', 'arroba');
+        possibleErrors.push({
+            field: 'email',
+            original: cvData.email,
+            error: emailError,
+            type: 'typo'
+        });
+    }
+
+    // Error en teléfono (remover un dígito)
+    const phoneDigits = cvData.telefono.replace(/\D/g, '');
+    if (phoneDigits.length > 6) {
+        const phoneError = cvData.telefono.slice(0, -1);
+        possibleErrors.push({
+            field: 'telefono',
+            original: cvData.telefono,
+            error: phoneError,
+            type: 'missing_digit'
+        });
+    }
+
+    // Errores en objetivo (quitar tildes, errores ortográficos)
+    if (cvData.objetivo) {
+        possibleErrors.push({
+            field: 'objetivo',
+            original: cvData.objetivo,
+            error: cvData.objetivo.replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u'),
+            type: 'accent'
+        });
+    }
+
+    // Errores en habilidades (quitar tildes)
+    cvData.habilidades.forEach((skill, i) => {
+        if (skill.includes('ó') || skill.includes('á') || skill.includes('é') || skill.includes('í') || skill.includes('ú')) {
+            possibleErrors.push({
+                field: `habilidad-${i}`,
+                original: skill,
+                error: skill.replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u'),
+                type: 'accent'
+            });
+        }
+    });
+
+    // Seleccionar aleatoriamente 8-10 errores
+    const selectedErrors = possibleErrors.slice(0, Math.min(10, possibleErrors.length));
+
+    // Aplicar los errores al CV
+    selectedErrors.forEach(error => {
+        if (error.field === 'email') cvData.email = error.error;
+        else if (error.field === 'telefono') cvData.telefono = error.error;
+        else if (error.field === 'objetivo') cvData.objetivo = error.error;
+        else if (error.field.startsWith('habilidad-')) {
+            const index = parseInt(error.field.split('-')[1]);
+            cvData.habilidades[index] = error.error;
+        }
+    });
+
+    // Actualizar errorsToFind con los nuevos errores
+    errorsToFind.length = 0;
+    selectedErrors.forEach((error, i) => {
+        errorsToFind.push({
+            id: i + 1,
+            type: error.field,
+            error: error.error,
+            correct: error.original,
+            found: false
+        });
+    });
+
+    // Actualizar el CV global con errores
+    Object.assign(cvWithErrors, cvData);
 }
 
 function startErrorTimer() {
@@ -1724,8 +1834,15 @@ function startErrorTimer() {
 function loadCVWithErrors() {
     const container = document.getElementById('cvErrorContainer');
     if (!container) return;
-    
+
+    // Verificar si se está usando el CV del usuario
+    const isUserCV = currentUser && localStorage.getItem(`userCV_${currentUser.email}`);
+    const cvTypeNotice = isUserCV
+        ? '<div class="cv-notice success">✅ Estás revisando TU PROPIO CV</div>'
+        : '<div class="cv-notice info">ℹ️ Estás revisando un CV de ejemplo. Crea tu CV primero para revisarlo.</div>';
+
     container.innerHTML = `
+        ${cvTypeNotice}
         <div class="cv-paper">
             <div class="cv-header">
                 <h2 class="cv-name clickable-text" data-error="nombre">${cvWithErrors.nombre}</h2>
@@ -2318,7 +2435,14 @@ function renderCVPreview() {
 
 function finishCVBuilder() {
     const timeElapsed = Math.floor((Date.now() - cvBuilderStartTime) / 1000);
-    
+
+    // Guardar el CV del usuario en localStorage para usarlo en el detector de errores
+    if (currentUser) {
+        const userCVKey = `userCV_${currentUser.email}`;
+        localStorage.setItem(userCVKey, JSON.stringify(cvBuilderData));
+        showToast('✅ Tu CV ha sido guardado', 'success');
+    }
+
     // Calcular score basado en completitud
     let score = 0;
     if (cvBuilderData.personalInfo.name) score += 20;
@@ -2326,11 +2450,11 @@ function finishCVBuilder() {
     if (cvBuilderData.experience.length > 0) score += 20;
     if (cvBuilderData.education.length > 0) score += 20;
     if (cvBuilderData.skills.length >= 3) score += 20;
-    
+
     if (!isPracticeMode) {
         incrementAttempts(currentTestType);
     }
-    
+
     const result = {
         user: currentUser.name,
         email: currentUser.email,
@@ -2343,14 +2467,14 @@ function finishCVBuilder() {
         time: timeElapsed,
         isPractice: isPracticeMode
     };
-    
+
     lastTestResult = result;
-    
+
     if (!isPracticeMode) {
         saveResult(result);
         sendToGoogleSheets(result, 'resultado');
     }
-    
+
     showResults(score, 'Construcción de CV');
 }
 
@@ -4101,7 +4225,11 @@ function deleteRecording() {
 
 function showScreen(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
+    const screen = document.getElementById(screenId);
+    if (screen) {
+        screen.classList.add('active');
+        window.scrollTo(0, 0);
+    }
 
     // Cargar avatar PRO si el usuario está logueado
     if (currentUser) {
@@ -4111,14 +4239,6 @@ function showScreen(screenId) {
             updateUserAvatarPro();
         }
     }
-}
-
-function goToWelcome() {
-    showScreen('welcomeScreen');
-}
-
-function goToMenu() {
-    showScreen('testMenuScreen');
 }
 
 // ========================================
@@ -5383,6 +5503,13 @@ function startSelection(e) {
         return;
     }
 
+    // Limpiar selecciones previas antes de comenzar nueva selección
+    document.querySelectorAll('.ws-cell.ws-selected').forEach(cell => {
+        if (!cell.classList.contains('ws-found')) {
+            cell.classList.remove('ws-selected');
+        }
+    });
+
     isSelecting = true;
     selectedCells = [e.target];
     e.target.classList.add('ws-selected');
@@ -5393,6 +5520,11 @@ function continueSelection(e) {
 
     // No permitir seleccionar celdas ya encontradas
     if (e.target.classList.contains('ws-found')) {
+        return;
+    }
+
+    // Verificar que el target sea una celda válida
+    if (!e.target.classList.contains('ws-cell')) {
         return;
     }
 
@@ -5408,13 +5540,15 @@ function endSelection() {
 
     checkSelectedWord();
 
-    // Limpiar selección
-    selectedCells.forEach(cell => {
-        if (!cell.classList.contains('ws-found')) {
-            cell.classList.remove('ws-selected');
-        }
-    });
-    selectedCells = [];
+    // Limpiar selección - SIEMPRE limpiar celdas que no fueron encontradas
+    setTimeout(() => {
+        selectedCells.forEach(cell => {
+            if (!cell.classList.contains('ws-found')) {
+                cell.classList.remove('ws-selected');
+            }
+        });
+        selectedCells = [];
+    }, 100);
 }
 
 function handleTouchStart(e) {
@@ -6624,30 +6758,6 @@ function loadUserActivityHistory() {
             </div>
         `;
     }).join('');
-}
-
-function uploadProfilePhoto(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith('image/')) {
-        showToast('Por favor selecciona una imagen válida', 'error');
-        return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('La imagen es muy grande. Máximo 5MB', 'error');
-        return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const imageData = e.target.result;
-        localStorage.setItem(`profilePhoto_${currentUser.email}`, imageData);
-        document.getElementById('userProfilePhoto').src = imageData;
-        showToast('Foto de perfil actualizada', 'success');
-    };
-    reader.readAsDataURL(file);
 }
 
 function changeUserPassword() {
