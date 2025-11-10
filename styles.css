@@ -2,46 +2,46 @@
    VARIABLES Y RESET
 ======================================== */
 :root {
-    /* Paleta Moderna Canva-Style - Vibrante & Profesional */
-    --primary: #6366F1;        /* Índigo vibrante */
-    --primary-light: #818CF8;  /* Índigo claro */
-    --primary-dark: #4F46E5;   /* Índigo oscuro */
+    /* Paleta Profesional Neutra - Estilo Canva */
+    --primary: #5D5DFF;        /* Azul profesional */
+    --primary-light: #7B7BFF;  /* Azul claro */
+    --primary-dark: #4545DD;   /* Azul oscuro */
 
-    --secondary: #10B981;      /* Verde esmeralda */
-    --secondary-light: #34D399;
-    --secondary-dark: #059669;
+    --secondary: #00C4CC;      /* Turquesa limpio */
+    --secondary-light: #33D1D8;
+    --secondary-dark: #00A3AA;
 
-    --accent: #F59E0B;         /* Ámbar cálido */
-    --accent-warm: #FBBF24;    /* Ámbar suave */
-    --accent-cool: #06B6D4;    /* Cian moderno */
+    --accent: #FF6F61;         /* Coral suave */
+    --accent-warm: #FFB400;    /* Amarillo dorado */
+    --accent-cool: #7B68EE;    /* Púrpura medio */
 
-    --success: #10B981;        /* Verde éxito */
-    --warning: #F59E0B;        /* Ámbar advertencia */
-    --error: #EF4444;          /* Rojo error */
-    --info: #3B82F6;           /* Azul info */
+    --success: #00C896;        /* Verde menta */
+    --warning: #FFB400;        /* Amarillo alerta */
+    --error: #FF4F61;          /* Rojo coral */
+    --info: #5D5DFF;           /* Azul info */
 
-    --dark: #1E293B;           /* Casi negro */
+    --dark: #2C2C2C;           /* Gris carbón */
     --white: #FFFFFF;
 
-    /* Escala de grises moderna */
-    --gray-50: #F9FAFB;
-    --gray-100: #F3F4F6;
-    --gray-200: #E5E7EB;
-    --gray-300: #D1D5DB;
-    --gray-400: #9CA3AF;
-    --gray-500: #6B7280;
-    --gray-600: #4B5563;
-    --gray-700: #374151;
-    --gray-800: #1F2937;
-    --gray-900: #111827;
+    /* Escala de grises neutra profesional */
+    --gray-50: #FAFAFA;
+    --gray-100: #F5F5F5;
+    --gray-200: #EEEEEE;
+    --gray-300: #E0E0E0;
+    --gray-400: #BDBDBD;
+    --gray-500: #9E9E9E;
+    --gray-600: #757575;
+    --gray-700: #616161;
+    --gray-800: #424242;
+    --gray-900: #212121;
 
-    /* Gradientes modernos */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    --gradient-success: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-warm: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-    --gradient-cool: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
-    --gradient-sunset: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+    /* Gradientes suaves y profesionales */
+    --gradient-primary: linear-gradient(135deg, #5D5DFF 0%, #7B68EE 100%);
+    --gradient-secondary: linear-gradient(135deg, #00C4CC 0%, #00A3AA 100%);
+    --gradient-success: linear-gradient(135deg, #00C896 0%, #00A67E 100%);
+    --gradient-warm: linear-gradient(135deg, #FFB400 0%, #FF9500 100%);
+    --gradient-cool: linear-gradient(135deg, #5D5DFF 0%, #00C4CC 100%);
+    --gradient-sunset: linear-gradient(135deg, #FF6F61 0%, #FFB400 100%);
 
     /* Bordes y sombras */
     --radius-sm: 8px;
@@ -72,9 +72,9 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 20%, #f093fb 50%, #667eea 100%);
+    background: linear-gradient(135deg, #F5F7FA 0%, #E8EBF0 25%, #F0F2F5 50%, #F5F7FA 100%);
     background-size: 400% 400%;
-    animation: gradientShift 15s ease infinite;
+    animation: gradientShift 20s ease infinite;
     color: var(--dark);
     min-height: 100vh;
     line-height: 1.6;
@@ -89,9 +89,9 @@ body::before {
     width: 100%;
     height: 100%;
     background:
-        radial-gradient(circle at 20% 50%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(240, 147, 251, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 40% 10%, rgba(16, 185, 129, 0.1) 0%, transparent 40%);
+        radial-gradient(circle at 20% 50%, rgba(93, 93, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, rgba(0, 196, 204, 0.06) 0%, transparent 50%),
+        radial-gradient(circle at 40% 10%, rgba(255, 111, 97, 0.05) 0%, transparent 40%);
     pointer-events: none;
     z-index: 0;
 }

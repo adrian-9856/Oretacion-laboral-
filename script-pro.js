@@ -7433,13 +7433,10 @@ function loadPerformanceAnalysis() {
     if (!currentUser) return;
 
     const email = currentUser.email;
-    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const userData = allUsers.find(u => u.email === email);
 
-    if (!userData) return;
-
-    // Calcular estadísticas
-    const results = userData.testResults || [];
+    // Obtener resultados del usuario desde localStorage
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const results = allResults.filter(r => r.email === email && !r.isPractice);
     const totalTests = results.length;
 
     let totalScore = 0;
@@ -7480,12 +7477,13 @@ function loadRecommendations() {
     if (!currentUser) return;
 
     const email = currentUser.email;
-    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const userData = allUsers.find(u => u.email === email);
 
-    if (!userData) return;
+    // Obtener resultados del usuario desde localStorage
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const results = allResults.filter(r => r.email === email && !r.isPractice);
 
-    const results = userData.testResults || [];
+    if (results.length === 0) return;
+
     const recommendations = [];
 
     // Analizar resultados y generar recomendaciones
@@ -7592,12 +7590,13 @@ function loadLearningPath() {
     if (!currentUser) return;
 
     const email = currentUser.email;
-    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    const userData = allUsers.find(u => u.email === email);
 
-    if (!userData) return;
+    // Obtener resultados del usuario desde localStorage
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const results = allResults.filter(r => r.email === email && !r.isPractice);
 
-    const results = userData.testResults || [];
+    // Verificar si tiene foto de perfil
+    const hasProfilePhoto = localStorage.getItem(`profilePhoto_${email}`) !== null;
 
     // Definir pasos del plan de aprendizaje
     const steps = [
@@ -7605,8 +7604,8 @@ function loadLearningPath() {
             number: 1,
             title: 'Completa tu Perfil',
             description: 'Actualiza tu información personal y crea un avatar profesional',
-            completed: userData.avatar ? true : false,
-            inProgress: !userData.avatar
+            completed: hasProfilePhoto,
+            inProgress: !hasProfilePhoto
         },
         {
             number: 2,
