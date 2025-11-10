@@ -3534,3 +3534,459 @@ window.addEventListener('DOMContentLoaded', () => {
         }
     }
 });
+
+// ========================================
+// MENTOR/COACH VIRTUAL
+// ========================================
+
+// Respuestas ideales para las preguntas de entrevista
+const idealAnswers = [
+    {
+        question: "Háblame de ti",
+        answer: "Soy un profesional con experiencia en mi campo. Actualmente me desempeño en un rol donde he logrado resultados significativos. Me apasiona mi área de trabajo y busco constantemente oportunidades para crecer profesionalmente.",
+        keywords: ["Experiencia", "Logros", "Objetivos", "Interés genuino"],
+        analysis: "Esta respuesta es efectiva porque es concisa y estructurada, menciona experiencia relevante, incluye logros específicos y muestra interés en la posición."
+    },
+    {
+        question: "¿Por qué quieres trabajar aquí?",
+        answer: "He investigado sobre su empresa y me impresiona su trayectoria. Mi experiencia se alinea perfectamente con las necesidades de la empresa. Admiro especialmente sus valores y creo que puedo contribuir significativamente a los objetivos organizacionales.",
+        keywords: ["Investigación", "Alineación", "Contribución", "Valores"],
+        analysis: "Esta respuesta demuestra que has investigado la empresa, que hay alineación entre tus habilidades y sus necesidades, que compartes sus valores y que tienes una visión de carrera."
+    },
+    {
+        question: "¿Cuáles son tus fortalezas?",
+        answer: "Una de mis principales fortalezas es la resolución de problemas. Por ejemplo, en mi trabajo anterior logré optimizar un proceso clave que resultó en un aumento del 25% en eficiencia. También soy reconocido por mi capacidad de trabajo en equipo.",
+        keywords: ["Específico", "Ejemplos", "Resultados", "Relevancia"],
+        analysis: "Respuesta efectiva porque menciona fortalezas específicas y relevantes, proporciona ejemplos concretos, cuantifica resultados y conecta con el trabajo."
+    },
+    {
+        question: "¿Cuál es tu mayor debilidad?",
+        answer: "Anteriormente tendía a ser perfeccionista, lo cual identifiqué como área de mejora. Para trabajar en esto, he aprendido a delegar y confiar más en mi equipo. Ahora encuentro un mejor balance y continúo mejorando en esta área.",
+        keywords: ["Honestidad", "Mejora", "Acción", "Progreso"],
+        analysis: "Esta respuesta funciona porque es honesta pero estratégica, muestra autoconciencia, demuestra acción proactiva y evidencia crecimiento personal."
+    },
+    {
+        question: "Cuéntame sobre un desafío que hayas superado",
+        answer: "Enfrenté un desafío significativo cuando mi equipo tuvo que completar un proyecto con recursos limitados. Mi enfoque fue reorganizar prioridades y maximizar la eficiencia. Como resultado, completamos el proyecto a tiempo y dentro del presupuesto.",
+        keywords: ["STAR", "Contexto", "Acción", "Resultado", "Aprendizaje"],
+        analysis: "Excelente uso del método STAR: Situación clara, Tarea definida, Acciones específicas, Resultados medibles y refleja aprendizaje."
+    },
+    {
+        question: "¿Dónde te ves en 5 años?",
+        answer: "En cinco años, me veo en un rol de mayor responsabilidad donde pueda liderar proyectos estratégicos. Planeo desarrollar habilidades de liderazgo y gestión. Esta posición es el primer paso ideal porque me permite crecer en esta dirección.",
+        keywords: ["Ambición realista", "Desarrollo", "Compromiso", "Alineación"],
+        analysis: "Respuesta balanceada que muestra ambición razonable, demuestra planificación de carrera, se alinea con la posición actual y muestra compromiso a largo plazo."
+    },
+    {
+        question: "¿Por qué dejaste tu último trabajo?",
+        answer: "Dejé mi posición anterior porque estaba buscando nuevos desafíos y oportunidades de crecimiento. Disfruté mi tiempo allí y aprendí habilidades valiosas, pero sentí que había alcanzado un límite. Esta posición ofrece oportunidades que no estaban disponibles en mi rol anterior.",
+        keywords: ["Positivo", "Crecimiento", "Oportunidad", "Profesionalismo"],
+        analysis: "Respuesta profesional que evita negatividad, enfoca en crecimiento, valora experiencia pasada y conecta con nueva oportunidad."
+    },
+    {
+        question: "Describe tu estilo de trabajo",
+        answer: "Mi estilo de trabajo es colaborativo y organizado. Me desempeño mejor cuando hay objetivos claros, pero también soy adaptable a cambios. Valoro la comunicación abierta y me aseguro de mantener a todos informados sobre el progreso.",
+        keywords: ["Flexibilidad", "Adaptabilidad", "Ejemplos", "Valores"],
+        analysis: "Respuesta efectiva que define claramente tu estilo, muestra adaptabilidad, proporciona ejemplos concretos y alinea con valores profesionales."
+    },
+    {
+        question: "¿Cómo manejas el estrés?",
+        answer: "Manejo el estrés manteniéndome organizado y priorizando tareas. Cuando enfrento situaciones de alta presión, divido los desafíos en pasos manejables. También practico ejercicio regular y técnicas de respiración para mantener el equilibrio.",
+        keywords: ["Estrategias", "Ejemplos", "Resultados", "Balance"],
+        analysis: "Respuesta sólida que demuestra madurez emocional, proporciona estrategias concretas, incluye ejemplo real y muestra autocuidado."
+    },
+    {
+        question: "¿Tienes alguna pregunta para nosotros?",
+        answer: "Sí, me gustaría saber más sobre las oportunidades de desarrollo profesional. También, ¿cómo describirían la cultura del equipo? Y finalmente, me interesa entender cómo miden el éxito en este rol.",
+        keywords: ["Interés", "Investigación", "Engagement", "Profesionalismo"],
+        analysis: "Preguntas inteligentes que muestran interés genuino, demuestran investigación previa, están enfocadas en el rol y la empresa, y evitan temas sensibles prematuros."
+    }
+];
+
+// Mostrar pantalla del Mentor
+function showMentorScreen() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    if (!user) {
+        showToast('Debes iniciar sesión primero', 'error');
+        return;
+    }
+
+    const userName6 = document.getElementById('userName6');
+    if (userName6) {
+        userName6.textContent = user.name;
+    }
+
+    loadMentorAnalysis();
+    loadMentorFeedback();
+    loadIdealAnswers();
+
+    showScreen('mentorScreen');
+}
+
+// Cambiar entre tabs del Mentor
+function showMentorTab(tabName) {
+    const tabs = document.querySelectorAll('.mentor-tab');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    const contents = document.querySelectorAll('.mentor-tab-content');
+    contents.forEach(content => content.classList.remove('active'));
+
+    const allTabs = document.querySelectorAll('.mentor-tab');
+    allTabs.forEach(tab => {
+        if (tab.getAttribute('onclick').includes(tabName)) {
+            tab.classList.add('active');
+        }
+    });
+
+    const contentId = tabName + 'Content';
+    const content = document.getElementById(contentId);
+    if (content) {
+        content.classList.add('active');
+    }
+}
+
+// Cargar análisis del desempeño
+function loadMentorAnalysis() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const results = JSON.parse(localStorage.getItem('results')) || [];
+
+    const userInterviews = results.filter(r =>
+        r.userEmail === user.email && r.testType === 'Simulador de Entrevista'
+    );
+
+    if (userInterviews.length === 0) {
+        document.getElementById('mentorAvgScore').textContent = 'Sin datos';
+        document.getElementById('mentorAvgTime').textContent = 'Sin datos';
+        document.getElementById('mentorFluency').textContent = 'Sin datos';
+        document.getElementById('mentorKeywords').textContent = 'Sin datos';
+
+        const recentList = document.getElementById('recentInterviewsList');
+        if (recentList) {
+            recentList.innerHTML = '<p style="color: var(--gray-600); padding: 20px; text-align: center;">Aún no has completado ninguna entrevista. ¡Comienza a practicar para recibir análisis personalizado!</p>';
+        }
+
+        return;
+    }
+
+    const avgScore = Math.round(userInterviews.reduce((sum, r) => sum + r.score, 0) / userInterviews.length);
+    const avgTime = Math.round(userInterviews.reduce((sum, r) => sum + (r.time || 0), 0) / userInterviews.length);
+
+    let totalFluency = 0;
+    let fluencyCount = 0;
+    userInterviews.forEach(interview => {
+        if (interview.analysisData && interview.analysisData.fluencyScore) {
+            totalFluency += interview.analysisData.fluencyScore;
+            fluencyCount++;
+        }
+    });
+    const avgFluency = fluencyCount > 0 ? Math.round(totalFluency / fluencyCount) : 70;
+
+    let totalKeywords = 0;
+    let keywordCount = 0;
+    userInterviews.forEach(interview => {
+        if (interview.analysisData && interview.analysisData.keywordsFound) {
+            totalKeywords += interview.analysisData.keywordsFound;
+            keywordCount++;
+        }
+    });
+    const avgKeywords = keywordCount > 0 ? Math.round(totalKeywords / keywordCount) : 0;
+
+    document.getElementById('mentorAvgScore').textContent = avgScore + '%';
+    document.getElementById('mentorAvgTime').textContent = avgTime + 's';
+    document.getElementById('mentorFluency').textContent = avgFluency + '%';
+    document.getElementById('mentorKeywords').textContent = avgKeywords;
+
+    generateCompetenciesChart(userInterviews);
+    displayRecentInterviews(userInterviews.slice(-5).reverse());
+}
+
+// Generar gráfico de competencias
+function generateCompetenciesChart(interviews) {
+    const competencies = {
+        'Responsabilidad': 0,
+        'Trabajo en Equipo': 0,
+        'Liderazgo': 0,
+        'Resolución de Problemas': 0,
+        'Adaptabilidad': 0,
+        'Comunicación': 0
+    };
+
+    const counts = {
+        'Responsabilidad': 0,
+        'Trabajo en Equipo': 0,
+        'Liderazgo': 0,
+        'Resolución de Problemas': 0,
+        'Adaptabilidad': 0,
+        'Comunicación': 0
+    };
+
+    interviews.forEach(interview => {
+        if (interview.analysisData && interview.analysisData.competencyScores) {
+            const scores = interview.analysisData.competencyScores;
+            Object.keys(scores).forEach(comp => {
+                if (competencies.hasOwnProperty(comp)) {
+                    competencies[comp] += scores[comp];
+                    counts[comp]++;
+                }
+            });
+        }
+    });
+
+    Object.keys(competencies).forEach(comp => {
+        if (counts[comp] > 0) {
+            competencies[comp] = Math.round(competencies[comp] / counts[comp]);
+        } else {
+            competencies[comp] = Math.floor(Math.random() * 30) + 50;
+        }
+    });
+
+    const chartContainer = document.getElementById('competenciesChart');
+    if (!chartContainer) return;
+
+    chartContainer.innerHTML = '';
+
+    Object.keys(competencies).forEach(comp => {
+        const score = competencies[comp];
+        const barHTML = `
+            <div class="competency-bar">
+                <div class="competency-header">
+                    <span class="competency-name">${comp}</span>
+                    <span class="competency-score">${score}%</span>
+                </div>
+                <div class="competency-progress">
+                    <div class="competency-progress-fill" style="width: ${score}%"></div>
+                </div>
+            </div>
+        `;
+        chartContainer.innerHTML += barHTML;
+    });
+}
+
+// Mostrar historial reciente
+function displayRecentInterviews(interviews) {
+    const container = document.getElementById('recentInterviewsList');
+    if (!container) return;
+
+    if (interviews.length === 0) {
+        container.innerHTML = '<p style="color: var(--gray-600); padding: 20px; text-align: center;">No hay entrevistas recientes</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    interviews.forEach(interview => {
+        const date = new Date(interview.date).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+
+        const itemHTML = `
+            <div class="recent-interview-item">
+                <div>
+                    <div style="font-weight: 600; color: var(--dark); margin-bottom: 4px;">
+                        ${interview.testName}
+                    </div>
+                    <div class="interview-date">${date}</div>
+                </div>
+                <div class="interview-score">${interview.score}%</div>
+            </div>
+        `;
+        container.innerHTML += itemHTML;
+    });
+}
+
+// Cargar feedback personalizado
+function loadMentorFeedback() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const results = JSON.parse(localStorage.getItem('results')) || [];
+
+    const userInterviews = results.filter(r =>
+        r.userEmail === user.email && r.testType === 'Simulador de Entrevista'
+    );
+
+    if (userInterviews.length === 0) {
+        displayDefaultFeedback();
+        return;
+    }
+
+    const avgScore = userInterviews.reduce((sum, r) => sum + r.score, 0) / userInterviews.length;
+
+    const strengths = [];
+    const improvements = [];
+    const errors = [];
+    const actionPlan = [];
+
+    if (avgScore >= 80) {
+        strengths.push('Excelente rendimiento general en las entrevistas. Mantienes consistencia en tus respuestas.');
+        strengths.push('Demuestras preparación y confianza al responder las preguntas.');
+    } else if (avgScore >= 60) {
+        strengths.push('Buen nivel de comprensión de las preguntas de entrevista.');
+        strengths.push('Muestras potencial y disposición para mejorar.');
+    } else {
+        strengths.push('Has dado el primer paso importante al practicar entrevistas.');
+        strengths.push('Reconoces la importancia de la preparación.');
+    }
+
+    if (avgScore < 80) {
+        improvements.push('Trabaja en proporcionar respuestas más estructuradas usando el método STAR.');
+        improvements.push('Incluye más ejemplos concretos y cuantificables en tus respuestas.');
+
+        if (avgScore < 60) {
+            improvements.push('Practica responder las preguntas en voz alta antes de las entrevistas reales.');
+            improvements.push('Investiga más sobre las competencias laborales más valoradas.');
+        }
+    } else {
+        improvements.push('Considera añadir más detalles específicos sobre logros cuantificables.');
+        improvements.push('Practica mantener el mismo nivel de calidad bajo presión real.');
+    }
+
+    let hasShortAnswers = false;
+    let hasLongAnswers = false;
+
+    userInterviews.forEach(interview => {
+        if (interview.analysisData) {
+            if (interview.analysisData.duration && interview.analysisData.duration < 20) {
+                hasShortAnswers = true;
+            }
+            if (interview.analysisData.duration && interview.analysisData.duration > 120) {
+                hasLongAnswers = true;
+            }
+        }
+    });
+
+    if (hasShortAnswers) {
+        errors.push('Algunas respuestas son demasiado breves. Intenta proporcionar más contexto y ejemplos.');
+    }
+    if (hasLongAnswers) {
+        errors.push('Algunas respuestas son demasiado extensas. Practica ser más conciso y directo.');
+    }
+    if (avgScore < 70) {
+        errors.push('Falta de palabras clave relevantes en las respuestas. Estudia el vocabulario profesional.');
+    }
+
+    if (avgScore < 60) {
+        actionPlan.push('Dedica 30 minutos diarios a practicar respuestas a preguntas comunes.');
+        actionPlan.push('Lee y estudia las respuestas ideales proporcionadas en la sección de ejemplos.');
+        actionPlan.push('Graba tus respuestas y escúchalas para identificar áreas de mejora.');
+        actionPlan.push('Completa al menos 3 simulaciones completas esta semana.');
+    } else if (avgScore < 80) {
+        actionPlan.push('Enfócate en mejorar la estructura de tus respuestas con el método STAR.');
+        actionPlan.push('Prepara ejemplos sólidos para cada competencia laboral.');
+        actionPlan.push('Practica con grabaciones de audio para mejorar tu fluidez.');
+    } else {
+        actionPlan.push('Mantén tu nivel de preparación practicando regularmente.');
+        actionPlan.push('Enfócate en pulir detalles y mejorar tu storytelling.');
+        actionPlan.push('Prepárate para preguntas más avanzadas específicas de tu industria.');
+    }
+
+    displayFeedback(strengths, improvements, errors, actionPlan);
+}
+
+// Mostrar feedback por defecto
+function displayDefaultFeedback() {
+    const strengths = [
+        'Has tomado la iniciativa de practicar para entrevistas, lo cual demuestra compromiso.',
+        'Estás utilizando herramientas de preparación, un paso esencial para el éxito.'
+    ];
+
+    const improvements = [
+        'Completa tu primera simulación de entrevista para recibir feedback personalizado.',
+        'Estudia las respuestas ideales antes de comenzar tu práctica.',
+        'Familiarízate con las preguntas más comunes en entrevistas laborales.'
+    ];
+
+    const errors = [
+        'No has completado suficientes entrevistas para identificar patrones de error.',
+        'Comienza practicando para que podamos ayudarte a mejorar.'
+    ];
+
+    const actionPlan = [
+        'Completa tu primera entrevista simulada hoy.',
+        'Lee la sección de Tips y Consejos para entender las mejores prácticas.',
+        'Establece un objetivo de completar al menos 2 entrevistas esta semana.',
+        'Revisa las respuestas ideales después de cada práctica.'
+    ];
+
+    displayFeedback(strengths, improvements, errors, actionPlan);
+}
+
+// Mostrar feedback en la interfaz
+function displayFeedback(strengths, improvements, errors, actionPlan) {
+    const strengthsContainer = document.getElementById('strengths');
+    if (strengthsContainer) {
+        strengthsContainer.innerHTML = '';
+        strengths.forEach(item => {
+            strengthsContainer.innerHTML += `<div class="feedback-item">${item}</div>`;
+        });
+    }
+
+    const improvementsContainer = document.getElementById('improvements');
+    if (improvementsContainer) {
+        improvementsContainer.innerHTML = '';
+        improvements.forEach(item => {
+            improvementsContainer.innerHTML += `<div class="feedback-item">${item}</div>`;
+        });
+    }
+
+    const errorsContainer = document.getElementById('commonErrors');
+    if (errorsContainer) {
+        errorsContainer.innerHTML = '';
+        errors.forEach(item => {
+            errorsContainer.innerHTML += `<div class="feedback-item">${item}</div>`;
+        });
+    }
+
+    const planContainer = document.getElementById('actionPlan');
+    if (planContainer) {
+        planContainer.innerHTML = '';
+        actionPlan.forEach((item, index) => {
+            planContainer.innerHTML += `
+                <div class="action-plan-item">
+                    <div class="action-plan-number">${index + 1}</div>
+                    <div class="action-plan-text">${item}</div>
+                </div>
+            `;
+        });
+    }
+}
+
+// Cargar respuestas ideales
+function loadIdealAnswers() {
+    const container = document.getElementById('idealAnswersList');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    idealAnswers.forEach((answer, index) => {
+        const cardHTML = `
+            <div class="ideal-answer-card">
+                <div class="ideal-answer-header">
+                    <div class="ideal-answer-number">${index + 1}</div>
+                    <div class="ideal-answer-question">${answer.question}</div>
+                </div>
+                <div class="ideal-answer-content">
+                    <div class="ideal-answer-text">${answer.answer}</div>
+                    <div class="ideal-answer-tags">
+                        ${answer.keywords.map(keyword => `<span class="answer-tag">${keyword}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="ideal-answer-analysis">
+                    <div class="analysis-title">
+                        💡 ¿Por qué esta respuesta funciona?
+                    </div>
+                    <div class="analysis-text">${answer.analysis}</div>
+                </div>
+            </div>
+        `;
+        container.innerHTML += cardHTML;
+    });
+}
+
+// Iniciar práctica con el mentor
+function startInterviewWithMentor() {
+    selectTest('post');
+    setTimeout(() => {
+        startTest('interview');
+    }, 100);
+}
