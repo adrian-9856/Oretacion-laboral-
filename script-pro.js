@@ -647,33 +647,48 @@ function startTest(testType) {
 // TIMER CON CUENTA REGRESIVA
 // ========================================
 
-function startCountdown() {
+function startCountdown(timerElementId = 'quizTimer') {
     if (countdownInterval) clearInterval(countdownInterval);
-    
-    const timerElement = document.getElementById('quizTimer');
-    if (!timerElement) return;
-    
+
+    const timerElement = document.getElementById(timerElementId);
+    if (!timerElement) {
+        console.error(`Timer element with id "${timerElementId}" not found`);
+        return;
+    }
+
     countdownInterval = setInterval(() => {
         remainingTime--;
-        
+
         const minutes = Math.floor(remainingTime / 60);
         const seconds = remainingTime % 60;
         timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-        
+
         if (remainingTime === 300) {
             showToast('⚠️ Quedan 5 minutos', 'warning');
         }
-        
+
         if (remainingTime === 60) {
             showToast('⏰ ¡Último minuto!', 'warning');
             timerElement.style.color = '#E86C4A';
-            timerElement.parentElement.classList.add('warning');
+            if (timerElement.parentElement) {
+                timerElement.parentElement.classList.add('warning');
+            }
         }
-        
+
         if (remainingTime <= 0) {
             clearInterval(countdownInterval);
             showToast('⏱️ Tiempo agotado', 'error');
-            finishQuiz();
+
+            // Determinar qué función finalizar según el timer
+            if (timerElementId === 'wordSearchTimer') {
+                finishWordSearch();
+            } else if (timerElementId === 'codeExamTimer') {
+                finishCodeExam();
+            } else if (timerElementId === 'strengthsTimer') {
+                finishStrengthsTest();
+            } else {
+                finishQuiz();
+            }
         }
     }, 1000);
 }
@@ -1660,14 +1675,14 @@ const cvWithErrors = {
 
 const errorsToFind = [
     { id: 1, type: 'email', error: 'gmial.com', correct: 'gmail.com', found: false },
-    { id: 2, type: 'telefono', error: 'falta dígito', correct: '+502 1234-5678', found: false },
+    { id: 2, type: 'telefono', error: '+502 1234-567', correct: '+502 1234-5678', found: false },
     { id: 3, type: 'objetivo', error: 'area', correct: 'área', found: false },
     { id: 4, type: 'objetivo', error: 'profecionalemnte', correct: 'profesionalmente', found: false },
-    { id: 5, type: 'experiencia', error: 'Atencion', correct: 'Atención', found: false },
-    { id: 6, type: 'experiencia', error: 'publico', correct: 'público', found: false },
+    { id: 5, type: 'experiencia', error: 'Atencion al cliente y ventas', correct: 'Atención al cliente y ventas', found: false },
+    { id: 6, type: 'experiencia', error: 'atencion al publico', correct: 'atención al público', found: false },
     { id: 7, type: 'habilidades', error: 'Comunicacion', correct: 'Comunicación', found: false },
     { id: 8, type: 'habilidades', error: 'Ofice', correct: 'Office', found: false },
-    { id: 9, type: 'habilidades', error: 'Atencion', correct: 'Atención', found: false },
+    { id: 9, type: 'habilidades', error: 'Atencion al cliente', correct: 'Atención al cliente', found: false },
     { id: 10, type: 'referencias', error: 'a pedido', correct: 'a solicitud', found: false }
 ];
 
