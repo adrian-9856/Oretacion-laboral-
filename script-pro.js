@@ -1486,6 +1486,7 @@ window.generateCertificate = generateCertificate;
 window.refreshDashboard = refreshDashboard;
 window.exportToExcel = exportToExcel;
 window.deleteResult = deleteResult;
+window.showScreen = showScreen;
 
 // ========================================
 // SHORTCUTS DE TECLADO
