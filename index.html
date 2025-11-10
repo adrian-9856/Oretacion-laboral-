@@ -538,6 +538,13 @@
                             <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
                         </svg>
                     </button>
+                    <button class="btn-icon" onclick="showMentorCoach()" title="Mi Mentor Virtual">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                            <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>
+                        </svg>
+                    </button>
                     <button class="btn-icon" onclick="showUserProfile()" title="Mi Perfil">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
@@ -1837,6 +1844,118 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MENTOR/COACH VIRTUAL -->
+<div class="screen" id="mentorCoachScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <span>👨‍🏫 Mi Mentor Virtual</span>
+            </div>
+            <div class="nav-user">
+                <button class="btn-icon" onclick="showWelcome()" title="Volver al inicio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </button>
+                <span id="mentorUserName">Usuario</span>
+                <button class="btn-logout" onclick="logout()">Salir</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mentor-container">
+        <div class="mentor-header">
+            <div class="mentor-icon">👨‍🏫</div>
+            <h1>Tu Mentor Virtual</h1>
+            <p class="mentor-subtitle">Guía personalizada para mejorar tus habilidades laborales y destacar en tus evaluaciones</p>
+        </div>
+
+        <!-- Daily Tip -->
+        <div class="daily-tip-card">
+            <div class="daily-tip-header">
+                <div class="daily-tip-icon">💡</div>
+                <div>
+                    <div class="daily-tip-title">Consejo del Día</div>
+                </div>
+            </div>
+            <div class="daily-tip-content" id="dailyTipContent">
+                Cargando consejo del día...
+            </div>
+            <span class="daily-tip-category" id="dailyTipCategory">General</span>
+        </div>
+
+        <!-- Performance Analysis -->
+        <div class="performance-analysis">
+            <div class="performance-header">
+                <h2 class="performance-title">📊 Tu Rendimiento</h2>
+            </div>
+            <div class="performance-stats">
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="totalTestsTaken">0</div>
+                    <div class="performance-stat-label">Pruebas Realizadas</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="averageScore">0%</div>
+                    <div class="performance-stat-label">Promedio General</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="improvementRate">+0%</div>
+                    <div class="performance-stat-label">Mejora</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="strongAreas">0</div>
+                    <div class="performance-stat-label">Áreas Fuertes</div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <h3 style="margin-bottom: 20px; color: var(--dark);">🎯 Recomendaciones Personalizadas</h3>
+            <div class="recommendations-list" id="recommendationsList">
+                <!-- Recommendations will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Learning Path -->
+        <div class="learning-path">
+            <h2 class="learning-path-title">🚀 Tu Plan de Mejora</h2>
+            <div class="path-steps" id="learningPathSteps">
+                <!-- Learning path steps will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Mentor Sections -->
+        <div class="mentor-sections">
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">📝</div>
+                <h3 class="mentor-section-title">Preparación de Entrevistas</h3>
+                <p class="mentor-section-description">Consejos y estrategias para destacar en tus entrevistas laborales</p>
+                <button class="btn-primary" onclick="selectTest('interview')">Practicar Entrevista</button>
+            </div>
+
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">📄</div>
+                <h3 class="mentor-section-title">Mejora tu CV</h3>
+                <p class="mentor-section-description">Aprende a crear un currículum profesional que capte la atención</p>
+                <button class="btn-primary" onclick="showScreen('cvBuilderScreen')">Construir CV</button>
+            </div>
+
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">🎯</div>
+                <h3 class="mentor-section-title">Desarrollo Personal</h3>
+                <p class="mentor-section-description">Identifica tus fortalezas y trabaja en tus áreas de oportunidad</p>
+                <button class="btn-primary" onclick="showScreen('strengthsScreen')">Ver Fortalezas</button>
+            </div>
+
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">💼</div>
+                <h3 class="mentor-section-title">Etiqueta Profesional</h3>
+                <p class="mentor-section-description">Domina el código de vestimenta y comportamiento profesional</p>
+                <button class="btn-primary" onclick="selectTest('dressCode')">Aprender Etiqueta</button>
             </div>
         </div>
     </div>

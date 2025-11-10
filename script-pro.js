@@ -7124,6 +7124,429 @@ function drawLineChart(ctx, labels, values, color) {
     ctx.stroke();
 }
 
+// ========================================
+// MENTOR/COACH VIRTUAL SYSTEM
+// ========================================
+
+// Base de datos de consejos diarios
+const DAILY_TIPS = [
+    {
+        category: "Entrevista",
+        tip: "Investiga sobre la empresa antes de la entrevista. Conocer su misión y valores demuestra interés genuino y preparación profesional."
+    },
+    {
+        category: "CV",
+        tip: "Mantén tu CV conciso en una o dos páginas. Enfócate en logros cuantificables y experiencias relevantes para el puesto."
+    },
+    {
+        category: "Comunicación",
+        tip: "Practica la escucha activa. Espera tu turno para hablar y demuestra que comprendiste antes de responder."
+    },
+    {
+        category: "Vestimenta",
+        tip: "Viste siempre un nivel más formal de lo esperado. Es mejor estar sobre-vestido que sub-vestido en el ambiente laboral."
+    },
+    {
+        category: "Puntualidad",
+        tip: "Llega 10-15 minutos antes a tus citas laborales. La puntualidad demuestra respeto y profesionalismo."
+    },
+    {
+        category: "Desarrollo Personal",
+        tip: "Identifica una habilidad nueva cada mes para aprender. El aprendizaje continuo es clave en el mercado laboral actual."
+    },
+    {
+        category: "Networking",
+        tip: "Construye relaciones profesionales genuinas. Las conexiones de calidad son más valiosas que la cantidad."
+    },
+    {
+        category: "Actitud",
+        tip: "Mantén una actitud positiva incluso en momentos difíciles. Tu actitud puede diferenciarte de otros candidatos."
+    },
+    {
+        category: "Entrevista",
+        tip: "Prepara ejemplos concretos de tus logros usando el método STAR: Situación, Tarea, Acción, Resultado."
+    },
+    {
+        category: "CV",
+        tip: "Usa verbos de acción al inicio de cada punto: 'Desarrollé', 'Lideré', 'Implementé'. Esto hace tu CV más dinámico."
+    },
+    {
+        category: "Comunicación",
+        tip: "Elimina muletillas como 'eh', 'mmm', 'este'. Practica hablar con pausas naturales en lugar de llenar el silencio."
+    },
+    {
+        category: "Etiqueta",
+        tip: "Apaga tu celular o ponlo en silencio durante reuniones y entrevistas. Demuestra que estás completamente presente."
+    },
+    {
+        category: "Entrevista",
+        tip: "Haz preguntas inteligentes al entrevistador. Preguntar sobre cultura, crecimiento y responsabilidades demuestra interés."
+    },
+    {
+        category: "Desarrollo Personal",
+        tip: "Pide retroalimentación regularmente. Saber cómo otros te perciben te ayuda a mejorar continuamente."
+    },
+    {
+        category: "CV",
+        tip: "Personaliza tu CV para cada aplicación. Ajusta las palabras clave para que coincidan con la descripción del puesto."
+    },
+    {
+        category: "Actitud",
+        tip: "Convierte los errores en oportunidades de aprendizaje. Muestra cómo has crecido a partir de los desafíos."
+    },
+    {
+        category: "Comunicación",
+        tip: "Tu lenguaje corporal comunica tanto como tus palabras. Mantén contacto visual y una postura abierta."
+    },
+    {
+        category: "Networking",
+        tip: "Haz seguimiento después de conocer a alguien. Un mensaje simple de 'Gusto en conocerte' fortalece la conexión."
+    },
+    {
+        category: "Entrevista",
+        tip: "Practica la regla 80/20: deja que el entrevistador hable 80% del tiempo, especialmente al inicio."
+    },
+    {
+        category: "Vestimenta",
+        tip: "Los detalles importan: zapatos limpios, ropa planchada, higiene personal impecable. Todo suma o resta puntos."
+    }
+];
+
+// Función para obtener el consejo del día
+function getDailyTip() {
+    const today = new Date().getDate();
+    const tipIndex = today % DAILY_TIPS.length;
+    return DAILY_TIPS[tipIndex];
+}
+
+// Función para mostrar la pantalla de Mentor/Coach
+function showMentorCoach() {
+    showScreen('mentorCoachScreen');
+
+    // Actualizar nombre de usuario
+    if (currentUser) {
+        document.getElementById('mentorUserName').textContent = currentUser.name || currentUser.email;
+    }
+
+    // Cargar consejo del día
+    const dailyTip = getDailyTip();
+    document.getElementById('dailyTipContent').textContent = dailyTip.tip;
+    document.getElementById('dailyTipCategory').textContent = dailyTip.category;
+
+    // Cargar análisis de rendimiento
+    loadPerformanceAnalysis();
+
+    // Cargar recomendaciones
+    loadRecommendations();
+
+    // Cargar plan de aprendizaje
+    loadLearningPath();
+}
+
+// Función para cargar análisis de rendimiento
+function loadPerformanceAnalysis() {
+    if (!currentUser) return;
+
+    const email = currentUser.email;
+    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const userData = allUsers.find(u => u.email === email);
+
+    if (!userData) return;
+
+    // Calcular estadísticas
+    const results = userData.testResults || [];
+    const totalTests = results.length;
+
+    let totalScore = 0;
+    let scoreCount = 0;
+    let strongAreas = 0;
+
+    results.forEach(result => {
+        if (result.score !== undefined) {
+            totalScore += result.score;
+            scoreCount++;
+            if (result.score >= 80) strongAreas++;
+        }
+    });
+
+    const averageScore = scoreCount > 0 ? Math.round(totalScore / scoreCount) : 0;
+
+    // Calcular mejora (comparar primeros vs últimos tests)
+    let improvementRate = 0;
+    if (results.length >= 2) {
+        const firstHalf = results.slice(0, Math.ceil(results.length / 2));
+        const secondHalf = results.slice(Math.ceil(results.length / 2));
+
+        const firstAvg = firstHalf.reduce((sum, r) => sum + (r.score || 0), 0) / firstHalf.length;
+        const secondAvg = secondHalf.reduce((sum, r) => sum + (r.score || 0), 0) / secondHalf.length;
+
+        improvementRate = Math.round(((secondAvg - firstAvg) / firstAvg) * 100);
+    }
+
+    // Actualizar UI
+    document.getElementById('totalTestsTaken').textContent = totalTests;
+    document.getElementById('averageScore').textContent = `${averageScore}%`;
+    document.getElementById('improvementRate').textContent = improvementRate >= 0 ? `+${improvementRate}%` : `${improvementRate}%`;
+    document.getElementById('strongAreas').textContent = strongAreas;
+}
+
+// Función para cargar recomendaciones personalizadas
+function loadRecommendations() {
+    if (!currentUser) return;
+
+    const email = currentUser.email;
+    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const userData = allUsers.find(u => u.email === email);
+
+    if (!userData) return;
+
+    const results = userData.testResults || [];
+    const recommendations = [];
+
+    // Analizar resultados y generar recomendaciones
+    const testTypes = {};
+    results.forEach(result => {
+        if (!testTypes[result.testType]) {
+            testTypes[result.testType] = [];
+        }
+        testTypes[result.testType].push(result.score || 0);
+    });
+
+    // Encontrar áreas débiles
+    const weakAreas = [];
+    for (const [type, scores] of Object.entries(testTypes)) {
+        const avg = scores.reduce((a, b) => a + b, 0) / scores.length;
+        if (avg < 70) {
+            weakAreas.push({ type, avg });
+        }
+    }
+
+    // Generar recomendaciones basadas en áreas débiles
+    if (weakAreas.length === 0) {
+        recommendations.push({
+            icon: '🎉',
+            title: '¡Excelente Desempeño!',
+            description: 'Estás haciendo un gran trabajo en todas las áreas. Continúa practicando para mantener tu nivel.'
+        });
+        recommendations.push({
+            icon: '🚀',
+            title: 'Desafíate a ti mismo',
+            description: 'Prueba el modo POST-TEST para evaluar habilidades más avanzadas y seguir creciendo.'
+        });
+    } else {
+        weakAreas.forEach(area => {
+            const recommendation = generateRecommendationForArea(area.type, area.avg);
+            if (recommendation) recommendations.push(recommendation);
+        });
+    }
+
+    // Si hay pocas pruebas realizadas
+    if (results.length < 3) {
+        recommendations.push({
+            icon: '📚',
+            title: 'Realiza más evaluaciones',
+            description: 'Completa más pruebas para obtener un análisis más preciso de tus habilidades y áreas de oportunidad.'
+        });
+    }
+
+    // Recomendación general
+    recommendations.push({
+        icon: '💪',
+        title: 'Practica regularmente',
+        description: 'La consistencia es clave. Dedica al menos 30 minutos diarios a mejorar tus habilidades laborales.'
+    });
+
+    // Renderizar recomendaciones
+    const container = document.getElementById('recommendationsList');
+    container.innerHTML = recommendations.map(rec => `
+        <div class="recommendation-item">
+            <div class="recommendation-icon">${rec.icon}</div>
+            <div class="recommendation-content">
+                <div class="recommendation-title">${rec.title}</div>
+                <div class="recommendation-description">${rec.description}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Función auxiliar para generar recomendación por área
+function generateRecommendationForArea(testType, avgScore) {
+    const recommendations = {
+        'quiz': {
+            icon: '📝',
+            title: 'Mejora tus conocimientos teóricos',
+            description: `Tu promedio en cuestionarios es ${Math.round(avgScore)}%. Revisa conceptos básicos de orientación laboral y practica más.`
+        },
+        'interview': {
+            icon: '🎤',
+            title: 'Practica tus habilidades de entrevista',
+            description: `Tu desempeño en entrevistas necesita atención. Practica respuestas usando el método STAR y graba tus respuestas.`
+        },
+        'cv': {
+            icon: '📄',
+            title: 'Fortalece tu CV',
+            description: `Necesitas mejorar la construcción de tu CV. Enfócate en logros cuantificables y formato profesional.`
+        },
+        'personality': {
+            icon: '🧠',
+            title: 'Desarrolla tu inteligencia emocional',
+            description: `Trabaja en conocerte mejor. Los tests de personalidad te ayudarán a identificar tus fortalezas únicas.`
+        },
+        'dressCode': {
+            icon: '👔',
+            title: 'Aprende etiqueta profesional',
+            description: `La presentación profesional necesita mejorar. Estudia códigos de vestimenta y comportamiento laboral.`
+        }
+    };
+
+    return recommendations[testType] || null;
+}
+
+// Función para cargar el plan de aprendizaje
+function loadLearningPath() {
+    if (!currentUser) return;
+
+    const email = currentUser.email;
+    const allUsers = JSON.parse(localStorage.getItem('users') || '[]');
+    const userData = allUsers.find(u => u.email === email);
+
+    if (!userData) return;
+
+    const results = userData.testResults || [];
+
+    // Definir pasos del plan de aprendizaje
+    const steps = [
+        {
+            number: 1,
+            title: 'Completa tu Perfil',
+            description: 'Actualiza tu información personal y crea un avatar profesional',
+            completed: userData.avatar ? true : false,
+            inProgress: !userData.avatar
+        },
+        {
+            number: 2,
+            title: 'Realiza el PRE-TEST',
+            description: 'Evalúa tus conocimientos iniciales para identificar áreas de oportunidad',
+            completed: results.some(r => r.testType === 'quiz' || r.type === 'PRE'),
+            inProgress: !results.some(r => r.testType === 'quiz' || r.type === 'PRE')
+        },
+        {
+            number: 3,
+            title: 'Practica Entrevistas',
+            description: 'Mejora tus habilidades de comunicación con el simulador de entrevistas',
+            completed: results.some(r => r.testType === 'interview'),
+            inProgress: results.some(r => r.testType === 'quiz') && !results.some(r => r.testType === 'interview')
+        },
+        {
+            number: 4,
+            title: 'Construye tu CV',
+            description: 'Crea un currículum profesional que destaque tus habilidades',
+            completed: results.some(r => r.testType === 'cv'),
+            inProgress: results.some(r => r.testType === 'interview') && !results.some(r => r.testType === 'cv')
+        },
+        {
+            number: 5,
+            title: 'Domina la Etiqueta Profesional',
+            description: 'Aprende las normas de comportamiento y vestimenta en el trabajo',
+            completed: results.some(r => r.testType === 'dressCode'),
+            inProgress: results.some(r => r.testType === 'cv') && !results.some(r => r.testType === 'dressCode')
+        },
+        {
+            number: 6,
+            title: 'Realiza el POST-TEST',
+            description: 'Demuestra todo lo que has aprendido con la evaluación final',
+            completed: results.some(r => r.type === 'POST' && r.score >= 70),
+            inProgress: results.length >= 5 && !results.some(r => r.type === 'POST')
+        }
+    ];
+
+    // Renderizar pasos
+    const container = document.getElementById('learningPathSteps');
+    container.innerHTML = steps.map(step => {
+        let statusClass = 'locked';
+        let statusText = '🔒 Bloqueado';
+
+        if (step.completed) {
+            statusClass = 'completed';
+            statusText = '✅ Completado';
+        } else if (step.inProgress) {
+            statusClass = 'in-progress';
+            statusText = '🔄 En Progreso';
+        }
+
+        return `
+            <div class="path-step">
+                <div class="path-step-number ${step.completed ? 'completed' : ''}">${step.number}</div>
+                <div class="path-step-content">
+                    <div class="path-step-title">${step.title}</div>
+                    <div class="path-step-description">${step.description}</div>
+                </div>
+                <span class="path-step-status ${statusClass}">${statusText}</span>
+            </div>
+        `;
+    }).join('');
+}
+
+// Función para agregar tip de mentor en pantallas específicas
+function addMentorTipToScreen(screenId, tipTitle, tipText) {
+    const screen = document.getElementById(screenId);
+    if (!screen) return;
+
+    // Buscar si ya existe un panel de mentor
+    let mentorPanel = screen.querySelector('.mentor-tips-panel');
+    if (mentorPanel) {
+        mentorPanel.remove();
+    }
+
+    // Crear nuevo panel
+    const panel = document.createElement('div');
+    panel.className = 'mentor-tips-panel';
+    panel.innerHTML = `
+        <div class="mentor-tip">
+            <div class="mentor-tip-icon">💡</div>
+            <div class="mentor-tip-content">
+                <div class="mentor-tip-title">${tipTitle}</div>
+                <div class="mentor-tip-text">${tipText}</div>
+            </div>
+        </div>
+    `;
+
+    // Insertar después del navbar
+    const navbar = screen.querySelector('.navbar');
+    if (navbar && navbar.nextSibling) {
+        navbar.parentNode.insertBefore(panel, navbar.nextSibling);
+    }
+}
+
+// Agregar tips contextuales al cargar pantallas
+function addContextualMentorTips() {
+    // Tip para simulador de entrevistas
+    addMentorTipToScreen(
+        'interviewSimulatorScreen',
+        'Consejo del Mentor para Entrevistas',
+        'Tómate tu tiempo para pensar antes de responder. La calidad de tus respuestas es más importante que la velocidad. Demuestra seguridad y profesionalismo en cada respuesta.'
+    );
+
+    // Tip para constructor de CV
+    addMentorTipToScreen(
+        'cvBuilderScreen',
+        'Consejo del Mentor para tu CV',
+        'Un buen CV es claro, conciso y personalizado. Enfócate en logros medibles y usa verbos de acción. Recuerda que el reclutador dedicará solo 6 segundos a tu CV en la primera revisión.'
+    );
+
+    // Tip para detección de errores
+    addMentorTipToScreen(
+        'errorDetectionScreen',
+        'Consejo del Mentor',
+        'Revisa cuidadosamente cada sección. Los errores comunes incluyen: faltas ortográficas, formato inconsistente, información irrelevante y falta de datos de contacto.'
+    );
+}
+
+// Llamar función cuando se inicializa el sistema
+window.addEventListener('load', function() {
+    setTimeout(addContextualMentorTips, 1000);
+});
+
 // Exportar funciones
 window.showUserProfile = showUserProfile;
 window.uploadProfilePhoto = uploadProfilePhoto;
@@ -7136,3 +7559,4 @@ window.switchUserDetailTab = switchUserDetailTab;
 window.adminChangeUserPassword = adminChangeUserPassword;
 window.confirmDeleteUser = confirmDeleteUser;
 window.createCharts = createCharts;
+window.showMentorCoach = showMentorCoach;
