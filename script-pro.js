@@ -427,14 +427,26 @@ document.getElementById('loginForm')?.addEventListener('submit', async function(
 // Login Admin
 document.getElementById('adminLoginForm')?.addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     const user = document.getElementById('adminUser').value;
     const pass = document.getElementById('adminPassword').value;
-    
+
+    // Verificar admin principal
     if (user === CONFIG.ADMIN_USER && pass === CONFIG.ADMIN_PASS) {
         showScreen('adminDashboard');
         loadDashboardData();
         showToast('Acceso concedido al panel de administrador', 'success');
+        return;
+    }
+
+    // Verificar usuarios con rol de administrador
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const adminUser = users.find(u => u.email === user && u.password === pass && u.isAdmin === true);
+
+    if (adminUser) {
+        showScreen('adminDashboard');
+        loadDashboardData();
+        showToast(`Bienvenido ${adminUser.name}, acceso concedido`, 'success');
     } else {
         showToast('Credenciales incorrectas', 'error');
     }
@@ -6786,6 +6798,20 @@ function showUserDetail(user) {
     const userResults = allResults.filter(r => r.email === user.email && !r.isPractice);
     document.getElementById('modalUserTests').textContent = userResults.length;
 
+    // Actualizar rol y botón de admin
+    const roleSpan = document.getElementById('modalUserRole');
+    const toggleBtn = document.getElementById('toggleAdminBtn');
+
+    if (user.isAdmin) {
+        roleSpan.textContent = '👑 Administrador';
+        roleSpan.style.color = '#f59e0b';
+        toggleBtn.textContent = 'Quitar Administrador';
+    } else {
+        roleSpan.textContent = 'Usuario Normal';
+        roleSpan.style.color = '#6b7280';
+        toggleBtn.textContent = 'Hacer Administrador';
+    }
+
     loadUserResultsInModal(user.email);
 
     document.getElementById('userDetailModal').style.display = 'flex';
@@ -6874,6 +6900,40 @@ function adminChangeUserPassword() {
 
         showToast(`Contraseña actualizada para ${selectedUser.name}`, 'success');
         document.getElementById('adminNewPassword').value = '';
+    }
+}
+
+function toggleUserAdmin() {
+    if (!selectedUser) return;
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.email === selectedUser.email);
+
+    if (userIndex !== -1) {
+        // Toggle admin status
+        users[userIndex].isAdmin = !users[userIndex].isAdmin;
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Update selected user
+        selectedUser.isAdmin = users[userIndex].isAdmin;
+
+        // Update UI
+        const roleSpan = document.getElementById('modalUserRole');
+        const toggleBtn = document.getElementById('toggleAdminBtn');
+
+        if (users[userIndex].isAdmin) {
+            roleSpan.textContent = '👑 Administrador';
+            roleSpan.style.color = '#f59e0b';
+            toggleBtn.textContent = 'Quitar Administrador';
+            showToast(`${selectedUser.name} ahora es administrador`, 'success');
+        } else {
+            roleSpan.textContent = 'Usuario Normal';
+            roleSpan.style.color = '#6b7280';
+            toggleBtn.textContent = 'Hacer Administrador';
+            showToast(`${selectedUser.name} ya no es administrador`, 'success');
+        }
+
+        loadUsersGrid();
     }
 }
 
@@ -7557,6 +7617,7 @@ window.showUserDetail = showUserDetail;
 window.closeUserDetailModal = closeUserDetailModal;
 window.switchUserDetailTab = switchUserDetailTab;
 window.adminChangeUserPassword = adminChangeUserPassword;
+window.toggleUserAdmin = toggleUserAdmin;
 window.confirmDeleteUser = confirmDeleteUser;
 window.createCharts = createCharts;
 window.showMentorCoach = showMentorCoach;

@@ -556,6 +556,11 @@
                             <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </button>
+                    <button class="btn-icon" onclick="showCodeExamInput()" title="Examen por Código">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                    </button>
                     <span id="userName">Usuario</span>
                     <button class="btn-logout" onclick="logout()">Salir</button>
                 </div>
@@ -728,18 +733,6 @@
     </div>
     <h3>Sopa de Letras</h3>
     <p>Encuentra palabras de orientación laboral</p>
-    <button class="test-start-btn">Iniciar →</button>
-</div>
-
-                <!-- EXAMEN POR CÓDIGO -->
-                <div class="test-card modern" onclick="showCodeExamInput()">
-    <div class="test-card-icon" style="background: linear-gradient(135deg, #4facfe, #00f2fe);">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
-        </svg>
-    </div>
-    <h3>Examen por Código</h3>
-    <p>Ingresa el código de tu examen</p>
     <button class="test-start-btn">Iniciar →</button>
 </div>
 
@@ -1830,6 +1823,15 @@
                         </div>
 
                         <div id="userDetailTabActions" class="tab-content">
+                            <h4>Permisos de Administrador</h4>
+                            <div class="form-group">
+                                <label>Rol Actual:</label>
+                                <span id="modalUserRole" style="font-weight: bold;">Usuario Normal</span>
+                            </div>
+                            <button class="btn-action" id="toggleAdminBtn" onclick="toggleUserAdmin()">Hacer Administrador</button>
+
+                            <hr style="margin: 2rem 0;">
+
                             <h4>Cambiar Contraseña del Usuario</h4>
                             <div class="form-group">
                                 <label>Nueva Contraseña:</label>
