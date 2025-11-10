@@ -6850,7 +6850,7 @@ function loadUsersGrid() {
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
 
         return `
-            <div class="user-card" onclick='showUserDetail(${JSON.stringify(user).replace(/'/g, "&apos;")})'>
+            <div class="user-card" data-user-email="${user.email}" onclick='showUserDetailByEmail("${user.email}")'>
                 <img src="${profilePhoto}" alt="${user.name}" class="user-card-photo">
                 <div class="user-card-info">
                     <h3>${user.name} ${user.lastName}</h3>
@@ -6887,7 +6887,7 @@ function filterUsers() {
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
 
         return `
-            <div class="user-card" onclick='showUserDetail(${JSON.stringify(user).replace(/'/g, "&apos;")})'>
+            <div class="user-card" data-user-email="${user.email}" onclick='showUserDetailByEmail("${user.email}")'>
                 <img src="${profilePhoto}" alt="${user.name}" class="user-card-photo">
                 <div class="user-card-info">
                     <h3>${user.name} ${user.lastName}</h3>
@@ -6945,6 +6945,17 @@ function showUserDetail(user) {
 function closeUserDetailModal() {
     document.getElementById('userDetailModal').style.display = 'none';
     selectedUser = null;
+}
+
+function showUserDetailByEmail(email) {
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const user = users.find(u => u.email === email);
+
+    if (user) {
+        showUserDetail(user);
+    } else {
+        showToast('❌ Usuario no encontrado', 'error');
+    }
 }
 
 function switchUserDetailTab(tab) {
@@ -7739,6 +7750,7 @@ window.showUsersManagement = showUsersManagement;
 window.filterUsers = filterUsers;
 window.showUserDetail = showUserDetail;
 window.closeUserDetailModal = closeUserDetailModal;
+window.showUserDetailByEmail = showUserDetailByEmail;
 window.switchUserDetailTab = switchUserDetailTab;
 window.adminChangeUserPassword = adminChangeUserPassword;
 window.toggleUserAdmin = toggleUserAdmin;
