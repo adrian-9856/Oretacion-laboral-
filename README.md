@@ -58,6 +58,24 @@ FIREBASE_MESSAGING_SENDER_ID=123456789
 FIREBASE_APP_ID=1:123456789:web:abc123
 ```
 
+### 3.1. Configurar Google Sheets (Opcional)
+
+Por defecto, la aplicación funciona completamente con **localStorage** (datos guardados en el navegador).
+
+Si deseas sincronizar datos con Google Sheets:
+
+1. Abre [Google Apps Script](https://script.google.com/)
+2. Crea un nuevo proyecto
+3. Pega el código de sincronización (ver `GUIA_FIREBASE.md`)
+4. Despliega como Web App
+5. Copia la URL y pégala en `script-pro.js` línea 9:
+
+```javascript
+GOOGLE_SHEET_URL: 'https://script.google.com/macros/s/TU_SCRIPT_ID/exec',
+```
+
+**Nota**: Si no configuras Google Sheets, la app funcionará perfectamente con localStorage.
+
 ### 4. Ejecutar en desarrollo
 
 ```bash

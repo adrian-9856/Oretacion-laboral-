@@ -4,6 +4,8 @@
 
 // CONFIGURACIÓN
 const CONFIG = {
+    // URL de Google Apps Script para sincronizar datos (opcional - deja como está para usar solo localStorage)
+    // Para configurar: https://script.google.com/macros/s/TU_SCRIPT_ID/exec
     GOOGLE_SHEET_URL: 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI',
     ADMIN_USER: 'admin',
     ADMIN_PASS: 'admin123',
@@ -684,7 +686,15 @@ function logout() {
 
 async function sendToGoogleSheets(data, type) {
     if (isPracticeMode) return true;
-    
+
+    // Validar que la URL de Google Sheets esté configurada correctamente
+    if (!CONFIG.GOOGLE_SHEET_URL ||
+        CONFIG.GOOGLE_SHEET_URL === 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI' ||
+        !CONFIG.GOOGLE_SHEET_URL.startsWith('https://')) {
+        console.warn('Google Sheets URL no configurada. Los datos se guardan solo en localStorage.');
+        return true; // Retornar true para no bloquear el flujo de la aplicación
+    }
+
     try {
         await fetch(CONFIG.GOOGLE_SHEET_URL, {
             method: 'POST',
@@ -698,11 +708,11 @@ async function sendToGoogleSheets(data, type) {
                 timestamp: new Date().toISOString()
             })
         });
-        
+
         return true;
     } catch (error) {
-        console.error('Error al enviar datos:', error);
-        return false;
+        console.error('Error al enviar datos a Google Sheets:', error);
+        return true; // Retornar true para no bloquear el flujo, los datos están en localStorage
     }
 }
 
