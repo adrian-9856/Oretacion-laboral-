@@ -579,14 +579,21 @@ function enablePracticeMode() {
 // ========================================
 
 function selectTest(type) {
+    // Manejar casos especiales que van directo a su pantalla
+    if (type === 'dressCode') {
+        currentTestType = 'dressCode';
+        showScreen('dressCodeTestScreen');
+        return;
+    }
+
     if (!canTakeTest(type) && !isPracticeMode) {
         showToast(`❌ Has alcanzado el límite de ${CONFIG.MAX_ATTEMPTS} intentos para este test`, 'error');
         return;
     }
-    
+
     currentTestType = type;
     currentDifficulty = type === 'pre' ? 'easy' : 'hard';
-    
+
     const badge = type === 'pre' ? 'PRE-TEST' : 'POST-TEST';
     if (document.getElementById('testTypeBadge')) {
         document.getElementById('testTypeBadge').textContent = badge;
@@ -594,7 +601,7 @@ function selectTest(type) {
     if (document.getElementById('testTypeBadge2')) {
         document.getElementById('testTypeBadge2').textContent = badge;
     }
-    
+
     showScreen('testMenuScreen');
 }
 

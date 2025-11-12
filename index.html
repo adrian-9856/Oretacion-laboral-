@@ -1102,8 +1102,190 @@
         </div>
     </nav>
     <div class="container-narrow">
-        <div class="quiz-card">
-            <div id="dressCodeQuestionContainer"></div>
+        <!-- Video Introductorio -->
+        <div class="dresscode-video-section" id="dressCodeVideoSection">
+            <div class="video-intro-card">
+                <h2>👔 Aprende a Vestirte para una Entrevista</h2>
+                <p>Mira este video antes de comenzar con la actividad interactiva</p>
+                <div class="video-wrapper">
+                    <iframe
+                        width="100%"
+                        height="400"
+                        src="https://www.youtube.com/embed/6TmqJ7l4JPg"
+                        title="Cómo Vestirse para una Entrevista de Trabajo"
+                        frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen>
+                    </iframe>
+                </div>
+                <button class="btn-primary btn-large" onclick="startDressCodeActivity()">
+                    Comenzar Actividad Interactiva 👉
+                </button>
+            </div>
+        </div>
+
+        <!-- Actividad Interactiva de Vestir Muñecos -->
+        <div class="dresscode-activity-section" id="dressCodeActivitySection" style="display: none;">
+            <div class="dresscode-header">
+                <h2>👔 Viste Apropiadamente para la Entrevista</h2>
+                <p>Selecciona la ropa adecuada para una entrevista profesional</p>
+            </div>
+
+            <!-- Selector de Género -->
+            <div class="gender-selector">
+                <button class="gender-btn active" onclick="selectGender('male')" id="genderBtnMale">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                        <path d="M12 2C10.89 2 10 2.89 10 4C10 5.11 10.89 6 12 6C13.11 6 14 5.11 14 4C14 2.89 13.11 2 12 2M12 7C9.79 7 8 8.79 8 11C8 11.5 8.1 12 8.29 12.44L6 22H8L9.64 16H10V22H12V16H12.36V22H14.36V16H15L16.65 22H18.65L16.36 12.44C16.55 12 16.65 11.5 16.65 11C16.65 8.79 14.86 7 12.65 7H12Z"/>
+                    </svg>
+                    Masculino
+                </button>
+                <button class="gender-btn" onclick="selectGender('female')" id="genderBtnFemale">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
+                        <path d="M12 2C10.89 2 10 2.89 10 4C10 5.11 10.89 6 12 6C13.11 6 14 5.11 14 4C14 2.89 13.11 2 12 2M16 16V22H14V16H13V22H11V16H10V13.5C10 12.67 10.67 12 11.5 12H12.5C13.33 12 14 12.67 14 13.5V16H16M15.09 9L14 11H10L8.91 9C8.66 8.5 8.09 8.31 7.59 8.56C7.09 8.81 6.9 9.38 7.15 9.88L8.85 13.07C9.06 13.47 9.47 13.72 9.92 13.72H14.08C14.53 13.72 14.94 13.47 15.15 13.07L16.85 9.88C17.1 9.38 16.91 8.81 16.41 8.56C15.91 8.31 15.34 8.5 15.09 9Z"/>
+                    </svg>
+                    Femenino
+                </button>
+            </div>
+
+            <!-- Área del Muñeco y Guardarropa -->
+            <div class="dresscode-main-area">
+                <!-- Panel Izquierdo: Guardarropa -->
+                <div class="wardrobe-panel">
+                    <h3>🎨 Guardarropa</h3>
+                    <p class="wardrobe-hint">Arrastra o haz clic en las prendas</p>
+
+                    <!-- Categorías de ropa -->
+                    <div class="clothing-categories">
+                        <!-- Parte Superior -->
+                        <div class="clothing-category">
+                            <h4>👕 Parte Superior</h4>
+                            <div class="clothing-items" id="topsContainer">
+                                <!-- Se llenará dinámicamente con JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Parte Inferior -->
+                        <div class="clothing-category">
+                            <h4>👖 Parte Inferior</h4>
+                            <div class="clothing-items" id="bottomsContainer">
+                                <!-- Se llenará dinámicamente con JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Calzado -->
+                        <div class="clothing-category">
+                            <h4>👞 Calzado</h4>
+                            <div class="clothing-items" id="shoesContainer">
+                                <!-- Se llenará dinámicamente con JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Accesorios -->
+                        <div class="clothing-category">
+                            <h4>👔 Accesorios</h4>
+                            <div class="clothing-items" id="accessoriesContainer">
+                                <!-- Se llenará dinámicamente con JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel Central: Muñeco -->
+                <div class="mannequin-panel">
+                    <div class="mannequin-container" id="mannequinContainer">
+                        <!-- El muñeco se renderizará aquí -->
+                        <div class="mannequin" id="mannequin">
+                            <div class="mannequin-body">
+                                <div class="mannequin-head"></div>
+                                <div class="mannequin-torso">
+                                    <div class="mannequin-outfit-top" id="outfitTop"></div>
+                                </div>
+                                <div class="mannequin-legs">
+                                    <div class="mannequin-outfit-bottom" id="outfitBottom"></div>
+                                </div>
+                                <div class="mannequin-feet">
+                                    <div class="mannequin-outfit-shoes" id="outfitShoes"></div>
+                                </div>
+                                <div class="mannequin-accessories" id="outfitAccessories"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-clear-outfit" onclick="clearOutfit()">
+                        🔄 Limpiar Todo
+                    </button>
+                </div>
+
+                <!-- Panel Derecho: Consejos -->
+                <div class="tips-panel">
+                    <h3>💡 Consejos</h3>
+                    <div class="tips-content">
+                        <div class="tip-item">
+                            <span class="tip-icon">✅</span>
+                            <p>Colores neutros y sobrios</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-icon">✅</span>
+                            <p>Ropa bien planchada</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-icon">✅</span>
+                            <p>Zapatos limpios y formales</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-icon">❌</span>
+                            <p>Evita ropa muy casual</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-icon">❌</span>
+                            <p>No uses colores muy llamativos</p>
+                        </div>
+                        <div class="tip-item">
+                            <span class="tip-icon">❌</span>
+                            <p>Evita exceso de accesorios</p>
+                        </div>
+                    </div>
+
+                    <!-- Feedback en tiempo real -->
+                    <div class="outfit-feedback" id="outfitFeedback">
+                        <h4>📊 Evaluación</h4>
+                        <div class="feedback-content" id="feedbackContent">
+                            <p class="feedback-placeholder">Selecciona tu vestimenta para recibir retroalimentación...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botón de Finalizar -->
+            <div class="dresscode-actions">
+                <button class="btn-secondary" onclick="backToVideo()">← Volver al Video</button>
+                <button class="btn-primary btn-large" onclick="submitDressCode()">
+                    ✅ Finalizar y Ver Resultados
+                </button>
+            </div>
+
+            <!-- Modal de Resultados -->
+            <div class="dresscode-results-modal" id="dressCodeResultsModal" style="display: none;">
+                <div class="results-modal-content">
+                    <div class="results-header">
+                        <h2 id="resultsTitle">🎉 ¡Excelente!</h2>
+                        <button class="close-modal" onclick="closeDressCodeResults()">✕</button>
+                    </div>
+                    <div class="results-body">
+                        <div class="score-display">
+                            <div class="score-circle" id="scoreCircle">
+                                <span class="score-number" id="scoreNumber">0</span>
+                                <span class="score-label">puntos</span>
+                            </div>
+                        </div>
+                        <div class="results-feedback" id="resultsFeedback"></div>
+                        <div class="results-details" id="resultsDetails"></div>
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn-secondary" onclick="tryAgainDressCode()">🔄 Intentar de Nuevo</button>
+                        <button class="btn-primary" onclick="finishDressCode()">✅ Finalizar</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -1967,6 +2149,344 @@
 <button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
     🎨
 </button>
+
+<script>
+// ===================================
+// DRESS CODE - FUNCIONALIDAD INTERACTIVA
+// ===================================
+
+let currentGender = 'male';
+let selectedOutfit = {
+    top: null,
+    bottom: null,
+    shoes: null,
+    accessories: null
+};
+
+// Catálogo de ropa
+const clothingCatalog = {
+    male: {
+        tops: [
+            { id: 'suit_jacket', name: 'Saco Formal', icon: '🧥', appropriate: true },
+            { id: 'dress_shirt', name: 'Camisa de Vestir', icon: '👔', appropriate: true },
+            { id: 'polo', name: 'Polo', icon: '👕', appropriate: false },
+            { id: 'tshirt', name: 'Camiseta', icon: '👕', appropriate: false },
+            { id: 'hoodie', name: 'Sudadera', icon: '🧥', appropriate: false }
+        ],
+        bottoms: [
+            { id: 'suit_pants', name: 'Pantalón de Vestir', icon: '👔', appropriate: true },
+            { id: 'chinos', name: 'Pantalones Chinos', icon: '👖', appropriate: true },
+            { id: 'jeans', name: 'Jeans', icon: '👖', appropriate: false },
+            { id: 'shorts', name: 'Bermudas', icon: '🩳', appropriate: false }
+        ],
+        shoes: [
+            { id: 'dress_shoes', name: 'Zapatos Formales', icon: '👞', appropriate: true },
+            { id: 'loafers', name: 'Mocasines', icon: '👞', appropriate: true },
+            { id: 'sneakers', name: 'Tenis', icon: '👟', appropriate: false },
+            { id: 'sandals', name: 'Sandalias', icon: '🩴', appropriate: false }
+        ],
+        accessories: [
+            { id: 'tie', name: 'Corbata', icon: '👔', appropriate: true },
+            { id: 'watch', name: 'Reloj Elegante', icon: '⌚', appropriate: true },
+            { id: 'belt', name: 'Cinturón', icon: '🔲', appropriate: true },
+            { id: 'cap', name: 'Gorra', icon: '🧢', appropriate: false },
+            { id: 'chains', name: 'Cadenas', icon: '📿', appropriate: false }
+        ]
+    },
+    female: {
+        tops: [
+            { id: 'blazer', name: 'Blazer', icon: '🧥', appropriate: true },
+            { id: 'blouse', name: 'Blusa Formal', icon: '👚', appropriate: true },
+            { id: 'cardigan', name: 'Cárdigan', icon: '🧥', appropriate: true },
+            { id: 'casual_top', name: 'Blusa Casual', icon: '👚', appropriate: false },
+            { id: 'crop_top', name: 'Crop Top', icon: '👚', appropriate: false }
+        ],
+        bottoms: [
+            { id: 'skirt', name: 'Falda Formal', icon: '👗', appropriate: true },
+            { id: 'dress_pants', name: 'Pantalón de Vestir', icon: '👖', appropriate: true },
+            { id: 'dress', name: 'Vestido Profesional', icon: '👗', appropriate: true },
+            { id: 'jeans', name: 'Jeans', icon: '👖', appropriate: false },
+            { id: 'shorts', name: 'Shorts', icon: '🩳', appropriate: false }
+        ],
+        shoes: [
+            { id: 'heels', name: 'Tacones', icon: '👠', appropriate: true },
+            { id: 'flats', name: 'Flats', icon: '🥿', appropriate: true },
+            { id: 'boots', name: 'Botas Elegantes', icon: '👢', appropriate: true },
+            { id: 'sneakers', name: 'Tenis', icon: '👟', appropriate: false },
+            { id: 'flip_flops', name: 'Chanclas', icon: '🩴', appropriate: false }
+        ],
+        accessories: [
+            { id: 'simple_jewelry', name: 'Joyería Sencilla', icon: '💍', appropriate: true },
+            { id: 'watch', name: 'Reloj Elegante', icon: '⌚', appropriate: true },
+            { id: 'scarf', name: 'Pañuelo', icon: '🧣', appropriate: true },
+            { id: 'big_jewelry', name: 'Joyería Excesiva', icon: '💎', appropriate: false },
+            { id: 'sunglasses', name: 'Lentes de Sol', icon: '🕶️', appropriate: false }
+        ]
+    }
+};
+
+// Iniciar actividad interactiva
+function startDressCodeActivity() {
+    document.getElementById('dressCodeVideoSection').style.display = 'none';
+    document.getElementById('dressCodeActivitySection').style.display = 'block';
+    loadClothing();
+}
+
+// Volver al video
+function backToVideo() {
+    document.getElementById('dressCodeActivitySection').style.display = 'none';
+    document.getElementById('dressCodeVideoSection').style.display = 'block';
+}
+
+// Seleccionar género
+function selectGender(gender) {
+    currentGender = gender;
+
+    // Actualizar botones
+    document.getElementById('genderBtnMale').classList.toggle('active', gender === 'male');
+    document.getElementById('genderBtnFemale').classList.toggle('active', gender === 'female');
+
+    // Limpiar outfit
+    clearOutfit();
+
+    // Recargar ropa
+    loadClothing();
+}
+
+// Cargar catálogo de ropa
+function loadClothing() {
+    const catalog = clothingCatalog[currentGender];
+
+    loadClothingCategory('tops', catalog.tops);
+    loadClothingCategory('bottoms', catalog.bottoms);
+    loadClothingCategory('shoes', catalog.shoes);
+    loadClothingCategory('accessories', catalog.accessories);
+}
+
+function loadClothingCategory(category, items) {
+    const container = document.getElementById(category + 'Container');
+    container.innerHTML = '';
+
+    items.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.className = 'clothing-item';
+        itemEl.onclick = () => selectClothing(category, item);
+
+        itemEl.innerHTML = `
+            <div class="clothing-item-icon">${item.icon}</div>
+            <div class="clothing-item-name">${item.name}</div>
+            ${item.appropriate ?
+                '<div class="clothing-item-badge appropriate">✓</div>' :
+                '<div class="clothing-item-badge inappropriate">✗</div>'}
+        `;
+
+        container.appendChild(itemEl);
+    });
+}
+
+// Seleccionar prenda
+function selectClothing(category, item) {
+    const categoryKey = category.replace('Container', '').replace('s', '');
+    let outfitKey;
+
+    switch(category) {
+        case 'tops':
+            outfitKey = 'top';
+            break;
+        case 'bottoms':
+            outfitKey = 'bottom';
+            break;
+        case 'shoes':
+            outfitKey = 'shoes';
+            break;
+        case 'accessories':
+            outfitKey = 'accessories';
+            break;
+    }
+
+    selectedOutfit[outfitKey] = item;
+    updateMannequin();
+    updateFeedback();
+}
+
+// Actualizar muñeco
+function updateMannequin() {
+    if (selectedOutfit.top) {
+        document.getElementById('outfitTop').innerHTML = `<span style="font-size: 4em;">${selectedOutfit.top.icon}</span>`;
+    } else {
+        document.getElementById('outfitTop').innerHTML = '';
+    }
+
+    if (selectedOutfit.bottom) {
+        document.getElementById('outfitBottom').innerHTML = `<span style="font-size: 4em;">${selectedOutfit.bottom.icon}</span>`;
+    } else {
+        document.getElementById('outfitBottom').innerHTML = '';
+    }
+
+    if (selectedOutfit.shoes) {
+        document.getElementById('outfitShoes').innerHTML = `<span style="font-size: 3em;">${selectedOutfit.shoes.icon}</span>`;
+    } else {
+        document.getElementById('outfitShoes').innerHTML = '';
+    }
+
+    if (selectedOutfit.accessories) {
+        document.getElementById('outfitAccessories').innerHTML = `<span style="font-size: 2.5em; position: absolute; top: 20px; right: 20px;">${selectedOutfit.accessories.icon}</span>`;
+    } else {
+        document.getElementById('outfitAccessories').innerHTML = '';
+    }
+}
+
+// Actualizar feedback en tiempo real
+function updateFeedback() {
+    const feedbackContent = document.getElementById('feedbackContent');
+    const items = Object.values(selectedOutfit).filter(item => item !== null);
+
+    if (items.length === 0) {
+        feedbackContent.innerHTML = '<p class="feedback-placeholder">Selecciona tu vestimenta para recibir retroalimentación...</p>';
+        return;
+    }
+
+    let html = '';
+    const appropriate = items.filter(item => item.appropriate);
+    const inappropriate = items.filter(item => !item.appropriate);
+
+    if (appropriate.length > 0) {
+        html += '<div class="feedback-item positive">✅ <strong>Buenas elecciones:</strong> ' +
+                appropriate.map(item => item.name).join(', ') + '</div>';
+    }
+
+    if (inappropriate.length > 0) {
+        html += '<div class="feedback-item negative">❌ <strong>Mejorar:</strong> ' +
+                inappropriate.map(item => item.name).join(', ') + '</div>';
+    }
+
+    const totalItems = items.length;
+    const appropriateCount = appropriate.length;
+    const percentage = Math.round((appropriateCount / totalItems) * 100);
+
+    html += `<div class="feedback-item neutral">📊 <strong>Nivel de apropiación:</strong> ${percentage}%</div>`;
+
+    feedbackContent.innerHTML = html;
+}
+
+// Limpiar outfit
+function clearOutfit() {
+    selectedOutfit = {
+        top: null,
+        bottom: null,
+        shoes: null,
+        accessories: null
+    };
+    updateMannequin();
+    updateFeedback();
+}
+
+// Enviar y ver resultados
+function submitDressCode() {
+    const items = Object.values(selectedOutfit).filter(item => item !== null);
+
+    if (items.length < 3) {
+        alert('⚠️ Por favor, selecciona al menos 3 prendas (parte superior, inferior y calzado)');
+        return;
+    }
+
+    // Calcular puntuación
+    const appropriate = items.filter(item => item.appropriate);
+    const score = Math.round((appropriate.length / items.length) * 100);
+
+    // Mostrar resultados
+    showResults(score, items, appropriate);
+}
+
+function showResults(score, allItems, appropriateItems) {
+    const modal = document.getElementById('dressCodeResultsModal');
+    const title = document.getElementById('resultsTitle');
+    const scoreNumber = document.getElementById('scoreNumber');
+    const scoreCircle = document.getElementById('scoreCircle');
+    const feedbackDiv = document.getElementById('resultsFeedback');
+    const detailsDiv = document.getElementById('resultsDetails');
+
+    // Título según puntuación
+    if (score >= 80) {
+        title.textContent = '🎉 ¡Excelente!';
+        title.style.color = '#22c55e';
+    } else if (score >= 60) {
+        title.textContent = '👍 ¡Bien!';
+        title.style.color = '#f59e0b';
+    } else {
+        title.textContent = '💡 Puedes Mejorar';
+        title.style.color = '#ef4444';
+    }
+
+    scoreNumber.textContent = score;
+
+    // Cambiar color del círculo
+    if (score >= 80) {
+        scoreCircle.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    } else if (score >= 60) {
+        scoreCircle.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    } else {
+        scoreCircle.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    }
+
+    // Feedback
+    let feedbackHTML = '<h3>Análisis de tu Vestimenta</h3>';
+    if (score >= 80) {
+        feedbackHTML += '<p>¡Perfecto! Tu vestimenta es completamente apropiada para una entrevista de trabajo. Demuestras profesionalismo y respeto por la ocasión.</p>';
+    } else if (score >= 60) {
+        feedbackHTML += '<p>Vas por buen camino, pero hay algunos elementos que podrías mejorar para proyectar una imagen más profesional.</p>';
+    } else {
+        feedbackHTML += '<p>Tu vestimenta necesita ajustes importantes. Recuerda que la primera impresión es crucial en una entrevista.</p>';
+    }
+    feedbackDiv.innerHTML = feedbackHTML;
+
+    // Detalles
+    const inappropriate = allItems.filter(item => !item.appropriate);
+    let detailsHTML = '<h4>Detalles de tu Selección:</h4>';
+
+    if (appropriateItems.length > 0) {
+        detailsHTML += '<div class="detail-item" style="border-left: 3px solid #22c55e;">';
+        detailsHTML += '<div class="detail-icon">✅</div>';
+        detailsHTML += '<div class="detail-text">';
+        detailsHTML += '<strong>Prendas Apropiadas (' + appropriateItems.length + ')</strong>';
+        detailsHTML += '<span>' + appropriateItems.map(item => item.name).join(', ') + '</span>';
+        detailsHTML += '</div></div>';
+    }
+
+    if (inappropriate.length > 0) {
+        detailsHTML += '<div class="detail-item" style="border-left: 3px solid #ef4444;">';
+        detailsHTML += '<div class="detail-icon">❌</div>';
+        detailsHTML += '<div class="detail-text">';
+        detailsHTML += '<strong>Prendas a Evitar (' + inappropriate.length + ')</strong>';
+        detailsHTML += '<span>' + inappropriate.map(item => item.name).join(', ') + '</span>';
+        detailsHTML += '</div></div>';
+    }
+
+    detailsDiv.innerHTML = detailsHTML;
+
+    // Mostrar modal
+    modal.style.display = 'flex';
+}
+
+function closeDressCodeResults() {
+    document.getElementById('dressCodeResultsModal').style.display = 'none';
+}
+
+function tryAgainDressCode() {
+    closeDressCodeResults();
+    clearOutfit();
+}
+
+function finishDressCode() {
+    closeDressCodeResults();
+    // Aquí podrías agregar lógica para guardar resultados o volver al menú
+    if (typeof showScreen === 'function') {
+        showScreen('welcomeScreen');
+    } else if (typeof window.showScreen === 'function') {
+        window.showScreen('welcomeScreen');
+    }
+}
+</script>
 
 <script src="script-pro.js"></script>
 </body>
