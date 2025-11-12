@@ -29,6 +29,20 @@ let remainingTime = 0;
 let modalCallback = null;
 let lastTestResult = null;
 
+// FUNCIÓN HELPER PARA OBTENER PREGUNTAS SEGÚN DIFICULTAD
+function getQuestionsByDifficulty() {
+    switch(currentDifficulty) {
+        case 'easy':
+            return questionsEasy;
+        case 'medium':
+            return questionsMedium;
+        case 'hard':
+            return questionsHard;
+        default:
+            return questionsEasy;
+    }
+}
+
 // PREGUNTAS - NIVEL FÁCIL (PRE-TEST)
 const questionsEasy = [
     {
@@ -128,6 +142,180 @@ const questionsEasy = [
             "Lo reconoces y buscas solución",
             "Culpas a otro",
             "Renuncias"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué significa ser proactivo en el trabajo?",
+        options: [
+            "Esperar instrucciones",
+            "Tomar iniciativa y anticiparse a problemas",
+            "Hacer solo lo que te piden",
+            "Trabajar más horas"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Cómo debes usar el celular en el trabajo?",
+        options: [
+            "Todo el tiempo para estar conectado",
+            "Solo en emergencias o descansos",
+            "Cuando el jefe no está mirando",
+            "Nunca usarlo"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué es el respeto en el ambiente laboral?",
+        options: [
+            "Tener miedo al jefe",
+            "Tratar a todos con dignidad y consideración",
+            "Hacer lo que otros quieran",
+            "No hablar con nadie"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué debes hacer si recibes crítica constructiva?",
+        options: [
+            "Enojarte y defenderte",
+            "Escuchar y mejorar",
+            "Ignorarla",
+            "Renunciar"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Por qué es importante la higiene personal en el trabajo?",
+        options: [
+            "No es importante",
+            "Muestra profesionalismo y respeto a los demás",
+            "Solo importa en trabajos de oficina",
+            "Solo si hay clientes"
+        ],
+        correct: 1
+    }
+];
+
+// PREGUNTAS - NIVEL MEDIO
+const questionsMedium = [
+    {
+        q: "¿Qué es la comunicación asertiva?",
+        options: [
+            "Hablar sin pensar",
+            "Expresar tus ideas con respeto y claridad",
+            "Gritar para que te escuchen",
+            "No decir nada para evitar problemas"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Cómo manejas el estrés laboral?",
+        options: [
+            "Ignorándolo",
+            "Con técnicas de manejo del tiempo y pausas activas",
+            "Quejándote constantemente",
+            "Trabajando más horas"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué es la ética profesional?",
+        options: [
+            "Hacer lo mínimo necesario",
+            "Actuar con honestidad, responsabilidad e integridad",
+            "Seguir reglas sin entenderlas",
+            "Hacer lo que sea para obtener resultados"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Cómo se resuelve un conflicto con un compañero?",
+        options: [
+            "Evitándolo siempre",
+            "Dialogando con respeto y buscando soluciones",
+            "Hablando mal de él con otros",
+            "Esperando que se resuelva solo"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué significa tener iniciativa?",
+        options: [
+            "Hacer cosas sin permiso",
+            "Proponer mejoras y actuar sin que te lo pidan",
+            "Criticar lo que está mal",
+            "Esperar órdenes"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Cómo demuestras compromiso con tu trabajo?",
+        options: [
+            "Llegando a tiempo siempre",
+            "Cumpliendo responsabilidades con calidad y dedicación",
+            "Trabajando horas extras sin pago",
+            "Diciendo que sí a todo"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué es la adaptabilidad laboral?",
+        options: [
+            "Hacer siempre lo mismo",
+            "Ajustarse a nuevos cambios y situaciones",
+            "Resistirse a los cambios",
+            "Cambiar de trabajo frecuentemente"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Cómo construyes buenas relaciones laborales?",
+        options: [
+            "Siendo amigo de todos en redes sociales",
+            "Con comunicación efectiva, respeto y colaboración",
+            "Haciendo favores personales",
+            "Evitando a todos"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué es el trabajo bajo presión?",
+        options: [
+            "Trabajar enojado",
+            "Mantener la calidad en situaciones de alta demanda",
+            "Trabajar sin descanso",
+            "Pedir ayuda siempre"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Por qué es importante la capacitación continua?",
+        options: [
+            "Para llenar el tiempo",
+            "Para actualizar conocimientos y crecer profesionalmente",
+            "Solo si la empresa lo exige",
+            "No es importante"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Qué es la confidencialidad laboral?",
+        options: [
+            "No hablar con nadie",
+            "Proteger información privada de la empresa",
+            "Compartir todo con amigos",
+            "Solo guardar secretos del jefe"
+        ],
+        correct: 1
+    },
+    {
+        q: "¿Cómo se da retroalimentación efectiva?",
+        options: [
+            "Criticando en público",
+            "De manera constructiva, específica y privada",
+            "Solo mencionando lo negativo",
+            "Evitando dar opiniones"
         ],
         correct: 1
     }
@@ -705,7 +893,7 @@ function startCountdown(timerElementId = 'quizTimer') {
 // ========================================
 
 function loadQuestion() {
-    const questions = currentDifficulty === 'easy' ? questionsEasy : questionsHard;
+    const questions = getQuestionsByDifficulty();
     const q = questions[currentQuizQuestion];
     const container = document.getElementById('questionContainer');
     
@@ -746,8 +934,8 @@ function selectOption(index) {
 }
 
 function nextQuestion() {
-    const questions = currentDifficulty === 'easy' ? questionsEasy : questionsHard;
-    
+    const questions = getQuestionsByDifficulty();
+
     if (quizAnswers[currentQuizQuestion] === undefined) {
         showToast('Por favor selecciona una respuesta antes de continuar', 'warning');
         return;
@@ -764,8 +952,8 @@ function nextQuestion() {
 
 function finishQuiz() {
     if (countdownInterval) clearInterval(countdownInterval);
-    
-    const questions = currentDifficulty === 'easy' ? questionsEasy : questionsHard;
+
+    const questions = getQuestionsByDifficulty();
     let correct = 0;
     
     questions.forEach((q, i) => {
@@ -1640,60 +1828,168 @@ console.log('%c💡 Tip: Escribe "debugSystem" en consola para ver comandos de d
 // DETECTAR ERRORES EN CV
 // ========================================
 
-const cvWithErrors = {
-    nombre: "Juan Perez",
-    email: "juan.perez@gmial.com", // Error: gmial
-    telefono: "+502 1234-567", // Error: falta un dígito
-    direccion: "Zona 10, Guatemala",
-    
-    objetivo: "Busco un puesto de trabajo en el area de ventas para poder crecer profecionalemnte.", // Errores de ortografía
-    
-    experiencia: [
-        {
-            puesto: "Vendedor",
-            empresa: "Tienda XYZ",
-            periodo: "2020 - 2022",
-            descripcion: "Atencion al cliente y ventas diarias" // Falta tilde
+// ========================================
+// BANCO DE CVs CON ERRORES (se selecciona uno aleatorio)
+// ========================================
+const cvErrorsBank = [
+    // CV 1: Juan Pérez - Ventas
+    {
+        cv: {
+            nombre: "Juan Perez",
+            email: "juan.perez@gmial.com",
+            telefono: "+502 1234-567",
+            direccion: "Zona 10, Guatemala",
+            objetivo: "Busco un puesto de trabajo en el area de ventas para poder crecer profecionalemnte.",
+            experiencia: [
+                {
+                    puesto: "Vendedor",
+                    empresa: "Tienda XYZ",
+                    periodo: "2020 - 2022",
+                    descripcion: "Atencion al cliente y ventas diarias"
+                },
+                {
+                    puesto: "Cajero",
+                    empresa: "Supermercado ABC",
+                    periodo: "2018 - 2020",
+                    descripcion: "Manejo de caja y atencion al publico"
+                }
+            ],
+            educacion: [
+                {
+                    titulo: "Bachillerato en Ciencias y Letras",
+                    institucion: "Colegio San Jose",
+                    año: "2018"
+                }
+            ],
+            habilidades: [
+                "Trabajo en equipo",
+                "Comunicacion efectiva",
+                "Manejo de Microsoft Ofice",
+                "Atencion al cliente"
+            ],
+            referencias: "Disponibles a pedido"
         },
-        {
-            puesto: "Cajero",
-            empresa: "Supermercado ABC", 
-            periodo: "2018 - 2020",
-            descripcion: "Manejo de caja y atencion al publico" // Faltan tildes
-        }
-    ],
-    
-    educacion: [
-        {
-            titulo: "Bachillerato en Ciencias y Letras",
-            institucion: "Colegio San Jose",
-            año: "2018" // Debe ser "año"
-        }
-    ],
-    
-    habilidades: [
-        "Trabajo en equipo",
-        "Comunicacion efectiva", // Falta tilde
-        "Manejo de Microsoft Ofice", // Error: Ofice
-        "Atencion al cliente" // Falta tilde
-    ],
-    
-    referencias: "Disponibles a pedido" // Error: debe ser "solicitud"
-};
+        errors: [
+            { id: 1, type: 'email', error: 'gmial.com', correct: 'gmail.com', found: false },
+            { id: 2, type: 'telefono', error: '+502 1234-567', correct: '+502 1234-5678', found: false },
+            { id: 3, type: 'objetivo', error: 'area', correct: 'área', found: false },
+            { id: 4, type: 'objetivo', error: 'profecionalemnte', correct: 'profesionalmente', found: false },
+            { id: 5, type: 'experiencia', error: 'Atencion al cliente y ventas', correct: 'Atención al cliente y ventas', found: false },
+            { id: 6, type: 'experiencia', error: 'atencion al publico', correct: 'atención al público', found: false },
+            { id: 7, type: 'habilidades', error: 'Comunicacion', correct: 'Comunicación', found: false },
+            { id: 8, type: 'habilidades', error: 'Ofice', correct: 'Office', found: false },
+            { id: 9, type: 'habilidades', error: 'Atencion al cliente', correct: 'Atención al cliente', found: false },
+            { id: 10, type: 'referencias', error: 'a pedido', correct: 'a solicitud', found: false }
+        ]
+    },
 
-const errorsToFind = [
-    { id: 1, type: 'email', error: 'gmial.com', correct: 'gmail.com', found: false },
-    { id: 2, type: 'telefono', error: '+502 1234-567', correct: '+502 1234-5678', found: false },
-    { id: 3, type: 'objetivo', error: 'area', correct: 'área', found: false },
-    { id: 4, type: 'objetivo', error: 'profecionalemnte', correct: 'profesionalmente', found: false },
-    { id: 5, type: 'experiencia', error: 'Atencion al cliente y ventas', correct: 'Atención al cliente y ventas', found: false },
-    { id: 6, type: 'experiencia', error: 'atencion al publico', correct: 'atención al público', found: false },
-    { id: 7, type: 'habilidades', error: 'Comunicacion', correct: 'Comunicación', found: false },
-    { id: 8, type: 'habilidades', error: 'Ofice', correct: 'Office', found: false },
-    { id: 9, type: 'habilidades', error: 'Atencion al cliente', correct: 'Atención al cliente', found: false },
-    { id: 10, type: 'referencias', error: 'a pedido', correct: 'a solicitud', found: false }
+    // CV 2: María López - Administración
+    {
+        cv: {
+            nombre: "maria lopez",
+            email: "maria_lopez@hotmial.com",
+            telefono: "+502 9876-54",
+            direccion: "Ciudad de Guatemala",
+            objetivo: "Busco una oportunidad laboral en el area administrativa donde pueda aplicar mis conocimeintos y habilidades.",
+            experiencia: [
+                {
+                    puesto: "asistente administrativa",
+                    empresa: "Empresa ABC S.A.",
+                    periodo: "2021-2023",
+                    descripcion: "Gestion de documentos, atencion telefonica y coordinacion de reuniones"
+                },
+                {
+                    puesto: "Recepcionista",
+                    empresa: "Hotel Plaza",
+                    periodo: "2019 - 2021",
+                    descripcion: "Atencion a clientes, reservaciones y manejo de llamdas entrantes"
+                }
+            ],
+            educacion: [
+                {
+                    titulo: "Perito Contador",
+                    institucion: "instituto comercial",
+                    año: "2019"
+                }
+            ],
+            habilidades: [
+                "Dominio de Exel y Word",
+                "Organizacion y planificacion",
+                "Comunicacion asertiva",
+                "Manejo de bases de datos"
+            ],
+            referencias: "disponibles cuando las necesiten"
+        },
+        errors: [
+            { id: 1, type: 'nombre', error: 'maria lopez', correct: 'María López', found: false },
+            { id: 2, type: 'email', error: 'hotmial.com', correct: 'hotmail.com', found: false },
+            { id: 3, type: 'telefono', error: '+502 9876-54', correct: '+502 9876-5432', found: false },
+            { id: 4, type: 'objetivo', error: 'conocimeintos', correct: 'conocimientos', found: false },
+            { id: 5, type: 'experiencia', error: 'asistente administrativa', correct: 'Asistente Administrativa', found: false },
+            { id: 6, type: 'experiencia', error: 'Gestion', correct: 'Gestión', found: false },
+            { id: 7, type: 'experiencia', error: 'llamdas', correct: 'llamadas', found: false },
+            { id: 8, type: 'educacion', error: 'instituto comercial', correct: 'Instituto Comercial', found: false },
+            { id: 9, type: 'habilidades', error: 'Exel', correct: 'Excel', found: false },
+            { id: 10, type: 'referencias', error: 'disponibles cuando las necesiten', correct: 'Disponibles a solicitud', found: false }
+        ]
+    },
+
+    // CV 3: Carlos Ramírez - Técnico
+    {
+        cv: {
+            nombre: "Carlos Ramirez",
+            email: "c.ramirez@yahooo.com",
+            telefono: "5555-123",
+            direccion: "zona 12, guatemala",
+            objetivo: "Obtener un puesto como tecnico en computadoras donde pueda desarollar mis habilidades tecnologicas.",
+            experiencia: [
+                {
+                    puesto: "Técnico en Soporte",
+                    empresa: "TechSupport GT",
+                    periodo: "2022-actualidad",
+                    descripcion: "reparacion de computadoras, instalacion de software y soporte tecnico a usuarios"
+                },
+                {
+                    puesto: "Ayudante de Sistemas",
+                    empresa: "Colegio Bilingüe",
+                    periodo: "2020-2022",
+                    descripcion: "Mantenimiento de equipos, actualizacion de programas y resolucion de problemas tecnicos"
+                }
+            ],
+            educacion: [
+                {
+                    titulo: "Bachillerato en computacion",
+                    institucion: "Colegio Tecnico",
+                    año: "2020"
+                }
+            ],
+            habilidades: [
+                "Reparación de hardware",
+                "instalacion de sistemas operativos",
+                "Conocimiento en redes",
+                "atencion al cliente"
+            ],
+            referencias: "tengo referencias disponibles"
+        },
+        errors: [
+            { id: 1, type: 'nombre', error: 'Ramirez', correct: 'Ramírez', found: false },
+            { id: 2, type: 'email', error: 'yahooo.com', correct: 'yahoo.com', found: false },
+            { id: 3, type: 'telefono', error: '5555-123', correct: '+502 5555-1234', found: false },
+            { id: 4, type: 'direccion', error: 'zona 12, guatemala', correct: 'Zona 12, Guatemala', found: false },
+            { id: 5, type: 'objetivo', error: 'tecnico', correct: 'técnico', found: false },
+            { id: 6, type: 'objetivo', error: 'desarollar', correct: 'desarrollar', found: false },
+            { id: 7, type: 'experiencia', error: 'reparacion de computadoras', correct: 'Reparación de computadoras', found: false },
+            { id: 8, type: 'experiencia', error: 'resolucion', correct: 'resolución', found: false },
+            { id: 9, type: 'educacion', error: 'computacion', correct: 'Computación', found: false },
+            { id: 10, type: 'habilidades', error: 'instalacion', correct: 'Instalación', found: false }
+        ]
+    }
 ];
 
+// Variables globales para el CV actual
+let currentCVData = null;
+let cvWithErrors = {};
+let errorsToFind = [];
 let foundErrors = [];
 let errorStartTime;
 let errorTimerInterval;
@@ -1701,10 +1997,20 @@ let errorTimerInterval;
 function startErrorDetection() {
     errorStartTime = Date.now();
     foundErrors = [];
-    errorsToFind.forEach(e => e.found = false);
     remainingTime = CONFIG.CV_ERRORS_TIME_LIMIT;
 
-    // Intentar cargar el CV del usuario
+    // Seleccionar aleatoriamente un CV del banco
+    const randomIndex = Math.floor(Math.random() * cvErrorsBank.length);
+    currentCVData = cvErrorsBank[randomIndex];
+
+    // Copiar el CV y los errores
+    cvWithErrors = JSON.parse(JSON.stringify(currentCVData.cv));
+    errorsToFind = JSON.parse(JSON.stringify(currentCVData.errors));
+
+    // Resetear el estado de los errores
+    errorsToFind.forEach(e => e.found = false);
+
+    // Intentar cargar el CV del usuario (opcional)
     if (currentUser) {
         const userCVKey = `userCV_${currentUser.email}`;
         const savedCV = localStorage.getItem(userCVKey);
@@ -1716,7 +2022,7 @@ function startErrorDetection() {
                 generateErrorsFromUserCV(userCV);
             } catch (e) {
                 console.error('Error al cargar CV del usuario:', e);
-                // Si hay error, usar el CV predeterminado
+                // Si hay error, usar el CV aleatorio del banco
             }
         }
     }
@@ -7216,116 +7522,189 @@ function createActivityChart() {
 
 // Funciones auxiliares para dibujar gráficas
 
+// ========================================
+// GRÁFICAS CON CHART.JS - VERSIÓN PROFESIONAL
+// ========================================
+let chartInstances = {};
+
 function drawBarChart(ctx, labels, values, color) {
-    const width = ctx.canvas.width;
-    const height = ctx.canvas.height;
-    const barWidth = width / labels.length - 20;
-    const maxValue = Math.max(...values, 1);
-    const padding = 40;
+    // Destruir gráfica anterior si existe
+    if (chartInstances[ctx.canvas.id]) {
+        chartInstances[ctx.canvas.id].destroy();
+    }
 
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = '#333';
-    ctx.font = '12px Inter';
-
-    labels.forEach((label, i) => {
-        const barHeight = (values[i] / maxValue) * (height - padding - 20);
-        const x = i * (barWidth + 20) + 10;
-        const y = height - barHeight - padding;
-
-        // Dibujar barra
-        ctx.fillStyle = color;
-        ctx.fillRect(x, y, barWidth, barHeight);
-
-        // Dibujar etiqueta
-        ctx.fillStyle = '#333';
-        ctx.textAlign = 'center';
-        ctx.fillText(label, x + barWidth / 2, height - 10);
-
-        // Dibujar valor
-        ctx.fillText(values[i], x + barWidth / 2, y - 5);
+    // Crear nueva gráfica con Chart.js
+    chartInstances[ctx.canvas.id] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Cantidad',
+                data: values,
+                backgroundColor: color,
+                borderColor: color,
+                borderWidth: 2,
+                borderRadius: 5,
+                barThickness: 40
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0,
+                        font: { size: 12 }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 12 }
+                    }
+                }
+            }
+        }
     });
 }
 
 function drawPieChart(ctx, labels, values) {
-    const width = ctx.canvas.width;
-    const height = ctx.canvas.height;
-    const centerX = width / 2;
-    const centerY = height / 2 - 10;
-    const radius = Math.min(width, height) / 3;
+    // Destruir gráfica anterior si existe
+    if (chartInstances[ctx.canvas.id]) {
+        chartInstances[ctx.canvas.id].destroy();
+    }
 
-    const colors = ['#E86C4A', '#F4A261', '#2A9D8F', '#264653', '#E76F51'];
-    const total = values.reduce((a, b) => a + b, 0);
+    const colors = ['#E86C4A', '#F4A261', '#2A9D8F', '#264653', '#E76F51', '#8B5CF6', '#EC4899'];
 
-    ctx.clearRect(0, 0, width, height);
-
-    let currentAngle = -Math.PI / 2;
-
-    values.forEach((value, i) => {
-        const sliceAngle = (value / total) * 2 * Math.PI;
-
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.arc(centerX, centerY, radius, currentAngle, currentAngle + sliceAngle);
-        ctx.closePath();
-        ctx.fill();
-
-        currentAngle += sliceAngle;
-    });
-
-    // Leyenda
-    ctx.font = '11px Inter';
-    ctx.textAlign = 'left';
-    const legendY = height - 30;
-    const legendX = 10;
-
-    labels.forEach((label, i) => {
-        if (i < 3) {
-            ctx.fillStyle = colors[i];
-            ctx.fillRect(legendX + (i * 130), legendY, 10, 10);
-            ctx.fillStyle = '#333';
-            ctx.fillText(label.substring(0, 12), legendX + (i * 130) + 15, legendY + 9);
+    // Crear nueva gráfica con Chart.js
+    chartInstances[ctx.canvas.id] = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: values,
+                backgroundColor: colors.slice(0, labels.length),
+                borderColor: '#fff',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 11 },
+                        boxWidth: 12,
+                        generateLabels: function(chart) {
+                            const data = chart.data;
+                            return data.labels.map((label, i) => ({
+                                text: label.length > 15 ? label.substring(0, 15) + '...' : label,
+                                fillStyle: data.datasets[0].backgroundColor[i],
+                                hidden: false,
+                                index: i
+                            }));
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.parsed} (${percentage}%)`;
+                        }
+                    }
+                }
+            }
         }
     });
 }
 
 function drawLineChart(ctx, labels, values, color) {
-    const width = ctx.canvas.width;
-    const height = ctx.canvas.height;
-    const padding = 40;
-    const maxValue = Math.max(...values, 1);
-    const stepX = (width - padding * 2) / (labels.length - 1);
+    // Destruir gráfica anterior si existe
+    if (chartInstances[ctx.canvas.id]) {
+        chartInstances[ctx.canvas.id].destroy();
+    }
 
-    ctx.clearRect(0, 0, width, height);
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    ctx.fillStyle = '#333';
-    ctx.font = '11px Inter';
-
-    // Dibujar línea
-    ctx.beginPath();
-    values.forEach((value, i) => {
-        const x = padding + i * stepX;
-        const y = height - padding - (value / maxValue) * (height - padding * 2);
-
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-
-        // Dibujar punto
-        ctx.fillStyle = color;
-        ctx.beginPath();
-        ctx.arc(x, y, 4, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Dibujar etiqueta
-        ctx.fillStyle = '#333';
-        ctx.textAlign = 'center';
-        ctx.fillText(labels[i], x, height - 10);
-        ctx.fillText(values[i], x, y - 10);
+    // Crear nueva gráfica con Chart.js
+    chartInstances[ctx.canvas.id] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Actividad',
+                data: values,
+                borderColor: color,
+                backgroundColor: color + '20',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: color,
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
+                    titleFont: { size: 14 },
+                    bodyFont: { size: 13 }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0,
+                        font: { size: 12 }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    },
+                    ticks: {
+                        font: { size: 11 }
+                    }
+                }
+            }
+        }
     });
-
-    ctx.strokeStyle = color;
-    ctx.stroke();
 }
 
 // ========================================
