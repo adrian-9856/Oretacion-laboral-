@@ -1658,12 +1658,46 @@ function getFormattedDate(date) {
 }
 
 // ========================================
-// MANEJO DE ERRORES
+// MANEJO DE ERRORES MEJORADO
 // ========================================
 
+// Contador de errores para evitar spam
+let errorCount = 0;
+let lastErrorTime = 0;
+
 window.addEventListener('error', function(e) {
-    console.error('Error capturado:', e.error);
-    showToast('⚠️ Ha ocurrido un error. Por favor, recarga la página.', 'error');
+    const currentTime = Date.now();
+
+    // Resetear contador si han pasado más de 10 segundos
+    if (currentTime - lastErrorTime > 10000) {
+        errorCount = 0;
+    }
+
+    errorCount++;
+    lastErrorTime = currentTime;
+
+    // Solo mostrar el toast si es el primer o segundo error en 10 segundos
+    if (errorCount <= 2) {
+        console.error('Error capturado:', e.error);
+
+        // Mensaje más amigable
+        const errorMessage = e.error?.message || 'Error desconocido';
+
+        // No mostrar errores menores de recursos externos
+        if (errorMessage.includes('Script error') ||
+            errorMessage.includes('Loading chunk') ||
+            errorMessage.includes('Failed to fetch')) {
+            return;
+        }
+
+        // Solo mostrar un mensaje genérico sin forzar recarga
+        showToast('⚠️ Algo salió mal. Si persiste, intenta refrescar la página.', 'warning');
+    }
+
+    // Si hay más de 5 errores en poco tiempo, podría ser algo serio
+    if (errorCount > 5) {
+        console.error('Múltiples errores detectados. Considera recargar la página.');
+    }
 });
 
 // ========================================

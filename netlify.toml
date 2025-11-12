@@ -1,4 +1,7 @@
-# Configuración de Netlify para Sistema de Evaluación Laboral PRO
+# ============================================
+# Configuración Optimizada de Netlify
+# Sistema de Evaluación Laboral PRO
+# ============================================
 
 [build]
   # Directorio que se publicará (root del proyecto)
@@ -7,47 +10,185 @@
   # Como es un sitio estático, no necesita comando de build
   command = ""
 
-# Configuración de contextos (producción, branches, etc.)
+# Variables de entorno de producción
 [build.environment]
   NODE_VERSION = "18"
+  # Optimización de Node
+  NODE_OPTIONS = "--max_old_space_size=4096"
 
-# Headers de seguridad para todas las páginas
+# ============================================
+# HEADERS DE SEGURIDAD Y OPTIMIZACIÓN
+# ============================================
+
+# Headers principales para todas las páginas
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
+    # Seguridad
+    X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 
-# Headers para archivos JavaScript
+    # Permisos (permitir cámara y micrófono para entrevistas)
+    Permissions-Policy = "geolocation=(), microphone=(self), camera=(self), interest-cohort=()"
+
+    # CORS - Permitir acceso desde múltiples orígenes
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+    # Compresión y rendimiento
+    X-Compress-Hint = "on"
+
+    # Cache básico
+    Cache-Control = "public, max-age=3600, must-revalidate"
+
+# Headers para archivos JavaScript con compresión
 [[headers]]
   for = "/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+    # Habilitar compresión Brotli/Gzip
+    Content-Encoding = "br, gzip"
 
-# Headers para archivos CSS
+# Headers para archivos CSS con compresión
 [[headers]]
   for = "/*.css"
   [headers.values]
     Content-Type = "text/css; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
+    X-Content-Type-Options = "nosniff"
+    Content-Encoding = "br, gzip"
 
-# Headers para HTML (sin cache agresivo)
+# Headers para HTML (sin cache agresivo para actualizaciones)
 [[headers]]
   for = "/*.html"
   [headers.values]
+    Content-Type = "text/html; charset=utf-8"
     Cache-Control = "public, max-age=0, must-revalidate"
+    X-UA-Compatible = "IE=edge"
+
+# Headers para imágenes
+[[headers]]
+  for = "/*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "image/svg+xml"
+
+[[headers]]
+  for = "/*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers para fuentes
+[[headers]]
+  for = "/*.woff2"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "font/woff2"
+    Access-Control-Allow-Origin = "*"
+
+[[headers]]
+  for = "/*.woff"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+    Content-Type = "font/woff"
+    Access-Control-Allow-Origin = "*"
+
+# Headers para archivos JSON
+[[headers]]
+  for = "/*.json"
+  [headers.values]
+    Content-Type = "application/json; charset=utf-8"
+    Cache-Control = "public, max-age=3600"
+
+# Headers para archivos de configuración
+[[headers]]
+  for = "/*.xml"
+  [headers.values]
+    Content-Type = "application/xml; charset=utf-8"
+
+# ============================================
+# REDIRECCIONES Y RUTAS SPA
+# ============================================
 
 # Redireccionamiento de errores 404 a index.html (SPA)
+# Esto permite que todas las rutas del frontend funcionen correctamente
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
   force = false
+  conditions = {Role = [""], Country = []}
 
-# Configuración de funciones (si llegas a necesitarlas)
+# ============================================
+# CONFIGURACIÓN DE FUNCIONES SERVERLESS
+# ============================================
+
 [functions]
   directory = "api"
+  # Configuración de timeout (máximo 10 segundos en plan gratuito)
+  timeout = 10
+
+# ============================================
+# OPTIMIZACIÓN DE RENDIMIENTO
+# ============================================
+
+# Habilitar compresión automática
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# ============================================
+# CONFIGURACIÓN DE CONTEXTOS
+# ============================================
+
+# Configuración para producción
+[context.production]
+  command = ""
+  publish = "."
+
+# Configuración para deploys de branches
+[context.branch-deploy]
+  command = ""
+  publish = "."
+
+# Configuración para deploy previews
+[context.deploy-preview]
+  command = ""
+  publish = "."
+
+# ============================================
+# CARACTERÍSTICAS ADICIONALES
+# ============================================
+
+# Habilitar Forms de Netlify (si se usan formularios)
+# [plugins]
+#   [[plugins]]
+#     package = "@netlify/plugin-forms"
