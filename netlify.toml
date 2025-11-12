@@ -1,0 +1,53 @@
+# Configuración de Netlify para Sistema de Evaluación Laboral PRO
+
+[build]
+  # Directorio que se publicará (root del proyecto)
+  publish = "."
+
+  # Como es un sitio estático, no necesita comando de build
+  command = ""
+
+# Configuración de contextos (producción, branches, etc.)
+[build.environment]
+  NODE_VERSION = "18"
+
+# Headers de seguridad para todas las páginas
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+
+# Headers para archivos JavaScript
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers para archivos CSS
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Content-Type = "text/css; charset=utf-8"
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Headers para HTML (sin cache agresivo)
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Redireccionamiento de errores 404 a index.html (SPA)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
+
+# Configuración de funciones (si llegas a necesitarlas)
+[functions]
+  directory = "api"
