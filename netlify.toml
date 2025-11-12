@@ -44,24 +44,21 @@
     # Cache básico
     Cache-Control = "public, max-age=3600, must-revalidate"
 
-# Headers para archivos JavaScript con compresión
+# Headers para archivos JavaScript
 [[headers]]
   for = "/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
     X-Content-Type-Options = "nosniff"
-    # Habilitar compresión Brotli/Gzip
-    Content-Encoding = "br, gzip"
 
-# Headers para archivos CSS con compresión
+# Headers para archivos CSS
 [[headers]]
   for = "/*.css"
   [headers.values]
     Content-Type = "text/css; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
     X-Content-Type-Options = "nosniff"
-    Content-Encoding = "br, gzip"
 
 # Headers para HTML (sin cache agresivo para actualizaciones)
 [[headers]]
@@ -152,12 +149,12 @@
   skip_processing = false
 
 [build.processing.css]
-  bundle = true
-  minify = true
+  bundle = false
+  minify = false
 
 [build.processing.js]
-  bundle = true
-  minify = true
+  bundle = false
+  minify = false
 
 [build.processing.html]
   pretty_urls = true
