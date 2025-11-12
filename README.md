@@ -17,6 +17,9 @@ Sistema completo de evaluación y orientación laboral potenciado con Inteligenc
 - **Frontend**: HTML5, CSS3, JavaScript vanilla
 - **Backend**: Vercel Serverless Functions
 - **IA**: Claude 3.5 Sonnet (Anthropic)
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Auth
+- **Storage**: Firebase Storage
 - **APIs**: Web Speech API, MediaRecorder API
 - **Hosting**: Vercel
 
@@ -41,10 +44,18 @@ npm install
 cp .env.example .env.local
 ```
 
-Edita `.env.local` y agrega tu API key de Anthropic:
+Edita `.env.local` y agrega tus credenciales:
 
 ```env
 ANTHROPIC_API_KEY=sk-ant-api03-xxxxx
+
+# Firebase (opcional - para guardar datos en la nube)
+FIREBASE_API_KEY=tu_api_key
+FIREBASE_AUTH_DOMAIN=tu-proyecto.firebaseapp.com
+FIREBASE_PROJECT_ID=tu-proyecto-id
+FIREBASE_STORAGE_BUCKET=tu-proyecto.appspot.com
+FIREBASE_MESSAGING_SENDER_ID=123456789
+FIREBASE_APP_ID=1:123456789:web:abc123
 ```
 
 ### 4. Ejecutar en desarrollo
@@ -63,12 +74,19 @@ npm run deploy
 
 ## 📚 Documentación
 
-Lee la [Guía Completa de Integración](./GUIA_INTEGRACION_CLAUDE_AI.md) para:
+- **[Guía de Integración Claude AI](./GUIA_INTEGRACION_CLAUDE_AI.md)**: Configuración de IA
+- **[Guía Completa de Firebase](./GUIA_FIREBASE.md)**: Autenticación, Base de Datos y Storage
 
-- Configuración detallada de Vercel y Anthropic
-- Ejemplos de uso de las APIs
-- Mejores prácticas y optimización
-- Troubleshooting
+### Guía de Firebase
+
+Lee la [Guía Completa de Firebase](./GUIA_FIREBASE.md) para:
+
+- ✅ Configurar autenticación de usuarios (email, Google, etc.)
+- ✅ Guardar resultados de tests en Firestore
+- ✅ Almacenar CVs en Firebase Storage
+- ✅ Obtener historial y estadísticas
+- ✅ Ejemplos de código completos
+- ✅ Solución de problemas
 
 ## 🔑 Obtener API Key de Claude
 
@@ -125,6 +143,11 @@ console.log(questions.questions);
 │   ├── generate-questions.js   # Generación de preguntas
 │   ├── mentor-coach.js         # Coach virtual
 │   └── analyze-cv.js           # Análisis de CV
+├── firebase-config.js          # Configuración de Firebase
+├── firebase-auth.js            # Autenticación de usuarios
+├── firebase-db.js              # Base de datos Firestore
+├── firebase-storage.js         # Almacenamiento de archivos
+├── firebase-integration.js     # Integración con sistema actual
 ├── index.html                  # Página principal
 ├── script-pro.js               # Lógica principal
 ├── claude-ai-helper.js         # Helper para Claude AI
