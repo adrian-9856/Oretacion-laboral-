@@ -28,6 +28,27 @@ let isPracticeMode = false;
 let remainingTime = 0;
 let modalCallback = null;
 let lastTestResult = null;
+let currentAvatar = null;
+
+// Variables para detección de errores
+let foundErrors = [];
+let errorStartTime;
+let errorTimerInterval;
+
+// Variables para simulador de entrevista
+let currentInterviewQuestion = 0;
+let interviewAnswers = [];
+let interviewStartTime;
+
+// Variables para grabación de audio
+let mediaRecorder;
+let audioChunks = [];
+let recordingInterval;
+let recordingStartTime;
+let currentInterviewMode = 'options';
+let speechRecognition = null;
+let currentTranscription = '';
+let audioAnalysisResult = null;
 
 // PREGUNTAS - NIVEL FÁCIL (PRE-TEST)
 const questionsEasy = [
@@ -539,6 +560,17 @@ function showScreen(screenId) {
         screen.classList.add('active');
         window.scrollTo(0, 0);
     }
+
+    // Cargar avatar si el usuario está logueado
+    if (currentUser) {
+        const savedAvatar = localStorage.getItem(`avatar_pro_${currentUser.email}`);
+        if (savedAvatar) {
+            currentAvatar = JSON.parse(savedAvatar);
+            if (typeof updateUserAvatarPro === 'function') {
+                updateUserAvatarPro();
+            }
+        }
+    }
 }
 
 function selectTest(type) {
@@ -579,7 +611,7 @@ function showProgress() {
 
 function startTest(testType) {
     startTime = Date.now();
-    
+
     if (testType === 'quiz') {
         currentQuizQuestion = 0;
         quizAnswers = [];
@@ -591,6 +623,10 @@ function startTest(testType) {
         startErrorDetection();
     } else if (testType === 'builder') {
         startCVBuilder();
+    } else if (testType === 'interview') {
+        if (typeof startInterviewSimulator === 'function') {
+            startInterviewSimulator();
+        }
     }
 }
 // ========================================
@@ -1438,10 +1474,6 @@ const errorsToFind = [
     { id: 10, type: 'referencias', error: 'a pedido', correct: 'a solicitud', found: false }
 ];
 
-let foundErrors = [];
-let errorStartTime;
-let errorTimerInterval;
-
 function startErrorDetection() {
     errorStartTime = Date.now();
     foundErrors = [];
@@ -1851,11 +1883,30 @@ function saveCVStepData() {
             address: document.getElementById('cvAddress')?.value.trim()
         };
     }
-    
+
     if (cvBuilderStep === 1) {
         cvBuilderData.objective = document.getElementById('cvObjective')?.value.trim();
     }
-    
+
+    if (cvBuilderStep === 2) {
+        // Guardar experiencia
+        cvBuilderData.experience = cvBuilderData.experience.map((exp, i) => ({
+            puesto: document.getElementById(`expJob-${i}`)?.value.trim() || '',
+            empresa: document.getElementById(`expCompany-${i}`)?.value.trim() || '',
+            periodo: document.getElementById(`expPeriod-${i}`)?.value.trim() || '',
+            descripcion: document.getElementById(`expDesc-${i}`)?.value.trim() || ''
+        }));
+    }
+
+    if (cvBuilderStep === 3) {
+        // Guardar educación
+        cvBuilderData.education = cvBuilderData.education.map((edu, i) => ({
+            titulo: document.getElementById(`eduTitle-${i}`)?.value.trim() || '',
+            institucion: document.getElementById(`eduInstitution-${i}`)?.value.trim() || '',
+            año: document.getElementById(`eduYear-${i}`)?.value.trim() || ''
+        }));
+    }
+
     if (cvBuilderStep === 5) {
         cvBuilderData.references = document.getElementById('cvReferences')?.value.trim();
     }
@@ -1880,13 +1931,96 @@ function removeSkill(index) {
 function renderSkills() {
     const container = document.getElementById('skillsList');
     if (!container) return;
-    
+
     container.innerHTML = cvBuilderData.skills.map((skill, i) => `
         <span class="skill-tag">
             ${skill}
             <button onclick="removeSkill(${i})">×</button>
         </span>
     `).join('');
+}
+
+function addExperience() {
+    const experienceList = document.getElementById('experienceList');
+    if (!experienceList) return;
+
+    const index = cvBuilderData.experience.length;
+
+    const experienceHTML = `
+        <div class="experience-item" id="exp-${index}">
+            <div class="form-group">
+                <label>Puesto</label>
+                <input type="text" id="expJob-${index}" placeholder="Ej: Asistente Administrativo">
+            </div>
+            <div class="form-group">
+                <label>Empresa</label>
+                <input type="text" id="expCompany-${index}" placeholder="Ej: Empresa XYZ">
+            </div>
+            <div class="form-group">
+                <label>Período</label>
+                <input type="text" id="expPeriod-${index}" placeholder="Ej: 2020 - 2022">
+            </div>
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="expDesc-${index}" rows="3" placeholder="Describe tus responsabilidades..."></textarea>
+            </div>
+            <button type="button" class="btn-remove" onclick="removeExperience(${index})">Eliminar</button>
+        </div>
+    `;
+
+    experienceList.insertAdjacentHTML('beforeend', experienceHTML);
+
+    cvBuilderData.experience.push({
+        puesto: '',
+        empresa: '',
+        periodo: '',
+        descripcion: ''
+    });
+}
+
+function removeExperience(index) {
+    cvBuilderData.experience.splice(index, 1);
+    const element = document.getElementById(`exp-${index}`);
+    if (element) element.remove();
+}
+
+function addEducation() {
+    const educationList = document.getElementById('educationList');
+    if (!educationList) return;
+
+    const index = cvBuilderData.education.length;
+
+    const educationHTML = `
+        <div class="education-item" id="edu-${index}">
+            <div class="form-group">
+                <label>Título/Grado</label>
+                <input type="text" id="eduTitle-${index}" placeholder="Ej: Bachillerato en Ciencias">
+            </div>
+            <div class="form-group">
+                <label>Institución</label>
+                <input type="text" id="eduInstitution-${index}" placeholder="Ej: Colegio Nacional">
+            </div>
+            <div class="form-group">
+                <label>Año</label>
+                <input type="text" id="eduYear-${index}" placeholder="Ej: 2018 - 2022">
+            </div>
+            <button type="button" class="btn-remove" onclick="removeEducation(${index})">Eliminar</button>
+        </div>
+    `;
+
+    educationList.insertAdjacentHTML('beforeend', educationHTML);
+
+    cvBuilderData.education.push({
+        titulo: '',
+        institucion: '',
+        año: ''
+    });
+}
+
+function removeEducation(index) {
+    cvBuilderData.education.splice(index, 1);
+    const element = document.getElementById(`edu-${index}`);
+    if (element) element.remove();
 }
 
 function renderCVPreview() {
@@ -1916,21 +2050,21 @@ function renderCVPreview() {
                     <h3>Experiencia Laboral</h3>
                     ${cvBuilderData.experience.map(exp => `
                         <div class="cv-item">
-                            <h4>${exp.position}</h4>
-                            <p><strong>${exp.company}</strong> | ${exp.period}</p>
-                            <p>${exp.description}</p>
+                            <h4>${exp.puesto}</h4>
+                            <p><strong>${exp.empresa}</strong> | ${exp.periodo}</p>
+                            <p>${exp.descripcion}</p>
                         </div>
                     `).join('')}
                 </div>
             ` : ''}
-            
+
             ${cvBuilderData.education.length > 0 ? `
                 <div class="cv-section">
                     <h3>Educación</h3>
                     ${cvBuilderData.education.map(edu => `
                         <div class="cv-item">
-                            <h4>${edu.degree}</h4>
-                            <p><strong>${edu.institution}</strong> | ${edu.year}</p>
+                            <h4>${edu.titulo}</h4>
+                            <p><strong>${edu.institucion}</strong> | ${edu.año}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -2001,6 +2135,10 @@ window.startErrorDetection = startErrorDetection;
 window.startCVBuilder = startCVBuilder;
 window.addSkill = addSkill;
 window.removeSkill = removeSkill;
+window.addExperience = addExperience;
+window.removeExperience = removeExperience;
+window.addEducation = addEducation;
+window.removeEducation = removeEducation;
 window.nextCVStep = nextCVStep;
 window.previousCVStep = previousCVStep;
 // ========================================
@@ -2210,10 +2348,6 @@ const interviewQuestions = [
     }
 ];
 
-let currentInterviewQuestion = 0;
-let interviewAnswers = [];
-let interviewStartTime;
-
 function startInterviewSimulator() {
     interviewStartTime = Date.now();
     currentInterviewQuestion = 0;
@@ -2325,30 +2459,16 @@ function finishInterviewSimulator() {
     showResults(scorePercentage, 'Simulador de Entrevista Laboral');
 }
 
-// Actualizar la función startTest para incluir interview
-function startTest(testType) {
-    startTime = Date.now();
-    
-    if (testType === 'quiz') {
-        currentQuizQuestion = 0;
-        quizAnswers = [];
-        remainingTime = CONFIG.QUIZ_TIME_LIMIT;
-        showScreen('quizScreen');
-        loadQuestion();
-        startCountdown();
-    } else if (testType === 'errors') {
-        startErrorDetection();
-    } else if (testType === 'builder') {
-        startCVBuilder();
-    } else if (testType === 'interview') {
-        startInterviewSimulator();
-    }
+// Exportar funciones del simulador de entrevista al scope global
+if (typeof startInterviewSimulator !== 'undefined') {
+    window.startInterviewSimulator = startInterviewSimulator;
 }
-
-// Exportar funciones
-window.startInterviewSimulator = startInterviewSimulator;
-window.selectInterviewOption = selectInterviewOption;
-window.nextInterviewQuestion = nextInterviewQuestion;
+if (typeof selectInterviewOption !== 'undefined') {
+    window.selectInterviewOption = selectInterviewOption;
+}
+if (typeof nextInterviewQuestion !== 'undefined') {
+    window.nextInterviewQuestion = nextInterviewQuestion;
+}
 
 console.log('✅ Simulador de Entrevista cargado');
 // ========================================
@@ -2601,11 +2721,15 @@ function getXPProgress() {
     const currentXP = userChallengeData.xp;
     const currentThreshold = levelThresholds[currentLevel - 1];
     const nextThreshold = getXPForNextLevel();
-    
+
     const progress = currentXP - currentThreshold;
     const required = nextThreshold - currentThreshold;
-    
+
     return { progress, required, percentage: (progress / required) * 100 };
+}
+
+function calculateLevelProgress() {
+    return getXPProgress();
 }
 
 // ========================================
@@ -2836,6 +2960,139 @@ initializeChallengesSystem();
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ChallengesAPI;
 }
+
+// ========================================
+// FUNCIONES DE NAVEGACIÓN PARA DESAFÍOS
+// ========================================
+
+function showChallengesScreen() {
+    showScreen('challengesScreen');
+    loadChallengesData();
+    updateChallengesDisplay();
+}
+
+function loadChallengesData() {
+    // Actualizar estadísticas del usuario
+    if (document.getElementById('userXP')) {
+        document.getElementById('userXP').textContent = `${userChallengeData.xp} XP`;
+    }
+    if (document.getElementById('userLevel')) {
+        document.getElementById('userLevel').textContent = userChallengeData.level;
+    }
+    if (document.getElementById('userBadges')) {
+        document.getElementById('userBadges').textContent = userChallengeData.badges.length;
+    }
+    if (document.getElementById('userStreak')) {
+        document.getElementById('userStreak').textContent = `${userChallengeData.streak} días`;
+    }
+    if (document.getElementById('userRank')) {
+        document.getElementById('userRank').textContent = '#-';
+    }
+
+    // Actualizar barra de progreso de nivel
+    const levelProgress = calculateLevelProgress();
+    if (document.getElementById('currentLevelDisplay')) {
+        document.getElementById('currentLevelDisplay').textContent = userChallengeData.level;
+    }
+    if (document.getElementById('currentXPDisplay')) {
+        document.getElementById('currentXPDisplay').textContent = userChallengeData.xp;
+    }
+    if (document.getElementById('nextLevelXP')) {
+        document.getElementById('nextLevelXP').textContent = getXPForNextLevel();
+    }
+    if (document.getElementById('levelProgressFill')) {
+        document.getElementById('levelProgressFill').style.width = `${levelProgress.percentage}%`;
+    }
+}
+
+function updateChallengesDisplay() {
+    // Actualizar desafíos diarios
+    const dailyGrid = document.getElementById('dailyChallengesGrid');
+    if (dailyGrid) {
+        dailyGrid.innerHTML = '';
+        dailyChallenges.forEach(challenge => {
+            const progress = userChallengeData.dailyProgress[challenge.id] || 0;
+            const completed = progress >= challenge.target;
+            dailyGrid.innerHTML += `
+                <div class="challenge-card ${completed ? 'completed' : ''}">
+                    <div class="challenge-icon">${challenge.icon}</div>
+                    <h4>${challenge.title}</h4>
+                    <p>${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${(progress / challenge.target) * 100}%"></div>
+                        </div>
+                        <span>${progress}/${challenge.target}</span>
+                    </div>
+                    <div class="challenge-reward">+${challenge.xp} XP</div>
+                </div>
+            `;
+        });
+    }
+
+    // Actualizar desafíos semanales
+    const weeklyGrid = document.getElementById('weeklyChallengesGrid');
+    if (weeklyGrid) {
+        weeklyGrid.innerHTML = '';
+        weeklyChallenges.forEach(challenge => {
+            const progress = userChallengeData.weeklyProgress[challenge.id] || 0;
+            const completed = progress >= challenge.target;
+            weeklyGrid.innerHTML += `
+                <div class="challenge-card ${completed ? 'completed' : ''}">
+                    <div class="challenge-icon">${challenge.icon}</div>
+                    <h4>${challenge.title}</h4>
+                    <p>${challenge.description}</p>
+                    <div class="challenge-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${(progress / challenge.target) * 100}%"></div>
+                        </div>
+                        <span>${progress}/${challenge.target}</span>
+                    </div>
+                    <div class="challenge-reward">+${challenge.xp} XP</div>
+                </div>
+            `;
+        });
+    }
+
+    // Actualizar badges
+    const badgesGrid = document.getElementById('badgesGrid');
+    if (badgesGrid) {
+        badgesGrid.innerHTML = '';
+        availableBadges.forEach(badge => {
+            const unlocked = userChallengeData.badges.includes(badge.id);
+            badgesGrid.innerHTML += `
+                <div class="badge-card ${unlocked ? 'unlocked' : 'locked'}">
+                    <div class="badge-icon">${badge.icon}</div>
+                    <h4>${badge.name}</h4>
+                    <p>${badge.description}</p>
+                    <span class="badge-status">${unlocked ? '✓ Desbloqueada' : '🔒 Bloqueada'}</span>
+                </div>
+            `;
+        });
+    }
+}
+
+function showChallengeTab(tabName) {
+    // Remover active de todos los tabs
+    document.querySelectorAll('.challenge-tab').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.challenge-tab-content').forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Activar el tab seleccionado
+    event.target.classList.add('active');
+    const contentId = tabName + 'Challenges';
+    const content = document.getElementById(contentId) || document.getElementById(tabName + 'Content');
+    if (content) {
+        content.classList.add('active');
+    }
+}
+
+// Exportar funciones al scope global
+window.showChallengesScreen = showChallengesScreen;
+window.showChallengeTab = showChallengeTab;
 
 // ========================================
 // CREADOR DE AVATAR PRO - DICEBEAR API
@@ -3097,19 +3354,22 @@ function updateUserAvatarPro() {
     });
 }
 
+// Exportar funciones del avatar al scope global
+window.showAvatarCreator = showAvatarCreator;
+window.changeAvatarStyle = changeAvatarStyle;
+window.randomizeAvatar = randomizeAvatar;
+window.applyCustomSeed = applyCustomSeed;
+window.changeBackground = changeBackground;
+window.changeSize = changeSize;
+window.toggleFlip = toggleFlip;
+window.exportAvatar = exportAvatar;
+window.saveAvatarPro = saveAvatarPro;
+
 // ========================================
 // SIMULADOR DE ENTREVISTA CON AUDIO
 // ========================================
 
-let mediaRecorder;
-let audioChunks = [];
-let recordingInterval;
-let recordingStartTime;
-let currentInterviewMode = 'options';
 let speechSynthesis = window.speechSynthesis;
-let speechRecognition = null;
-let currentTranscription = '';
-let audioAnalysisResult = null;
 
 // Configurar reconocimiento de voz (para transcripción)
 if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -3465,31 +3725,17 @@ function deleteRecording() {
     showToast('Grabación eliminada', 'info');
 }
 
+// Exportar funciones del simulador de entrevista al scope global
+window.switchInterviewMode = switchInterviewMode;
+window.speakQuestion = speakQuestion;
+window.startRecording = startRecording;
+window.stopRecording = stopRecording;
+window.deleteRecording = deleteRecording;
+
 // ========================================
 // NAVEGACIÓN Y PANTALLAS
 // ========================================
-
-function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById(screenId).classList.add('active');
-
-    // Cargar avatar si el usuario está logueado
-    if (currentUser) {
-        const savedAvatar = localStorage.getItem(`avatar_${currentUser.email}`);
-        if (savedAvatar) {
-            currentAvatar = JSON.parse(savedAvatar);
-            updateUserAvatar();
-        }
-    }
-}
-
-function goToWelcome() {
-    showScreen('welcomeScreen');
-}
-
-function goToMenu() {
-    showScreen('testMenuScreen');
-}
+// (Funciones movidas a la sección principal de NAVEGACIÓN)
 
 // ========================================
 // INICIALIZACIÓN AL CARGAR LA PÁGINA
