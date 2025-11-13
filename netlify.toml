@@ -62,9 +62,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
-  # Condiciones para SPA routing
-  conditions = {Role = ["*"]}
 
 # ============================================
 # OPTIMIZACIÓN DE RENDIMIENTO
@@ -79,7 +76,7 @@
 
 [build.processing.js]
   bundle = false
-  minify = true
+  minify = false
 
 [build.processing.html]
   pretty_urls = true
@@ -91,12 +88,4 @@
 # CONFIGURACIÓN ADICIONAL
 # ============================================
 
-# Configuración para múltiples usuarios concurrentes
-[context.production]
-  environment = { NODE_ENV = "production" }
-
-[context.deploy-preview]
-  environment = { NODE_ENV = "development" }
-
-[context.branch-deploy]
-  environment = { NODE_ENV = "development" }
+# Sin contextos específicos para evitar conflictos
