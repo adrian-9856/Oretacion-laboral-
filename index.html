@@ -1163,8 +1163,16 @@
         <!-- Actividad Interactiva de Vestir Muñecos -->
         <div class="dresscode-activity-section" id="dressCodeActivitySection" style="display: none;">
             <div class="dresscode-header">
-                <h2>👔 Viste Apropiadamente para la Entrevista</h2>
-                <p>Selecciona la ropa adecuada para una entrevista profesional</p>
+                <h2>Vista Profesionalmente para tu Entrevista</h2>
+                <p>Aprende a crear el outfit perfecto con nuestro simulador interactivo</p>
+            </div>
+
+            <!-- Galería de Outfits Recomendados -->
+            <div class="recommended-outfits-section">
+                <h3>Outfits Recomendados por Tipo de Entrevista</h3>
+                <div class="outfits-gallery" id="outfitsGallery">
+                    <!-- Se llenará dinámicamente -->
+                </div>
             </div>
 
             <!-- Selector de Género -->
@@ -1183,18 +1191,53 @@
                 </button>
             </div>
 
+            <!-- Comparación Antes/Después -->
+            <div class="before-after-section">
+                <div class="before-after-card inappropriate-example">
+                    <div class="card-badge badge-wrong">Evitar</div>
+                    <h4>Vestimenta Inapropiada</h4>
+                    <div class="example-avatar" id="inappropriateAvatar">
+                        <!-- Avatar con ropa inapropiada -->
+                    </div>
+                    <ul class="example-points">
+                        <li>Ropa demasiado casual</li>
+                        <li>Colores muy llamativos</li>
+                        <li>Accesorios excesivos</li>
+                        <li>Calzado deportivo</li>
+                    </ul>
+                </div>
+                <div class="before-after-arrow">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
+                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                    </svg>
+                </div>
+                <div class="before-after-card appropriate-example">
+                    <div class="card-badge badge-correct">Ideal</div>
+                    <h4>Vestimenta Profesional</h4>
+                    <div class="example-avatar" id="appropriateAvatar">
+                        <!-- Avatar con ropa apropiada -->
+                    </div>
+                    <ul class="example-points">
+                        <li>Colores neutros y elegantes</li>
+                        <li>Ropa bien ajustada</li>
+                        <li>Accesorios discretos</li>
+                        <li>Calzado formal y limpio</li>
+                    </ul>
+                </div>
+            </div>
+
             <!-- Área del Muñeco y Guardarropa -->
             <div class="dresscode-main-area">
                 <!-- Panel Izquierdo: Guardarropa -->
                 <div class="wardrobe-panel">
-                    <h3>🎨 Guardarropa</h3>
-                    <p class="wardrobe-hint">Arrastra o haz clic en las prendas</p>
+                    <h3>Guardarropa Profesional</h3>
+                    <p class="wardrobe-hint">Haz clic en las prendas para vestir tu avatar</p>
 
                     <!-- Categorías de ropa -->
                     <div class="clothing-categories">
                         <!-- Parte Superior -->
                         <div class="clothing-category">
-                            <h4>👕 Parte Superior</h4>
+                            <h4>Parte Superior</h4>
                             <div class="clothing-items" id="topsContainer">
                                 <!-- Se llenará dinámicamente con JavaScript -->
                             </div>
@@ -1202,7 +1245,7 @@
 
                         <!-- Parte Inferior -->
                         <div class="clothing-category">
-                            <h4>👖 Parte Inferior</h4>
+                            <h4>Parte Inferior</h4>
                             <div class="clothing-items" id="bottomsContainer">
                                 <!-- Se llenará dinámicamente con JavaScript -->
                             </div>
@@ -1210,7 +1253,7 @@
 
                         <!-- Calzado -->
                         <div class="clothing-category">
-                            <h4>👞 Calzado</h4>
+                            <h4>Calzado</h4>
                             <div class="clothing-items" id="shoesContainer">
                                 <!-- Se llenará dinámicamente con JavaScript -->
                             </div>
@@ -1218,7 +1261,7 @@
 
                         <!-- Accesorios -->
                         <div class="clothing-category">
-                            <h4>👔 Accesorios</h4>
+                            <h4>Accesorios</h4>
                             <div class="clothing-items" id="accessoriesContainer">
                                 <!-- Se llenará dinámicamente con JavaScript -->
                             </div>
@@ -1226,66 +1269,65 @@
                     </div>
                 </div>
 
-                <!-- Panel Central: Muñeco -->
-                <div class="mannequin-panel">
-                    <div class="mannequin-container" id="mannequinContainer">
-                        <!-- El muñeco se renderizará aquí -->
-                        <div class="mannequin" id="mannequin">
-                            <div class="mannequin-body">
-                                <div class="mannequin-head"></div>
-                                <div class="mannequin-torso">
-                                    <div class="mannequin-outfit-top" id="outfitTop"></div>
-                                </div>
-                                <div class="mannequin-legs">
-                                    <div class="mannequin-outfit-bottom" id="outfitBottom"></div>
-                                </div>
-                                <div class="mannequin-feet">
-                                    <div class="mannequin-outfit-shoes" id="outfitShoes"></div>
-                                </div>
-                                <div class="mannequin-accessories" id="outfitAccessories"></div>
-                            </div>
+                <!-- Panel Central: Avatar Profesional -->
+                <div class="avatar-panel">
+                    <div class="avatar-stage">
+                        <div class="avatar-container" id="avatarContainer">
+                            <!-- El avatar SVG se renderizará aquí -->
                         </div>
                     </div>
                     <button class="btn-clear-outfit" onclick="clearOutfit()">
-                        🔄 Limpiar Todo
+                        Limpiar Todo
                     </button>
                 </div>
 
-                <!-- Panel Derecho: Consejos -->
-                <div class="tips-panel">
-                    <h3>💡 Consejos</h3>
-                    <div class="tips-content">
-                        <div class="tip-item">
-                            <span class="tip-icon">✅</span>
-                            <p>Colores neutros y sobrios</p>
+                <!-- Panel Derecho: Análisis y Consejos -->
+                <div class="analysis-panel">
+                    <h3>Análisis en Tiempo Real</h3>
+
+                    <!-- Outfit Score -->
+                    <div class="outfit-score-display" id="outfitScoreDisplay">
+                        <div class="score-circle-mini" id="scoreCircleMini">
+                            <span class="score-percentage" id="scorePercentage">0%</span>
                         </div>
-                        <div class="tip-item">
-                            <span class="tip-icon">✅</span>
-                            <p>Ropa bien planchada</p>
-                        </div>
-                        <div class="tip-item">
-                            <span class="tip-icon">✅</span>
-                            <p>Zapatos limpios y formales</p>
-                        </div>
-                        <div class="tip-item">
-                            <span class="tip-icon">❌</span>
-                            <p>Evita ropa muy casual</p>
-                        </div>
-                        <div class="tip-item">
-                            <span class="tip-icon">❌</span>
-                            <p>No uses colores muy llamativos</p>
-                        </div>
-                        <div class="tip-item">
-                            <span class="tip-icon">❌</span>
-                            <p>Evita exceso de accesorios</p>
+                        <p class="score-label">Nivel Profesional</p>
+                    </div>
+
+                    <!-- Feedback detallado -->
+                    <div class="outfit-feedback" id="outfitFeedback">
+                        <div class="feedback-content" id="feedbackContent">
+                            <p class="feedback-placeholder">Comienza a seleccionar prendas para recibir retroalimentación personalizada...</p>
                         </div>
                     </div>
 
-                    <!-- Feedback en tiempo real -->
-                    <div class="outfit-feedback" id="outfitFeedback">
-                        <h4>📊 Evaluación</h4>
-                        <div class="feedback-content" id="feedbackContent">
-                            <p class="feedback-placeholder">Selecciona tu vestimenta para recibir retroalimentación...</p>
+                    <!-- Tips profesionales -->
+                    <div class="professional-tips">
+                        <h4>Consejos Profesionales</h4>
+                        <div class="tips-list" id="dynamicTipsList">
+                            <div class="tip-item">
+                                <span class="tip-icon success">✓</span>
+                                <p>Colores neutros proyectan profesionalismo</p>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-icon success">✓</span>
+                                <p>Ropa bien planchada y ajustada</p>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-icon success">✓</span>
+                                <p>Zapatos limpios y en buen estado</p>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-icon warning">×</span>
+                                <p>Evita ropa demasiado casual</p>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-icon warning">×</span>
+                                <p>Sin colores fluorescentes</p>
+                            </div>
+                            <div class="tip-item">
+                                <span class="tip-icon warning">×</span>
+                                <p>Accesorios mínimos y elegantes</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2264,73 +2306,185 @@ let selectedOutfit = {
     accessories: null
 };
 
-// Catálogo de ropa
+// Catálogo de ropa mejorado con colores y descripciones
 const clothingCatalog = {
     male: {
         tops: [
-            { id: 'suit_jacket', name: 'Saco Formal', icon: '🧥', appropriate: true },
-            { id: 'dress_shirt', name: 'Camisa de Vestir', icon: '👔', appropriate: true },
-            { id: 'polo', name: 'Polo', icon: '👕', appropriate: false },
-            { id: 'tshirt', name: 'Camiseta', icon: '👕', appropriate: false },
-            { id: 'hoodie', name: 'Sudadera', icon: '🧥', appropriate: false }
+            { id: 'suit_jacket_navy', name: 'Saco Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Color clásico y profesional' },
+            { id: 'suit_jacket_gray', name: 'Saco Gris', color: '#4a5568', appropriate: true, tip: 'Versátil y elegante' },
+            { id: 'dress_shirt_white', name: 'Camisa Blanca', color: '#f8f9fa', appropriate: true, tip: 'La opción más segura' },
+            { id: 'dress_shirt_blue', name: 'Camisa Azul Claro', color: '#a8c8e1', appropriate: true, tip: 'Profesional y moderno' },
+            { id: 'polo_shirt', name: 'Polo', color: '#ff6b6b', appropriate: false, tip: 'Demasiado casual' },
+            { id: 'tshirt_casual', name: 'Camiseta Casual', color: '#95e1d3', appropriate: false, tip: 'No apropiada para entrevistas' },
+            { id: 'hoodie', name: 'Sudadera', color: '#f38181', appropriate: false, tip: 'Muy informal' }
         ],
         bottoms: [
-            { id: 'suit_pants', name: 'Pantalón de Vestir', icon: '👔', appropriate: true },
-            { id: 'chinos', name: 'Pantalones Chinos', icon: '👖', appropriate: true },
-            { id: 'jeans', name: 'Jeans', icon: '👖', appropriate: false },
-            { id: 'shorts', name: 'Bermudas', icon: '🩳', appropriate: false }
+            { id: 'suit_pants_navy', name: 'Pantalón Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Combina con todo' },
+            { id: 'suit_pants_gray', name: 'Pantalón Gris', color: '#4a5568', appropriate: true, tip: 'Elegante y formal' },
+            { id: 'suit_pants_black', name: 'Pantalón Negro', color: '#2d3748', appropriate: true, tip: 'Clásico formal' },
+            { id: 'chinos_beige', name: 'Chinos Beige', color: '#d4a574', appropriate: false, tip: 'Poco formal para entrevista' },
+            { id: 'jeans', name: 'Jeans', color: '#5f7a9b', appropriate: false, tip: 'Demasiado casual' },
+            { id: 'shorts', name: 'Bermudas', color: '#ffd93d', appropriate: false, tip: 'Totalmente inapropiado' }
         ],
         shoes: [
-            { id: 'dress_shoes', name: 'Zapatos Formales', icon: '👞', appropriate: true },
-            { id: 'loafers', name: 'Mocasines', icon: '👞', appropriate: true },
-            { id: 'sneakers', name: 'Tenis', icon: '👟', appropriate: false },
-            { id: 'sandals', name: 'Sandalias', icon: '🩴', appropriate: false }
+            { id: 'oxford_black', name: 'Oxford Negros', color: '#2d3748', appropriate: true, tip: 'Los más formales' },
+            { id: 'oxford_brown', name: 'Oxford Café', color: '#6b4423', appropriate: true, tip: 'Elegantes y versátiles' },
+            { id: 'loafers', name: 'Mocasines', color: '#4a5568', appropriate: true, tip: 'Business casual' },
+            { id: 'sneakers_white', name: 'Tenis Blancos', color: '#f8f9fa', appropriate: false, tip: 'No para entrevistas' },
+            { id: 'sandals', name: 'Sandalias', color: '#ff6b6b', appropriate: false, tip: 'Inapropiado' }
         ],
         accessories: [
-            { id: 'tie', name: 'Corbata', icon: '👔', appropriate: true },
-            { id: 'watch', name: 'Reloj Elegante', icon: '⌚', appropriate: true },
-            { id: 'belt', name: 'Cinturón', icon: '🔲', appropriate: true },
-            { id: 'cap', name: 'Gorra', icon: '🧢', appropriate: false },
-            { id: 'chains', name: 'Cadenas', icon: '📿', appropriate: false }
+            { id: 'tie_navy', name: 'Corbata Azul', color: '#1e3a5f', appropriate: true, tip: 'Añade formalidad' },
+            { id: 'tie_burgundy', name: 'Corbata Vino', color: '#7f2020', appropriate: true, tip: 'Sofisticada' },
+            { id: 'watch_silver', name: 'Reloj Plateado', color: '#cbd5e0', appropriate: true, tip: 'Elegante y discreto' },
+            { id: 'belt_black', name: 'Cinturón Negro', color: '#2d3748', appropriate: true, tip: 'Esencial' },
+            { id: 'cap', name: 'Gorra', color: '#ff6b6b', appropriate: false, tip: 'No usar en entrevistas' },
+            { id: 'chains', name: 'Cadenas Gruesas', color: '#ffd700', appropriate: false, tip: 'Excesivo' }
         ]
     },
     female: {
         tops: [
-            { id: 'blazer', name: 'Blazer', icon: '🧥', appropriate: true },
-            { id: 'blouse', name: 'Blusa Formal', icon: '👚', appropriate: true },
-            { id: 'cardigan', name: 'Cárdigan', icon: '🧥', appropriate: true },
-            { id: 'casual_top', name: 'Blusa Casual', icon: '👚', appropriate: false },
-            { id: 'crop_top', name: 'Crop Top', icon: '👚', appropriate: false }
+            { id: 'blazer_navy', name: 'Blazer Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Profesional y poderoso' },
+            { id: 'blazer_black', name: 'Blazer Negro', color: '#2d3748', appropriate: true, tip: 'Clásico y elegante' },
+            { id: 'blouse_white', name: 'Blusa Blanca', color: '#f8f9fa', appropriate: true, tip: 'Limpia y profesional' },
+            { id: 'blouse_cream', name: 'Blusa Crema', color: '#f4e4c1', appropriate: true, tip: 'Suave y formal' },
+            { id: 'cardigan', name: 'Cárdigan Casual', color: '#a8c8e1', appropriate: false, tip: 'Poco estructurado' },
+            { id: 'casual_top', name: 'Blusa Casual', color: '#ff6b6b', appropriate: false, tip: 'Demasiado casual' },
+            { id: 'crop_top', name: 'Crop Top', color: '#f38181', appropriate: false, tip: 'Inapropiado' }
         ],
         bottoms: [
-            { id: 'skirt', name: 'Falda Formal', icon: '👗', appropriate: true },
-            { id: 'dress_pants', name: 'Pantalón de Vestir', icon: '👖', appropriate: true },
-            { id: 'dress', name: 'Vestido Profesional', icon: '👗', appropriate: true },
-            { id: 'jeans', name: 'Jeans', icon: '👖', appropriate: false },
-            { id: 'shorts', name: 'Shorts', icon: '🩳', appropriate: false }
+            { id: 'skirt_black', name: 'Falda Negra', color: '#2d3748', appropriate: true, tip: 'Largo apropiado' },
+            { id: 'pants_navy', name: 'Pantalón Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Profesional' },
+            { id: 'pants_gray', name: 'Pantalón Gris', color: '#4a5568', appropriate: true, tip: 'Elegante' },
+            { id: 'dress_navy', name: 'Vestido Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Profesional y femenino' },
+            { id: 'jeans', name: 'Jeans', color: '#5f7a9b', appropriate: false, tip: 'Demasiado casual' },
+            { id: 'skirt_mini', name: 'Minifalda', color: '#ff6b6b', appropriate: false, tip: 'Muy corta' }
         ],
         shoes: [
-            { id: 'heels', name: 'Tacones', icon: '👠', appropriate: true },
-            { id: 'flats', name: 'Flats', icon: '🥿', appropriate: true },
-            { id: 'boots', name: 'Botas Elegantes', icon: '👢', appropriate: true },
-            { id: 'sneakers', name: 'Tenis', icon: '👟', appropriate: false },
-            { id: 'flip_flops', name: 'Chanclas', icon: '🩴', appropriate: false }
+            { id: 'heels_black', name: 'Tacones Negros', color: '#2d3748', appropriate: true, tip: 'Clásicos y elegantes' },
+            { id: 'heels_nude', name: 'Tacones Nude', color: '#d4a574', appropriate: true, tip: 'Versátiles' },
+            { id: 'flats_black', name: 'Flats Negros', color: '#2d3748', appropriate: true, tip: 'Cómodos y profesionales' },
+            { id: 'boots_ankle', name: 'Botines', color: '#4a5568', appropriate: true, tip: 'Modernos y elegantes' },
+            { id: 'sneakers', name: 'Tenis', color: '#f8f9fa', appropriate: false, tip: 'No para entrevistas' },
+            { id: 'flip_flops', name: 'Chanclas', color: '#ff6b6b', appropriate: false, tip: 'Inapropiado' }
         ],
         accessories: [
-            { id: 'simple_jewelry', name: 'Joyería Sencilla', icon: '💍', appropriate: true },
-            { id: 'watch', name: 'Reloj Elegante', icon: '⌚', appropriate: true },
-            { id: 'scarf', name: 'Pañuelo', icon: '🧣', appropriate: true },
-            { id: 'big_jewelry', name: 'Joyería Excesiva', icon: '💎', appropriate: false },
-            { id: 'sunglasses', name: 'Lentes de Sol', icon: '🕶️', appropriate: false }
+            { id: 'necklace_simple', name: 'Collar Sencillo', color: '#cbd5e0', appropriate: true, tip: 'Elegante y discreto' },
+            { id: 'earrings_small', name: 'Aretes Pequeños', color: '#cbd5e0', appropriate: true, tip: 'Profesionales' },
+            { id: 'watch_silver', name: 'Reloj Plateado', color: '#cbd5e0', appropriate: true, tip: 'Funcional y elegante' },
+            { id: 'scarf_silk', name: 'Pañuelo de Seda', color: '#a8c8e1', appropriate: true, tip: 'Toque sofisticado' },
+            { id: 'jewelry_big', name: 'Joyería Grande', color: '#ffd700', appropriate: false, tip: 'Demasiado llamativo' },
+            { id: 'sunglasses', name: 'Lentes de Sol', color: '#2d3748', appropriate: false, tip: 'No en interiores' }
         ]
     }
+};
+
+// Outfits recomendados por tipo de entrevista
+const recommendedOutfits = {
+    male: [
+        {
+            name: 'Corporativo Formal',
+            description: 'Ideal para bancos, firmas legales, consultoría',
+            top: 'suit_jacket_navy',
+            bottom: 'suit_pants_navy',
+            shoes: 'oxford_black',
+            accessory: 'tie_navy'
+        },
+        {
+            name: 'Business Professional',
+            description: 'Empresas tradicionales, gerencia',
+            top: 'suit_jacket_gray',
+            bottom: 'suit_pants_gray',
+            shoes: 'oxford_brown',
+            accessory: 'tie_burgundy'
+        },
+        {
+            name: 'Business Casual',
+            description: 'Startups, empresas tech, creativas',
+            top: 'dress_shirt_blue',
+            bottom: 'suit_pants_black',
+            shoes: 'loafers',
+            accessory: 'belt_black'
+        }
+    ],
+    female: [
+        {
+            name: 'Ejecutivo Formal',
+            description: 'Corporativos, alta dirección',
+            top: 'blazer_navy',
+            bottom: 'pants_navy',
+            shoes: 'heels_black',
+            accessory: 'necklace_simple'
+        },
+        {
+            name: 'Profesional Elegante',
+            description: 'Oficinas, reuniones importantes',
+            top: 'blazer_black',
+            bottom: 'skirt_black',
+            shoes: 'heels_nude',
+            accessory: 'earrings_small'
+        },
+        {
+            name: 'Business Moderno',
+            description: 'Empresas modernas, creativas',
+            top: 'blouse_white',
+            bottom: 'pants_gray',
+            shoes: 'flats_black',
+            accessory: 'watch_silver'
+        }
+    ]
 };
 
 // Iniciar actividad interactiva
 function startDressCodeActivity() {
     document.getElementById('dressCodeVideoSection').style.display = 'none';
     document.getElementById('dressCodeActivitySection').style.display = 'block';
+    loadRecommendedOutfits();
     loadClothing();
+    renderAvatar();
+    loadBeforeAfterExamples();
+}
+
+// Cargar galería de outfits recomendados
+function loadRecommendedOutfits() {
+    const gallery = document.getElementById('outfitsGallery');
+    const outfits = recommendedOutfits[currentGender];
+
+    gallery.innerHTML = outfits.map(outfit => `
+        <div class="outfit-card" onclick="applyRecommendedOutfit('${outfit.top}', '${outfit.bottom}', '${outfit.shoes}', '${outfit.accessory}')">
+            <div class="outfit-card-header">
+                <h4>${outfit.name}</h4>
+                <span class="outfit-badge">Recomendado</span>
+            </div>
+            <div class="outfit-preview">
+                <div class="outfit-preview-avatar"></div>
+            </div>
+            <p class="outfit-description">${outfit.description}</p>
+            <button class="btn-apply-outfit">Aplicar este Outfit</button>
+        </div>
+    `).join('');
+}
+
+// Aplicar outfit recomendado
+function applyRecommendedOutfit(topId, bottomId, shoesId, accessoryId) {
+    const catalog = clothingCatalog[currentGender];
+
+    selectedOutfit.top = catalog.tops.find(item => item.id === topId);
+    selectedOutfit.bottom = catalog.bottoms.find(item => item.id === bottomId);
+    selectedOutfit.shoes = catalog.shoes.find(item => item.id === shoesId);
+    selectedOutfit.accessories = catalog.accessories.find(item => item.id === accessoryId);
+
+    renderAvatar();
+    updateFeedback();
+}
+
+// Cargar ejemplos Antes/Después
+function loadBeforeAfterExamples() {
+    const inappropriateDiv = document.getElementById('inappropriateAvatar');
+    const appropriateDiv = document.getElementById('appropriateAvatar');
+
+    inappropriateDiv.innerHTML = createAvatarSVG(currentGender, 'inappropriate');
+    appropriateDiv.innerHTML = createAvatarSVG(currentGender, 'appropriate');
 }
 
 // Volver al video
@@ -2350,8 +2504,11 @@ function selectGender(gender) {
     // Limpiar outfit
     clearOutfit();
 
-    // Recargar ropa
+    // Recargar todo
+    loadRecommendedOutfits();
     loadClothing();
+    renderAvatar();
+    loadBeforeAfterExamples();
 }
 
 // Cargar catálogo de ropa
@@ -2370,24 +2527,48 @@ function loadClothingCategory(category, items) {
 
     items.forEach(item => {
         const itemEl = document.createElement('div');
-        itemEl.className = 'clothing-item';
+        itemEl.className = 'clothing-item-card';
         itemEl.onclick = () => selectClothing(category, item);
 
+        const isSelected = selectedOutfit[category.replace('s', '')] === item ||
+                          selectedOutfit[category] === item ||
+                          (category === 'accessories' && selectedOutfit.accessories === item);
+
         itemEl.innerHTML = `
-            <div class="clothing-item-icon">${item.icon}</div>
-            <div class="clothing-item-name">${item.name}</div>
-            ${item.appropriate ?
-                '<div class="clothing-item-badge appropriate">✓</div>' :
-                '<div class="clothing-item-badge inappropriate">✗</div>'}
+            <div class="clothing-item-visual" style="background: linear-gradient(135deg, ${item.color} 0%, ${adjustColor(item.color, -20)} 100%);">
+                ${item.appropriate ?
+                    '<span class="visual-checkmark">✓</span>' :
+                    '<span class="visual-cross">×</span>'}
+            </div>
+            <div class="clothing-item-info">
+                <div class="clothing-item-name">${item.name}</div>
+                <div class="clothing-item-tip">${item.tip}</div>
+            </div>
+            <div class="clothing-item-badge ${item.appropriate ? 'badge-appropriate' : 'badge-inappropriate'}">
+                ${item.appropriate ? 'Apropiado' : 'Evitar'}
+            </div>
+            ${isSelected ? '<div class="selected-indicator">Seleccionado</div>' : ''}
         `;
 
         container.appendChild(itemEl);
     });
 }
 
+// Función auxiliar para ajustar colores
+function adjustColor(color, percent) {
+    const num = parseInt(color.replace("#", ""), 16);
+    const amt = Math.round(2.55 * percent);
+    const R = (num >> 16) + amt;
+    const G = (num >> 8 & 0x00FF) + amt;
+    const B = (num & 0x0000FF) + amt;
+    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+        (B < 255 ? B < 1 ? 0 : B : 255))
+        .toString(16).slice(1);
+}
+
 // Seleccionar prenda
 function selectClothing(category, item) {
-    const categoryKey = category.replace('Container', '').replace('s', '');
     let outfitKey;
 
     switch(category) {
@@ -2406,44 +2587,205 @@ function selectClothing(category, item) {
     }
 
     selectedOutfit[outfitKey] = item;
-    updateMannequin();
+    renderAvatar();
     updateFeedback();
+    loadClothing(); // Recargar para actualizar indicador de selección
 }
 
-// Actualizar muñeco
-function updateMannequin() {
-    if (selectedOutfit.top) {
-        document.getElementById('outfitTop').innerHTML = `<span style="font-size: 4em;">${selectedOutfit.top.icon}</span>`;
-    } else {
-        document.getElementById('outfitTop').innerHTML = '';
+// Renderizar avatar SVG con outfit
+function renderAvatar() {
+    const container = document.getElementById('avatarContainer');
+    container.innerHTML = createAvatarSVG(currentGender, 'custom', selectedOutfit);
+}
+
+// Crear SVG de avatar profesional
+function createAvatarSVG(gender, type, outfit = null) {
+    const skinTone = '#f4d3b0';
+    const hairColor = '#3d2817';
+
+    // Determinar colores del outfit
+    let topColor = '#e0e0e0';
+    let bottomColor = '#e0e0e0';
+    let shoesColor = '#808080';
+    let accessoryColor = '#4a5568';
+
+    if (type === 'inappropriate') {
+        // Outfit inapropiado de ejemplo
+        topColor = '#ff6b6b';
+        bottomColor = '#ffd93d';
+        shoesColor = '#95e1d3';
+        accessoryColor = '#f38181';
+    } else if (type === 'appropriate') {
+        // Outfit apropiado de ejemplo
+        topColor = '#1e3a5f';
+        bottomColor = '#1e3a5f';
+        shoesColor = '#2d3748';
+        accessoryColor = '#1e3a5f';
+    } else if (outfit) {
+        // Outfit personalizado
+        topColor = outfit.top ? outfit.top.color : '#e0e0e0';
+        bottomColor = outfit.bottom ? outfit.bottom.color : '#e0e0e0';
+        shoesColor = outfit.shoes ? outfit.shoes.color : '#808080';
+        accessoryColor = outfit.accessories ? outfit.accessories.color : '#4a5568';
     }
 
-    if (selectedOutfit.bottom) {
-        document.getElementById('outfitBottom').innerHTML = `<span style="font-size: 4em;">${selectedOutfit.bottom.icon}</span>`;
-    } else {
-        document.getElementById('outfitBottom').innerHTML = '';
-    }
+    if (gender === 'male') {
+        return `
+            <svg viewBox="0 0 200 400" class="avatar-svg">
+                <!-- Cabeza -->
+                <ellipse cx="100" cy="60" rx="35" ry="40" fill="${skinTone}" stroke="#d4a574" stroke-width="2"/>
 
-    if (selectedOutfit.shoes) {
-        document.getElementById('outfitShoes').innerHTML = `<span style="font-size: 3em;">${selectedOutfit.shoes.icon}</span>`;
-    } else {
-        document.getElementById('outfitShoes').innerHTML = '';
-    }
+                <!-- Cabello -->
+                <path d="M 65 50 Q 65 25 100 25 Q 135 25 135 50" fill="${hairColor}" stroke="${hairColor}" stroke-width="2"/>
 
-    if (selectedOutfit.accessories) {
-        document.getElementById('outfitAccessories').innerHTML = `<span style="font-size: 2.5em; position: absolute; top: 20px; right: 20px;">${selectedOutfit.accessories.icon}</span>`;
+                <!-- Ojos -->
+                <circle cx="85" cy="60" r="3" fill="#2d3748"/>
+                <circle cx="115" cy="60" r="3" fill="#2d3748"/>
+
+                <!-- Boca -->
+                <path d="M 85 75 Q 100 80 115 75" stroke="#d4a574" stroke-width="2" fill="none"/>
+
+                <!-- Cuello -->
+                <rect x="90" y="95" width="20" height="15" fill="${skinTone}"/>
+
+                <!-- Parte Superior (Jacket/Camisa) -->
+                <path d="M 60 110 L 70 140 L 70 220 L 130 220 L 130 140 L 140 110 L 120 110 L 110 105 L 90 105 L 80 110 Z"
+                      fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
+
+                <!-- Solapa del saco -->
+                ${outfit && outfit.top && outfit.top.id.includes('jacket') ? `
+                    <path d="M 80 110 L 90 140 L 100 130" fill="${adjustColor(topColor, -30)}" stroke="${adjustColor(topColor, -40)}" stroke-width="1"/>
+                    <path d="M 120 110 L 110 140 L 100 130" fill="${adjustColor(topColor, -30)}" stroke="${adjustColor(topColor, -40)}" stroke-width="1"/>
+                ` : ''}
+
+                <!-- Corbata/Accesorio de cuello -->
+                ${outfit && outfit.accessories && outfit.accessories.id.includes('tie') ? `
+                    <path d="M 100 110 L 95 140 L 97 200 L 100 210 L 103 200 L 105 140 Z"
+                          fill="${accessoryColor}" stroke="${adjustColor(accessoryColor, -20)}" stroke-width="1"/>
+                ` : ''}
+
+                <!-- Brazos -->
+                <rect x="50" y="140" width="20" height="80" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
+                <rect x="130" y="140" width="20" height="80" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
+
+                <!-- Manos -->
+                <circle cx="60" cy="220" r="10" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
+                <circle cx="140" cy="220" r="10" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
+
+                <!-- Parte Inferior (Pantalones) -->
+                <rect x="70" y="220" width="60" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
+
+                <!-- Pliegue del pantalón -->
+                <line x1="100" y1="220" x2="100" y2="340" stroke="${adjustColor(bottomColor, -30)}" stroke-width="1"/>
+
+                <!-- Piernas separadas -->
+                <rect x="70" y="220" width="28" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
+                <rect x="102" y="220" width="28" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
+
+                <!-- Zapatos -->
+                <ellipse cx="84" cy="350" rx="18" ry="10" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
+                <ellipse cx="116" cy="350" rx="18" ry="10" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
+
+                <!-- Detalles de zapatos -->
+                <ellipse cx="84" cy="348" rx="12" ry="6" fill="${adjustColor(shoesColor, 20)}"/>
+                <ellipse cx="116" cy="348" rx="12" ry="6" fill="${adjustColor(shoesColor, 20)}"/>
+            </svg>
+        `;
     } else {
-        document.getElementById('outfitAccessories').innerHTML = '';
+        // Avatar femenino
+        return `
+            <svg viewBox="0 0 200 400" class="avatar-svg">
+                <!-- Cabeza -->
+                <ellipse cx="100" cy="60" rx="32" ry="38" fill="${skinTone}" stroke="#d4a574" stroke-width="2"/>
+
+                <!-- Cabello -->
+                <path d="M 68 45 Q 68 20 100 20 Q 132 20 132 45 L 132 80 Q 120 85 100 85 Q 80 85 68 80 Z"
+                      fill="${hairColor}" stroke="${hairColor}" stroke-width="2"/>
+
+                <!-- Ojos -->
+                <circle cx="85" cy="58" r="3" fill="#2d3748"/>
+                <circle cx="115" cy="58" r="3" fill="#2d3748"/>
+
+                <!-- Pestañas -->
+                <path d="M 82 55 L 80 52" stroke="#2d3748" stroke-width="1"/>
+                <path d="M 118 55 L 120 52" stroke="#2d3748" stroke-width="1"/>
+
+                <!-- Boca -->
+                <path d="M 88 73 Q 100 78 112 73" stroke="#d4a574" stroke-width="2" fill="none"/>
+
+                <!-- Cuello -->
+                <rect x="92" y="93" width="16" height="12" fill="${skinTone}"/>
+
+                <!-- Parte Superior (Blazer/Blusa) -->
+                <path d="M 65 105 L 72 135 L 72 220 L 128 220 L 128 135 L 135 105 L 118 105 L 108 100 L 92 100 L 82 105 Z"
+                      fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
+
+                <!-- Solapas de blazer -->
+                ${outfit && outfit.top && outfit.top.id.includes('blazer') ? `
+                    <path d="M 82 105 L 92 140 L 100 125" fill="${adjustColor(topColor, -25)}" stroke="${adjustColor(topColor, -35)}" stroke-width="1"/>
+                    <path d="M 118 105 L 108 140 L 100 125" fill="${adjustColor(topColor, -25)}" stroke="${adjustColor(topColor, -35)}" stroke-width="1"/>
+                    <circle cx="95" cy="150" r="3" fill="${adjustColor(topColor, -40)}"/>
+                    <circle cx="95" cy="170" r="3" fill="${adjustColor(topColor, -40)}"/>
+                ` : ''}
+
+                <!-- Collar/Accesorio -->
+                ${outfit && outfit.accessories && (outfit.accessories.id.includes('necklace') || outfit.accessories.id.includes('scarf')) ? `
+                    <ellipse cx="100" cy="105" rx="15" ry="3" fill="${accessoryColor}" opacity="0.8"/>
+                    ${outfit.accessories.id.includes('necklace') ? `
+                        <circle cx="100" cy="115" r="4" fill="${accessoryColor}"/>
+                    ` : ''}
+                ` : ''}
+
+                <!-- Brazos -->
+                <rect x="52" y="135" width="20" height="85" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
+                <rect x="128" y="135" width="20" height="85" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
+
+                <!-- Manos -->
+                <circle cx="62" cy="218" r="9" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
+                <circle cx="138" cy="218" r="9" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
+
+                <!-- Parte Inferior (Falda o Pantalones) -->
+                ${outfit && outfit.bottom && (outfit.bottom.id.includes('skirt') || outfit.bottom.id.includes('dress')) ? `
+                    <!-- Falda -->
+                    <path d="M 72 220 L 65 290 L 135 290 L 128 220 Z"
+                          fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
+                    <!-- Piernas visibles -->
+                    <rect x="78" y="290" width="16" height="50" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
+                    <rect x="106" y="290" width="16" height="50" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
+                ` : `
+                    <!-- Pantalones -->
+                    <rect x="72" y="220" width="26" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
+                    <rect x="102" y="220" width="26" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
+                `}
+
+                <!-- Zapatos -->
+                ${outfit && outfit.shoes && outfit.shoes.id.includes('heels') ? `
+                    <!-- Tacones -->
+                    <path d="M 80 345 L 78 360 L 92 360 L 90 345 Z" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="1"/>
+                    <path d="M 110 345 L 108 360 L 122 360 L 120 345 Z" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="1"/>
+                    <rect x="78" y="360" width="4" height="15" fill="${shoesColor}"/>
+                    <rect x="108" y="360" width="4" height="15" fill="${shoesColor}"/>
+                ` : `
+                    <!-- Zapatos planos -->
+                    <ellipse cx="86" cy="350" rx="16" ry="9" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
+                    <ellipse cx="114" cy="350" rx="16" ry="9" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
+                `}
+            </svg>
+        `;
     }
 }
 
 // Actualizar feedback en tiempo real
 function updateFeedback() {
     const feedbackContent = document.getElementById('feedbackContent');
+    const scorePercentage = document.getElementById('scorePercentage');
+    const scoreCircle = document.getElementById('scoreCircleMini');
     const items = Object.values(selectedOutfit).filter(item => item !== null);
 
     if (items.length === 0) {
-        feedbackContent.innerHTML = '<p class="feedback-placeholder">Selecciona tu vestimenta para recibir retroalimentación...</p>';
+        feedbackContent.innerHTML = '<p class="feedback-placeholder">Comienza a seleccionar prendas para recibir retroalimentación personalizada...</p>';
+        scorePercentage.textContent = '0%';
+        scoreCircle.style.background = 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%)';
         return;
     }
 
@@ -2451,21 +2793,73 @@ function updateFeedback() {
     const appropriate = items.filter(item => item.appropriate);
     const inappropriate = items.filter(item => !item.appropriate);
 
-    if (appropriate.length > 0) {
-        html += '<div class="feedback-item positive">✅ <strong>Buenas elecciones:</strong> ' +
-                appropriate.map(item => item.name).join(', ') + '</div>';
-    }
-
-    if (inappropriate.length > 0) {
-        html += '<div class="feedback-item negative">❌ <strong>Mejorar:</strong> ' +
-                inappropriate.map(item => item.name).join(', ') + '</div>';
-    }
-
     const totalItems = items.length;
     const appropriateCount = appropriate.length;
     const percentage = Math.round((appropriateCount / totalItems) * 100);
 
-    html += `<div class="feedback-item neutral">📊 <strong>Nivel de apropiación:</strong> ${percentage}%</div>`;
+    // Actualizar score circle
+    scorePercentage.textContent = percentage + '%';
+
+    if (percentage >= 80) {
+        scoreCircle.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+    } else if (percentage >= 60) {
+        scoreCircle.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
+    } else {
+        scoreCircle.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+    }
+
+    // Mensaje general
+    if (percentage >= 80) {
+        html += '<div class="feedback-section excellent"><h5>Excelente Selección</h5><p>Tu outfit proyecta profesionalismo y es apropiado para una entrevista formal.</p></div>';
+    } else if (percentage >= 60) {
+        html += '<div class="feedback-section good"><h5>Buen Camino</h5><p>Tu outfit es aceptable, pero puedes mejorarlo para causar una mejor impresión.</p></div>';
+    } else {
+        html += '<div class="feedback-section needs-work"><h5>Necesita Mejoras</h5><p>Tu outfit actual no es apropiado para una entrevista. Te recomendamos revisar las prendas seleccionadas.</p></div>';
+    }
+
+    // Prendas apropiadas
+    if (appropriate.length > 0) {
+        html += '<div class="feedback-detail good">';
+        html += '<h6><span class="icon-check">✓</span> Prendas Apropiadas (' + appropriate.length + ')</h6>';
+        html += '<ul>';
+        appropriate.forEach(item => {
+            html += `<li><strong>${item.name}</strong> - ${item.tip}</li>`;
+        });
+        html += '</ul></div>';
+    }
+
+    // Prendas inapropiadas
+    if (inappropriate.length > 0) {
+        html += '<div class="feedback-detail warning">';
+        html += '<h6><span class="icon-cross">×</span> Prendas a Evitar (' + inappropriate.length + ')</h6>';
+        html += '<ul>';
+        inappropriate.forEach(item => {
+            html += `<li><strong>${item.name}</strong> - ${item.tip}</li>`;
+        });
+        html += '</ul></div>';
+    }
+
+    // Sugerencias
+    if (inappropriate.length > 0) {
+        html += '<div class="feedback-suggestions">';
+        html += '<h6>Sugerencias de Mejora:</h6>';
+        html += '<ul>';
+
+        if (inappropriate.some(i => i.id.includes('jeans') || i.id.includes('shorts'))) {
+            html += '<li>Opta por pantalones de vestir en colores neutros</li>';
+        }
+        if (inappropriate.some(i => i.id.includes('tshirt') || i.id.includes('polo') || i.id.includes('hoodie'))) {
+            html += '<li>Elige camisa de vestir o blazer para mayor formalidad</li>';
+        }
+        if (inappropriate.some(i => i.id.includes('sneakers') || i.id.includes('sandals') || i.id.includes('flip'))) {
+            html += '<li>Usa calzado formal cerrado y en buen estado</li>';
+        }
+        if (inappropriate.some(i => i.id.includes('cap') || i.id.includes('sunglasses'))) {
+            html += '<li>Evita accesorios casuales en entrevistas</li>';
+        }
+
+        html += '</ul></div>';
+    }
 
     feedbackContent.innerHTML = html;
 }
@@ -2478,8 +2872,9 @@ function clearOutfit() {
         shoes: null,
         accessories: null
     };
-    updateMannequin();
+    renderAvatar();
     updateFeedback();
+    loadClothing(); // Recargar para quitar indicadores de selección
 }
 
 // Enviar y ver resultados
