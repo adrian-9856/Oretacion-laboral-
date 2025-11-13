@@ -645,7 +645,7 @@ document.getElementById('adminLoginForm')?.addEventListener('submit', function(e
 // Registro
 document.getElementById('registerForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     const userData = {
         name: document.getElementById('regName').value,
         lastName: document.getElementById('regLastName').value,
@@ -653,24 +653,37 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
         phone: document.getElementById('regPhone').value,
         age: document.getElementById('regAge').value,
         password: document.getElementById('regPassword').value,
-        registeredAt: new Date().toISOString()
+        registeredAt: new Date().toISOString(),
+        isNewUser: true  // Marcar como nuevo usuario
     };
-    
+
     const users = JSON.parse(localStorage.getItem('users') || '[]');
-    
+
     if (users.find(u => u.email === userData.email)) {
         showToast('Este correo ya está registrado', 'error');
         return;
     }
-    
+
     users.push(userData);
     localStorage.setItem('users', JSON.stringify(users));
-    
+
     await sendToGoogleSheets(userData, 'registro');
-    
-    showToast('✅ Cuenta creada exitosamente', 'success');
-    showLoginTab('login');
+
+    // Autologin del usuario recién registrado
+    currentUser = userData;
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    document.getElementById('userName').textContent = userData.name;
+    if (document.getElementById('userName3')) {
+        document.getElementById('userName3').textContent = userData.name;
+    }
+
+    showToast('✅ ¡Bienvenido! Vamos a crear tu avatar personalizado', 'success');
     document.getElementById('registerForm').reset();
+
+    // FLUJO MEJORADO: Registro -> Tutorial -> Avatar -> PRE/POST
+    setTimeout(() => {
+        showOnboarding();  // Mostrar tutorial primero
+    }, 500);
 });
 
 function logout() {
@@ -679,6 +692,257 @@ function logout() {
     showScreen('loginScreen');
     showToast('Sesión cerrada', 'info');
 }
+
+// ========================================
+// SISTEMA DE ONBOARDING/TUTORIAL
+// ========================================
+
+let currentOnboardingStep = 0;
+const onboardingSteps = [
+    {
+        title: '¡Bienvenido a Orientación Laboral!',
+        message: 'Te guiaremos paso a paso para que aproveches al máximo la plataforma. Este tutorial te tomará solo 2 minutos.',
+        icon: '👋',
+        action: null
+    },
+    {
+        title: 'Paso 1: Crea tu Avatar',
+        message: 'Personaliza tu avatar para hacerlo único. Será tu imagen de perfil en la plataforma.',
+        icon: '🎨',
+        action: 'avatar'
+    },
+    {
+        title: 'Paso 2: Evalúate con PRE-TEST o POST-TEST',
+        message: 'PRE-TEST: Evaluación inicial antes de capacitarte.\nPOST-TEST: Evaluación final después de aprender.',
+        icon: '📝',
+        action: null
+    },
+    {
+        title: 'Paso 3: Explora las Herramientas',
+        message: 'Accede a simuladores de entrevista, constructor de CV, análisis de personalidad y más.',
+        icon: '🛠️',
+        action: null
+    },
+    {
+        title: 'Paso 4: Consulta tu Progreso',
+        message: 'Revisa tus resultados, estadísticas y desafíos completados en cualquier momento.',
+        icon: '📊',
+        action: null
+    },
+    {
+        title: '¡Todo Listo!',
+        message: 'Ahora estás preparado para comenzar. ¡Mucha suerte en tu camino profesional!',
+        icon: '🚀',
+        action: 'finish'
+    }
+];
+
+function showOnboarding() {
+    currentOnboardingStep = 0;
+    createOnboardingOverlay();
+    showOnboardingStep();
+}
+
+function createOnboardingOverlay() {
+    // Eliminar overlay existente si hay uno
+    const existing = document.getElementById('onboardingOverlay');
+    if (existing) existing.remove();
+
+    // Crear overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'onboardingOverlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: fadeIn 0.3s ease;
+    `;
+
+    // Crear modal de onboarding
+    const modal = document.createElement('div');
+    modal.id = 'onboardingModal';
+    modal.style.cssText = `
+        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        border-radius: 20px;
+        padding: 2.5rem;
+        max-width: 500px;
+        width: 90%;
+        color: white;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        animation: slideUp 0.4s ease;
+    `;
+
+    modal.innerHTML = `
+        <div id="onboardingContent">
+            <!-- El contenido se actualizará dinámicamente -->
+        </div>
+    `;
+
+    overlay.appendChild(modal);
+    document.body.appendChild(overlay);
+}
+
+function showOnboardingStep() {
+    const step = onboardingSteps[currentOnboardingStep];
+    const content = document.getElementById('onboardingContent');
+
+    if (!content) return;
+
+    const isFirstStep = currentOnboardingStep === 0;
+    const isLastStep = currentOnboardingStep === onboardingSteps.length - 1;
+
+    content.innerHTML = `
+        <div style="font-size: 4rem; margin-bottom: 1rem;">${step.icon}</div>
+        <h2 style="margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700;">${step.title}</h2>
+        <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; white-space: pre-line;">${step.message}</p>
+
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+            ${!isFirstStep ? `
+                <button onclick="previousOnboardingStep()" style="
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 2px solid white;
+                    color: white;
+                    padding: 0.8rem 1.5rem;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-weight: 600;
+                    font-size: 1rem;
+                    transition: all 0.3s;
+                " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                    ← Anterior
+                </button>
+            ` : ''}
+
+            <button onclick="${isLastStep ? 'finishOnboarding()' : 'nextOnboardingStep()'}" style="
+                background: white;
+                border: none;
+                color: var(--primary);
+                padding: 0.8rem 2rem;
+                border-radius: 10px;
+                cursor: pointer;
+                font-weight: 700;
+                font-size: 1rem;
+                transition: all 0.3s;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)'">
+                ${isLastStep ? '¡Comenzar! 🎉' : 'Siguiente →'}
+            </button>
+        </div>
+
+        <div style="margin-top: 2rem; display: flex; gap: 0.5rem; justify-content: center;">
+            ${onboardingSteps.map((_, index) => `
+                <div style="
+                    width: ${index === currentOnboardingStep ? '30px' : '10px'};
+                    height: 10px;
+                    background: ${index === currentOnboardingStep ? 'white' : 'rgba(255, 255, 255, 0.3)'};
+                    border-radius: 5px;
+                    transition: all 0.3s;
+                "></div>
+            `).join('')}
+        </div>
+
+        ${!isLastStep ? `
+            <button onclick="skipOnboarding()" style="
+                background: none;
+                border: none;
+                color: rgba(255, 255, 255, 0.7);
+                padding: 0.5rem;
+                cursor: pointer;
+                font-size: 0.9rem;
+                margin-top: 1rem;
+                text-decoration: underline;
+            " onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'">
+                Saltar tutorial
+            </button>
+        ` : ''}
+    `;
+}
+
+function nextOnboardingStep() {
+    const step = onboardingSteps[currentOnboardingStep];
+
+    // Ejecutar acción del paso si la hay
+    if (step.action === 'avatar') {
+        // Cerrar onboarding y abrir creador de avatar
+        closeOnboarding();
+        setTimeout(() => {
+            showAvatarCreatorForNewUser();
+        }, 300);
+        return;
+    }
+
+    if (currentOnboardingStep < onboardingSteps.length - 1) {
+        currentOnboardingStep++;
+        showOnboardingStep();
+    }
+}
+
+function previousOnboardingStep() {
+    if (currentOnboardingStep > 0) {
+        currentOnboardingStep--;
+        showOnboardingStep();
+    }
+}
+
+function skipOnboarding() {
+    closeOnboarding();
+    markOnboardingAsCompleted();
+    showScreen('welcomeScreen');
+    showToast('Puedes ver el tutorial en cualquier momento desde el menú', 'info');
+}
+
+function finishOnboarding() {
+    closeOnboarding();
+    markOnboardingAsCompleted();
+    showScreen('welcomeScreen');
+    showToast('¡Perfecto! Ya puedes empezar a usar la plataforma', 'success');
+}
+
+function closeOnboarding() {
+    const overlay = document.getElementById('onboardingOverlay');
+    if (overlay) {
+        overlay.style.animation = 'fadeOut 0.3s ease';
+        setTimeout(() => overlay.remove(), 300);
+    }
+}
+
+function markOnboardingAsCompleted() {
+    if (currentUser) {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const userIndex = users.findIndex(u => u.email === currentUser.email);
+        if (userIndex !== -1) {
+            users[userIndex].onboardingCompleted = true;
+            users[userIndex].isNewUser = false;
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser.onboardingCompleted = true;
+            currentUser.isNewUser = false;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
+    }
+}
+
+function showAvatarCreatorForNewUser() {
+    showAvatarCreator();
+    // Agregar mensaje especial para nuevos usuarios
+    setTimeout(() => {
+        showToast('💡 Personaliza tu avatar y luego haz clic en "Guardar Avatar"', 'info');
+    }, 500);
+}
+
+// Exportar funciones de onboarding
+window.showOnboarding = showOnboarding;
+window.nextOnboardingStep = nextOnboardingStep;
+window.previousOnboardingStep = previousOnboardingStep;
+window.skipOnboarding = skipOnboarding;
+window.finishOnboarding = finishOnboarding;
 
 // ========================================
 // GOOGLE SHEETS
@@ -760,16 +1024,6 @@ function updateAttempts() {
             <small>Intentos: ${postAttempts}/${CONFIG.MAX_ATTEMPTS}</small>
         `;
     }
-}
-
-// ========================================
-// MODO PRÁCTICA
-// ========================================
-
-function enablePracticeMode() {
-    isPracticeMode = true;
-    showToast('🎓 Modo Práctica activado - Los resultados no se guardarán', 'info');
-    selectTest('pre');
 }
 
 // ========================================
@@ -1736,7 +1990,6 @@ window.showProgress = showProgress;
 window.selectTest = selectTest;
 window.goToWelcome = goToWelcome;
 window.goToMenu = goToMenu;
-window.enablePracticeMode = enablePracticeMode;
 window.startTest = startTest;
 window.selectOption = selectOption;
 window.nextQuestion = nextQuestion;
@@ -4218,13 +4471,35 @@ function saveAvatarPro() {
         return;
     }
 
+    // Generar URL del avatar
+    const avatarURL = generateAvatarURL();
+
     // Guardar configuración en localStorage
     localStorage.setItem(`avatar_pro_${currentUser.email}`, JSON.stringify(avatarConfig));
+
+    // IMPORTANTE: Sincronizar avatar con foto de perfil
+    localStorage.setItem(`profilePhoto_${currentUser.email}`, avatarURL);
 
     // Actualizar avatar en la navegación
     updateUserAvatarPro();
 
-    showToast('¡Avatar guardado exitosamente!', 'success');
+    // Actualizar foto de perfil en el perfil del usuario
+    updateProfilePhoto();
+
+    showToast('¡Avatar guardado y sincronizado con tu perfil!', 'success');
+
+    // Si es un nuevo usuario, continuar con el flujo de onboarding
+    if (currentUser.isNewUser) {
+        setTimeout(() => {
+            showScreen('testMenuScreen');
+            showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar', 'info');
+        }, 1500);
+    } else {
+        // Usuario existente, volver a la pantalla anterior
+        setTimeout(() => {
+            showScreen('welcomeScreen');
+        }, 1000);
+    }
 }
 
 // Actualizar avatar del usuario en la navegación
@@ -4244,6 +4519,33 @@ function updateUserAvatarPro() {
             existingAvatar.remove();
         }
         navUser.insertBefore(avatarContainer.cloneNode(true), navUser.firstChild);
+    });
+}
+
+// Actualizar foto de perfil en todas partes
+function updateProfilePhoto() {
+    if (!currentUser) return;
+
+    const profilePhoto = localStorage.getItem(`profilePhoto_${currentUser.email}`);
+    if (!profilePhoto) return;
+
+    // Actualizar en el perfil del usuario
+    const profilePhotoElement = document.getElementById('userProfilePhoto');
+    if (profilePhotoElement) {
+        profilePhotoElement.src = profilePhoto;
+    }
+
+    // Actualizar en modal de usuario (admin)
+    const modalUserPhoto = document.getElementById('modalUserPhoto');
+    if (modalUserPhoto) {
+        modalUserPhoto.src = profilePhoto;
+    }
+
+    // Actualizar cualquier otra imagen de perfil en la página
+    document.querySelectorAll('.user-photo, .user-card-photo').forEach(img => {
+        if (img.dataset.userEmail === currentUser.email || !img.dataset.userEmail) {
+            img.src = profilePhoto;
+        }
     });
 }
 
@@ -7515,12 +7817,141 @@ function confirmDeleteUser() {
 
         // Eliminar foto de perfil
         localStorage.removeItem(`profilePhoto_${selectedUser.email}`);
+        localStorage.removeItem(`avatar_pro_${selectedUser.email}`);
 
         showToast('Usuario eliminado', 'success');
         closeUserDetailModal();
         loadUsersGrid();
     }
 }
+
+// Función para editar datos de usuario (ADMIN)
+function enableUserEditing() {
+    if (!selectedUser) return;
+
+    // Convertir campos a editables
+    const nameField = document.getElementById('modalUserFullName');
+    const phoneField = document.getElementById('modalUserPhone');
+    const ageField = document.getElementById('modalUserAge');
+
+    if (!nameField || !phoneField || !ageField) return;
+
+    // Crear inputs editables
+    nameField.innerHTML = `<input type="text" id="editUserName" value="${selectedUser.name || ''}" style="padding: 0.5rem; border: 2px solid var(--primary); border-radius: 5px; width: 100%;">`;
+    phoneField.innerHTML = `<input type="text" id="editUserPhone" value="${selectedUser.phone || ''}" style="padding: 0.5rem; border: 2px solid var(--primary); border-radius: 5px; width: 100%;">`;
+    ageField.innerHTML = `<input type="number" id="editUserAge" value="${selectedUser.age || ''}" style="padding: 0.5rem; border: 2px solid var(--primary); border-radius: 5px; width: 100%;">`;
+
+    // Cambiar botón de editar a guardar
+    const editBtn = document.getElementById('editUserBtn');
+    if (editBtn) {
+        editBtn.textContent = 'Guardar Cambios';
+        editBtn.onclick = saveUserEdits;
+        editBtn.style.background = 'var(--success)';
+    }
+
+    showToast('Modo edición activado', 'info');
+}
+
+// Guardar cambios de usuario (ADMIN)
+function saveUserEdits() {
+    if (!selectedUser) return;
+
+    const newName = document.getElementById('editUserName')?.value.trim();
+    const newPhone = document.getElementById('editUserPhone')?.value.trim();
+    const newAge = document.getElementById('editUserAge')?.value;
+
+    if (!newName) {
+        showToast('El nombre no puede estar vacío', 'error');
+        return;
+    }
+
+    // Actualizar usuario en localStorage
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.email === selectedUser.email);
+
+    if (userIndex !== -1) {
+        users[userIndex].name = newName;
+        users[userIndex].phone = newPhone;
+        users[userIndex].age = newAge ? parseInt(newAge) : null;
+
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Actualizar selectedUser
+        selectedUser = users[userIndex];
+
+        showToast('✅ Usuario actualizado correctamente', 'success');
+
+        // Recargar vista del modal
+        showUserDetail(selectedUser);
+        loadUsersGrid();
+    }
+}
+
+// Función para resetear contraseña de usuario (ADMIN)
+function resetUserPassword() {
+    if (!selectedUser) return;
+
+    const newPassword = prompt(`Ingresa la nueva contraseña para ${selectedUser.name}:`, '123456');
+
+    if (!newPassword) {
+        return;
+    }
+
+    if (newPassword.length < 6) {
+        showToast('La contraseña debe tener al menos 6 caracteres', 'error');
+        return;
+    }
+
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+    const userIndex = users.findIndex(u => u.email === selectedUser.email);
+
+    if (userIndex !== -1) {
+        users[userIndex].password = newPassword;
+        localStorage.setItem('users', JSON.stringify(users));
+
+        showToast(`✅ Contraseña actualizada para ${selectedUser.name}`, 'success');
+    }
+}
+
+// Función para ver todos los resultados de un usuario (ADMIN)
+function exportUserResults() {
+    if (!selectedUser) return;
+
+    const allResults = JSON.parse(localStorage.getItem('results') || '[]');
+    const userResults = allResults.filter(r => r.email === selectedUser.email && !r.isPractice);
+
+    if (userResults.length === 0) {
+        showToast('Este usuario no tiene resultados', 'info');
+        return;
+    }
+
+    // Crear CSV
+    let csv = 'Fecha,Test,Puntuación,Respuestas Correctas,Total Preguntas,Tiempo\n';
+
+    userResults.forEach(r => {
+        const date = new Date(r.timestamp).toLocaleDateString();
+        csv += `${date},${r.test},${r.score}%,${r.correctAnswers},${r.totalQuestions},${r.time}s\n`;
+    });
+
+    // Descargar CSV
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `resultados_${selectedUser.name}_${selectedUser.lastName}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast(`✅ Resultados de ${selectedUser.name} exportados`, 'success');
+}
+
+// Exportar funciones para el admin
+window.enableUserEditing = enableUserEditing;
+window.saveUserEdits = saveUserEdits;
+window.resetUserPassword = resetUserPassword;
+window.exportUserResults = exportUserResults;
 
 // ========================================
 // GRÁFICAS Y ESTADÍSTICAS
