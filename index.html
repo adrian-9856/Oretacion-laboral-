@@ -1138,210 +1138,104 @@
         </div>
     </nav>
     <div class="container-narrow">
-        <!-- Video Introductorio -->
-        <div class="dresscode-video-section" id="dressCodeVideoSection">
-            <div class="video-intro-card">
-                <h2>👔 Aprende a Vestirte para una Entrevista</h2>
-                <p>Mira este video antes de comenzar con la actividad interactiva</p>
-                <div class="video-wrapper">
-                    <iframe
-                        width="100%"
-                        height="400"
-                        src="https://www.youtube.com/embed/6TmqJ7l4JPg"
-                        title="Cómo Vestirse para una Entrevista de Trabajo"
-                        frameborder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen>
-                    </iframe>
+        <!-- Lookbook Profesional -->
+        <div class="lookbook-section" id="lookbookSection">
+
+            <!-- Header del Lookbook -->
+            <div class="lookbook-header">
+                <div class="lookbook-title-section">
+                    <h1>Tu Lookbook Profesional</h1>
+                    <p>Descubre outfits perfectos para tu próxima entrevista</p>
                 </div>
-                <button class="btn-primary btn-large" onclick="startDressCodeActivity()">
-                    Comenzar Actividad Interactiva 👉
-                </button>
-            </div>
-        </div>
 
-        <!-- Actividad Interactiva de Vestir Muñecos -->
-        <div class="dresscode-activity-section" id="dressCodeActivitySection" style="display: none;">
-            <div class="dresscode-header">
-                <h2>Vista Profesionalmente para tu Entrevista</h2>
-                <p>Aprende a crear el outfit perfecto con nuestro simulador interactivo</p>
-            </div>
-
-            <!-- Galería de Outfits Recomendados -->
-            <div class="recommended-outfits-section">
-                <h3>Outfits Recomendados por Tipo de Entrevista</h3>
-                <div class="outfits-gallery" id="outfitsGallery">
-                    <!-- Se llenará dinámicamente -->
-                </div>
-            </div>
-
-            <!-- Selector de Género -->
-            <div class="gender-selector">
-                <button class="gender-btn active" onclick="selectGender('male')" id="genderBtnMale">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                        <path d="M12 2C10.89 2 10 2.89 10 4C10 5.11 10.89 6 12 6C13.11 6 14 5.11 14 4C14 2.89 13.11 2 12 2M12 7C9.79 7 8 8.79 8 11C8 11.5 8.1 12 8.29 12.44L6 22H8L9.64 16H10V22H12V16H12.36V22H14.36V16H15L16.65 22H18.65L16.36 12.44C16.55 12 16.65 11.5 16.65 11C16.65 8.79 14.86 7 12.65 7H12Z"/>
-                    </svg>
-                    Masculino
-                </button>
-                <button class="gender-btn" onclick="selectGender('female')" id="genderBtnFemale">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                        <path d="M12 2C10.89 2 10 2.89 10 4C10 5.11 10.89 6 12 6C13.11 6 14 5.11 14 4C14 2.89 13.11 2 12 2M16 16V22H14V16H13V22H11V16H10V13.5C10 12.67 10.67 12 11.5 12H12.5C13.33 12 14 12.67 14 13.5V16H16M15.09 9L14 11H10L8.91 9C8.66 8.5 8.09 8.31 7.59 8.56C7.09 8.81 6.9 9.38 7.15 9.88L8.85 13.07C9.06 13.47 9.47 13.72 9.92 13.72H14.08C14.53 13.72 14.94 13.47 15.15 13.07L16.85 9.88C17.1 9.38 16.91 8.81 16.41 8.56C15.91 8.31 15.34 8.5 15.09 9Z"/>
-                    </svg>
-                    Femenino
-                </button>
-            </div>
-
-            <!-- Comparación Antes/Después -->
-            <div class="before-after-section">
-                <div class="before-after-card inappropriate-example">
-                    <div class="card-badge badge-wrong">Evitar</div>
-                    <h4>Vestimenta Inapropiada</h4>
-                    <div class="example-avatar" id="inappropriateAvatar">
-                        <!-- Avatar con ropa inapropiada -->
-                    </div>
-                    <ul class="example-points">
-                        <li>Ropa demasiado casual</li>
-                        <li>Colores muy llamativos</li>
-                        <li>Accesorios excesivos</li>
-                        <li>Calzado deportivo</li>
-                    </ul>
-                </div>
-                <div class="before-after-arrow">
-                    <svg viewBox="0 0 24 24" fill="currentColor" width="48" height="48">
-                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-                    </svg>
-                </div>
-                <div class="before-after-card appropriate-example">
-                    <div class="card-badge badge-correct">Ideal</div>
-                    <h4>Vestimenta Profesional</h4>
-                    <div class="example-avatar" id="appropriateAvatar">
-                        <!-- Avatar con ropa apropiada -->
-                    </div>
-                    <ul class="example-points">
-                        <li>Colores neutros y elegantes</li>
-                        <li>Ropa bien ajustada</li>
-                        <li>Accesorios discretos</li>
-                        <li>Calzado formal y limpio</li>
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Área del Muñeco y Guardarropa -->
-            <div class="dresscode-main-area">
-                <!-- Panel Izquierdo: Guardarropa -->
-                <div class="wardrobe-panel">
-                    <h3>Guardarropa Profesional</h3>
-                    <p class="wardrobe-hint">Haz clic en las prendas para vestir tu avatar</p>
-
-                    <!-- Categorías de ropa -->
-                    <div class="clothing-categories">
-                        <!-- Parte Superior -->
-                        <div class="clothing-category">
-                            <h4>Parte Superior</h4>
-                            <div class="clothing-items" id="topsContainer">
-                                <!-- Se llenará dinámicamente con JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- Parte Inferior -->
-                        <div class="clothing-category">
-                            <h4>Parte Inferior</h4>
-                            <div class="clothing-items" id="bottomsContainer">
-                                <!-- Se llenará dinámicamente con JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- Calzado -->
-                        <div class="clothing-category">
-                            <h4>Calzado</h4>
-                            <div class="clothing-items" id="shoesContainer">
-                                <!-- Se llenará dinámicamente con JavaScript -->
-                            </div>
-                        </div>
-
-                        <!-- Accesorios -->
-                        <div class="clothing-category">
-                            <h4>Accesorios</h4>
-                            <div class="clothing-items" id="accessoriesContainer">
-                                <!-- Se llenará dinámicamente con JavaScript -->
-                            </div>
-                        </div>
+                <!-- Video Tutorial (ARREGLADO) -->
+                <div class="lookbook-video-card">
+                    <h3>Guía Rápida: Cómo Vestirse para Entrevistas</h3>
+                    <div class="video-wrapper">
+                        <iframe
+                            width="100%"
+                            height="315"
+                            src="https://www.youtube.com/embed/Jv1e6cIzTxw"
+                            title="Cómo Vestirse para una Entrevista de Trabajo"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                        </iframe>
                     </div>
                 </div>
+            </div>
 
-                <!-- Panel Central: Avatar Profesional -->
-                <div class="avatar-panel">
-                    <div class="avatar-stage">
-                        <div class="avatar-container" id="avatarContainer">
-                            <!-- El avatar SVG se renderizará aquí -->
-                        </div>
-                    </div>
-                    <button class="btn-clear-outfit" onclick="clearOutfit()">
-                        Limpiar Todo
+            <!-- Filtros y Búsqueda -->
+            <div class="lookbook-filters">
+                <div class="filter-group">
+                    <button class="filter-btn active" onclick="filterByGender('all')" data-filter="all">
+                        Todos
+                    </button>
+                    <button class="filter-btn" onclick="filterByGender('male')" data-filter="male">
+                        Hombre
+                    </button>
+                    <button class="filter-btn" onclick="filterByGender('female')" data-filter="female">
+                        Mujer
                     </button>
                 </div>
 
-                <!-- Panel Derecho: Análisis y Consejos -->
-                <div class="analysis-panel">
-                    <h3>Análisis en Tiempo Real</h3>
+                <div class="filter-tags">
+                    <span class="tag-label">Filtrar por industria:</span>
+                    <button class="tag-btn active" onclick="filterByTag('all')" data-tag="all">Todos</button>
+                    <button class="tag-btn" onclick="filterByTag('corporativo')" data-tag="corporativo">#Corporativo</button>
+                    <button class="tag-btn" onclick="filterByTag('tech')" data-tag="tech">#Tech</button>
+                    <button class="tag-btn" onclick="filterByTag('creativo')" data-tag="creativo">#Creativo</button>
+                    <button class="tag-btn" onclick="filterByTag('salud')" data-tag="salud">#Salud</button>
+                    <button class="tag-btn" onclick="filterByTag('casual')" data-tag="casual">#BusinessCasual</button>
+                </div>
 
-                    <!-- Outfit Score -->
-                    <div class="outfit-score-display" id="outfitScoreDisplay">
-                        <div class="score-circle-mini" id="scoreCircleMini">
-                            <span class="score-percentage" id="scorePercentage">0%</span>
-                        </div>
-                        <p class="score-label">Nivel Profesional</p>
-                    </div>
+                <!-- Mi Closet Virtual -->
+                <div class="my-closet-btn-container">
+                    <button class="btn-my-closet" onclick="toggleMyCloset()">
+                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        <span>Mi Closet</span>
+                        <span class="closet-count" id="closetCount">0</span>
+                    </button>
+                </div>
+            </div>
 
-                    <!-- Feedback detallado -->
-                    <div class="outfit-feedback" id="outfitFeedback">
-                        <div class="feedback-content" id="feedbackContent">
-                            <p class="feedback-placeholder">Comienza a seleccionar prendas para recibir retroalimentación personalizada...</p>
-                        </div>
-                    </div>
+            <!-- Grid de Outfits (Estilo Instagram) -->
+            <div class="lookbook-grid" id="lookbookGrid">
+                <!-- Se llenará dinámicamente con JavaScript -->
+            </div>
 
-                    <!-- Tips profesionales -->
-                    <div class="professional-tips">
-                        <h4>Consejos Profesionales</h4>
-                        <div class="tips-list" id="dynamicTipsList">
-                            <div class="tip-item">
-                                <span class="tip-icon success">✓</span>
-                                <p>Colores neutros proyectan profesionalismo</p>
-                            </div>
-                            <div class="tip-item">
-                                <span class="tip-icon success">✓</span>
-                                <p>Ropa bien planchada y ajustada</p>
-                            </div>
-                            <div class="tip-item">
-                                <span class="tip-icon success">✓</span>
-                                <p>Zapatos limpios y en buen estado</p>
-                            </div>
-                            <div class="tip-item">
-                                <span class="tip-icon warning">×</span>
-                                <p>Evita ropa demasiado casual</p>
-                            </div>
-                            <div class="tip-item">
-                                <span class="tip-icon warning">×</span>
-                                <p>Sin colores fluorescentes</p>
-                            </div>
-                            <div class="tip-item">
-                                <span class="tip-icon warning">×</span>
-                                <p>Accesorios mínimos y elegantes</p>
-                            </div>
-                        </div>
+            <!-- Botones de acción -->
+            <div class="lookbook-actions">
+                <button class="btn-secondary" onclick="showScreen('welcomeScreen')">← Volver al Inicio</button>
+                <button class="btn-primary" onclick="exportMyCloset()">
+                    Descargar Mi Guía PDF
+                </button>
+            </div>
+
+            <!-- Modal de Detalles de Outfit -->
+            <div class="outfit-modal" id="outfitModal" style="display: none;">
+                <div class="outfit-modal-content">
+                    <button class="modal-close" onclick="closeOutfitModal()">×</button>
+                    <div class="modal-body" id="modalBody">
+                        <!-- Se llenará dinámicamente -->
                     </div>
                 </div>
             </div>
 
-            <!-- Botón de Finalizar -->
-            <div class="dresscode-actions">
-                <button class="btn-secondary" onclick="backToVideo()">← Volver al Video</button>
-                <button class="btn-primary btn-large" onclick="submitDressCode()">
-                    ✅ Finalizar y Ver Resultados
-                </button>
+            <!-- Panel Mi Closet Virtual -->
+            <div class="my-closet-panel" id="myClosetPanel" style="display: none;">
+                <div class="closet-panel-header">
+                    <h3>Mi Closet Virtual</h3>
+                    <button class="closet-close" onclick="toggleMyCloset()">×</button>
+                </div>
+                <div class="closet-items" id="closetItems">
+                    <p class="closet-empty">Aún no has guardado ningún outfit. Haz clic en el corazón de tus favoritos.</p>
+                </div>
             </div>
 
-            <!-- Modal de Resultados -->
+            <!-- Modal de Resultados (Conservado) -->
             <div class="dresscode-results-modal" id="dressCodeResultsModal" style="display: none;">
                 <div class="results-modal-content">
                     <div class="results-header">
@@ -2295,673 +2189,480 @@
 
 <script>
 // ===================================
-// DRESS CODE - FUNCIONALIDAD INTERACTIVA
+// LOOKBOOK PROFESIONAL - FUNCIONALIDAD
 // ===================================
 
-let currentGender = 'male';
-let selectedOutfit = {
-    top: null,
-    bottom: null,
-    shoes: null,
-    accessories: null
-};
-
-// Catálogo de ropa mejorado con colores y descripciones
-const clothingCatalog = {
-    male: {
-        tops: [
-            { id: 'suit_jacket_navy', name: 'Saco Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Color clásico y profesional' },
-            { id: 'suit_jacket_gray', name: 'Saco Gris', color: '#4a5568', appropriate: true, tip: 'Versátil y elegante' },
-            { id: 'dress_shirt_white', name: 'Camisa Blanca', color: '#f8f9fa', appropriate: true, tip: 'La opción más segura' },
-            { id: 'dress_shirt_blue', name: 'Camisa Azul Claro', color: '#a8c8e1', appropriate: true, tip: 'Profesional y moderno' },
-            { id: 'polo_shirt', name: 'Polo', color: '#ff6b6b', appropriate: false, tip: 'Demasiado casual' },
-            { id: 'tshirt_casual', name: 'Camiseta Casual', color: '#95e1d3', appropriate: false, tip: 'No apropiada para entrevistas' },
-            { id: 'hoodie', name: 'Sudadera', color: '#f38181', appropriate: false, tip: 'Muy informal' }
+// Base de datos de outfits profesionales del Lookbook
+const lookbookOutfits = [
+    {
+        id: 1,
+        name: 'Ejecutivo Corporativo',
+        gender: 'male',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500',
+        items: [
+            { type: 'Saco', detail: 'Azul marino de corte slim' },
+            { type: 'Camisa', detail: 'Blanca de algodón' },
+            { type: 'Pantalón', detail: 'De vestir azul marino' },
+            { type: 'Zapatos', detail: 'Oxford negros lustrados' },
+            { type: 'Corbata', detail: 'Azul marino con textura sutil' },
+            { type: 'Cinturón', detail: 'Negro de cuero' }
         ],
-        bottoms: [
-            { id: 'suit_pants_navy', name: 'Pantalón Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Combina con todo' },
-            { id: 'suit_pants_gray', name: 'Pantalón Gris', color: '#4a5568', appropriate: true, tip: 'Elegante y formal' },
-            { id: 'suit_pants_black', name: 'Pantalón Negro', color: '#2d3748', appropriate: true, tip: 'Clásico formal' },
-            { id: 'chinos_beige', name: 'Chinos Beige', color: '#d4a574', appropriate: false, tip: 'Poco formal para entrevista' },
-            { id: 'jeans', name: 'Jeans', color: '#5f7a9b', appropriate: false, tip: 'Demasiado casual' },
-            { id: 'shorts', name: 'Bermudas', color: '#ffd93d', appropriate: false, tip: 'Totalmente inapropiado' }
-        ],
-        shoes: [
-            { id: 'oxford_black', name: 'Oxford Negros', color: '#2d3748', appropriate: true, tip: 'Los más formales' },
-            { id: 'oxford_brown', name: 'Oxford Café', color: '#6b4423', appropriate: true, tip: 'Elegantes y versátiles' },
-            { id: 'loafers', name: 'Mocasines', color: '#4a5568', appropriate: true, tip: 'Business casual' },
-            { id: 'sneakers_white', name: 'Tenis Blancos', color: '#f8f9fa', appropriate: false, tip: 'No para entrevistas' },
-            { id: 'sandals', name: 'Sandalias', color: '#ff6b6b', appropriate: false, tip: 'Inapropiado' }
-        ],
-        accessories: [
-            { id: 'tie_navy', name: 'Corbata Azul', color: '#1e3a5f', appropriate: true, tip: 'Añade formalidad' },
-            { id: 'tie_burgundy', name: 'Corbata Vino', color: '#7f2020', appropriate: true, tip: 'Sofisticada' },
-            { id: 'watch_silver', name: 'Reloj Plateado', color: '#cbd5e0', appropriate: true, tip: 'Elegante y discreto' },
-            { id: 'belt_black', name: 'Cinturón Negro', color: '#2d3748', appropriate: true, tip: 'Esencial' },
-            { id: 'cap', name: 'Gorra', color: '#ff6b6b', appropriate: false, tip: 'No usar en entrevistas' },
-            { id: 'chains', name: 'Cadenas Gruesas', color: '#ffd700', appropriate: false, tip: 'Excesivo' }
-        ]
+        description: 'Perfecto para entrevistas en bancos, firmas legales y consultoría. Proyecta autoridad y profesionalismo.',
+        level: 'Muy Formal',
+        price: '$$$'
     },
-    female: {
-        tops: [
-            { id: 'blazer_navy', name: 'Blazer Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Profesional y poderoso' },
-            { id: 'blazer_black', name: 'Blazer Negro', color: '#2d3748', appropriate: true, tip: 'Clásico y elegante' },
-            { id: 'blouse_white', name: 'Blusa Blanca', color: '#f8f9fa', appropriate: true, tip: 'Limpia y profesional' },
-            { id: 'blouse_cream', name: 'Blusa Crema', color: '#f4e4c1', appropriate: true, tip: 'Suave y formal' },
-            { id: 'cardigan', name: 'Cárdigan Casual', color: '#a8c8e1', appropriate: false, tip: 'Poco estructurado' },
-            { id: 'casual_top', name: 'Blusa Casual', color: '#ff6b6b', appropriate: false, tip: 'Demasiado casual' },
-            { id: 'crop_top', name: 'Crop Top', color: '#f38181', appropriate: false, tip: 'Inapropiado' }
+    {
+        id: 2,
+        name: 'Tech Professional',
+        gender: 'male',
+        tags: ['tech', 'casual'],
+        image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=500',
+        items: [
+            { type: 'Camisa', detail: 'Azul claro sin corbata' },
+            { type: 'Chinos', detail: 'Gris oscuro' },
+            { type: 'Zapatos', detail: 'Mocasines café' },
+            { type: 'Reloj', detail: 'Minimalista plateado' }
         ],
-        bottoms: [
-            { id: 'skirt_black', name: 'Falda Negra', color: '#2d3748', appropriate: true, tip: 'Largo apropiado' },
-            { id: 'pants_navy', name: 'Pantalón Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Profesional' },
-            { id: 'pants_gray', name: 'Pantalón Gris', color: '#4a5568', appropriate: true, tip: 'Elegante' },
-            { id: 'dress_navy', name: 'Vestido Azul Marino', color: '#1e3a5f', appropriate: true, tip: 'Profesional y femenino' },
-            { id: 'jeans', name: 'Jeans', color: '#5f7a9b', appropriate: false, tip: 'Demasiado casual' },
-            { id: 'skirt_mini', name: 'Minifalda', color: '#ff6b6b', appropriate: false, tip: 'Muy corta' }
+        description: 'Ideal para startups y empresas tech. Balance perfecto entre profesional y relajado.',
+        level: 'Business Casual',
+        price: '$$'
+    },
+    {
+        id: 3,
+        name: 'Creativo Moderno',
+        gender: 'male',
+        tags: ['creativo', 'casual'],
+        image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Gris jaspeado' },
+            { type: 'Camiseta', detail: 'Negra de algodón premium' },
+            { type: 'Jeans', detail: 'Oscuros sin roturas' },
+            { type: 'Zapatos', detail: 'Boots chelsea negros' }
         ],
-        shoes: [
-            { id: 'heels_black', name: 'Tacones Negros', color: '#2d3748', appropriate: true, tip: 'Clásicos y elegantes' },
-            { id: 'heels_nude', name: 'Tacones Nude', color: '#d4a574', appropriate: true, tip: 'Versátiles' },
-            { id: 'flats_black', name: 'Flats Negros', color: '#2d3748', appropriate: true, tip: 'Cómodos y profesionales' },
-            { id: 'boots_ankle', name: 'Botines', color: '#4a5568', appropriate: true, tip: 'Modernos y elegantes' },
-            { id: 'sneakers', name: 'Tenis', color: '#f8f9fa', appropriate: false, tip: 'No para entrevistas' },
-            { id: 'flip_flops', name: 'Chanclas', color: '#ff6b6b', appropriate: false, tip: 'Inapropiado' }
+        description: 'Para agencias creativas, diseño, marketing. Muestra personalidad manteniendo profesionalismo.',
+        level: 'Smart Casual',
+        price: '$$'
+    },
+    {
+        id: 4,
+        name: 'Ejecutiva Poderosa',
+        gender: 'female',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Negro estructurado' },
+            { type: 'Blusa', detail: 'Blanca de seda' },
+            { type: 'Pantalón', detail: 'De vestir negro' },
+            { type: 'Tacones', detail: 'Negros clásicos (5-7cm)' },
+            { type: 'Collar', detail: 'Perlas discretas' }
         ],
-        accessories: [
-            { id: 'necklace_simple', name: 'Collar Sencillo', color: '#cbd5e0', appropriate: true, tip: 'Elegante y discreto' },
-            { id: 'earrings_small', name: 'Aretes Pequeños', color: '#cbd5e0', appropriate: true, tip: 'Profesionales' },
-            { id: 'watch_silver', name: 'Reloj Plateado', color: '#cbd5e0', appropriate: true, tip: 'Funcional y elegante' },
-            { id: 'scarf_silk', name: 'Pañuelo de Seda', color: '#a8c8e1', appropriate: true, tip: 'Toque sofisticado' },
-            { id: 'jewelry_big', name: 'Joyería Grande', color: '#ffd700', appropriate: false, tip: 'Demasiado llamativo' },
-            { id: 'sunglasses', name: 'Lentes de Sol', color: '#2d3748', appropriate: false, tip: 'No en interiores' }
-        ]
+        description: 'Para posiciones ejecutivas y corporativas. Transmite liderazgo y confianza.',
+        level: 'Muy Formal',
+        price: '$$$'
+    },
+    {
+        id: 5,
+        name: 'Profesional Elegante',
+        gender: 'female',
+        tags: ['corporativo', 'casual'],
+        image: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Gris claro' },
+            { type: 'Blusa', detail: 'Crema' },
+            { type: 'Falda', detail: 'Lápiz gris (hasta rodilla)' },
+            { type: 'Zapatos', detail: 'Tacones nude medios' },
+            { type: 'Aretes', detail: 'Pequeños plateados' }
+        ],
+        description: 'Versátil para la mayoría de entrevistas profesionales. Femenina y formal.',
+        level: 'Formal',
+        price: '$$'
+    },
+    {
+        id: 6,
+        name: 'Business Moderno',
+        gender: 'female',
+        tags: ['tech', 'casual'],
+        image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=500',
+        items: [
+            { type: 'Blusa', detail: 'Blanca estructurada' },
+            { type: 'Pantalón', detail: 'Gris de corte recto' },
+            { type: 'Flats', detail: 'Negros puntiagudos' },
+            { type: 'Reloj', detail: 'Minimalista dorado' }
+        ],
+        description: 'Para empresas modernas y tecnología. Cómodo pero profesional.',
+        level: 'Business Casual',
+        price: '$$'
+    },
+    {
+        id: 7,
+        name: 'Formal Tradicional',
+        gender: 'male',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500',
+        items: [
+            { type: 'Traje', detail: 'Gris carbón de 3 piezas' },
+            { type: 'Camisa', detail: 'Azul claro' },
+            { type: 'Corbata', detail: 'Vino con patrón discreto' },
+            { type: 'Zapatos', detail: 'Oxford café oscuro' },
+            { type: 'Gemelos', detail: 'Plateados clásicos' }
+        ],
+        description: 'Para industrias conservadoras: finanzas, derecho, seguros.',
+        level: 'Máxima Formalidad',
+        price: '$$$$'
+    },
+    {
+        id: 8,
+        name: 'Sector Salud',
+        gender: 'female',
+        tags: ['salud', 'corporativo'],
+        image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Azul marino' },
+            { type: 'Blusa', detail: 'Blanca sin estampados' },
+            { type: 'Pantalón', detail: 'Negro recto' },
+            { type: 'Zapatos', detail: 'Flats o tacones bajos negros' }
+        ],
+        description: 'Para entrevistas en hospitales, clínicas, sector farmacéutico. Limpio y profesional.',
+        level: 'Formal',
+        price: '$$'
+    },
+    {
+        id: 9,
+        name: 'Industria Creativa',
+        gender: 'male',
+        tags: ['creativo'],
+        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=500',
+        items: [
+            { type: 'Camisa', detail: 'Blanca Oxford sin corbata' },
+            { type: 'Pantalón', detail: 'Chinos beige' },
+            { type: 'Blazer', detail: 'Azul marino casual (opcional)' },
+            { type: 'Zapatos', detail: 'Desert boots marrones' }
+        ],
+        description: 'Para marketing, publicidad, diseño. Equilibrio entre creativo y profesional.',
+        level: 'Smart Casual',
+        price: '$$'
+    },
+    {
+        id: 10,
+        name: 'Versatil Profesional',
+        gender: 'female',
+        tags: ['creativo', 'casual'],
+        image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=500',
+        items: [
+            { type: 'Vestido', detail: 'Azul marino tipo sheath' },
+            { type: 'Cardigan', detail: 'Gris estructurado' },
+            { type: 'Zapatos', detail: 'Tacones medios negros' },
+            { type: 'Bolso', detail: 'Tote negro profesional' }
+        ],
+        description: 'Funciona para múltiples industrias. Simple, elegante y fácil de usar.',
+        level: 'Business Casual',
+        price: '$$'
+    },
+    {
+        id: 11,
+        name: 'Consultor Senior',
+        gender: 'male',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500',
+        items: [
+            { type: 'Traje', detail: 'Azul marino' },
+            { type: 'Camisa', detail: 'Blanca de puño francés' },
+            { type: 'Corbata', detail: 'Azul rey' },
+            { type: 'Zapatos', detail: 'Oxford negros cap-toe' },
+            { type: 'Portafolio', detail: 'Cuero negro' }
+        ],
+        description: 'Para consultorías de alto nivel. Imagen impecable y confiable.',
+        level: 'Muy Formal',
+        price: '$$$'
+    },
+    {
+        id: 12,
+        name: 'Manager Moderna',
+        gender: 'female',
+        tags: ['corporativo', 'tech'],
+        image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=500',
+        items: [
+            { type: 'Saco', detail: 'Gris claro sin solapas' },
+            { type: 'Pantalón', detail: 'Negro de corte recto' },
+            { type: 'Blusa', detail: 'Blanca minimalista' },
+            { type: 'Zapatos', detail: 'Flats puntiagudos' },
+            { type: 'Reloj', detail: 'Smart watch elegante' }
+        ],
+        description: 'Para posiciones de gerencia en empresas tech o modernas. Look contemporáneo.',
+        level: 'Business Professional',
+        price: '$$'
     }
-};
+];
 
-// Outfits recomendados por tipo de entrevista
-const recommendedOutfits = {
-    male: [
-        {
-            name: 'Corporativo Formal',
-            description: 'Ideal para bancos, firmas legales, consultoría',
-            top: 'suit_jacket_navy',
-            bottom: 'suit_pants_navy',
-            shoes: 'oxford_black',
-            accessory: 'tie_navy'
-        },
-        {
-            name: 'Business Professional',
-            description: 'Empresas tradicionales, gerencia',
-            top: 'suit_jacket_gray',
-            bottom: 'suit_pants_gray',
-            shoes: 'oxford_brown',
-            accessory: 'tie_burgundy'
-        },
-        {
-            name: 'Business Casual',
-            description: 'Startups, empresas tech, creativas',
-            top: 'dress_shirt_blue',
-            bottom: 'suit_pants_black',
-            shoes: 'loafers',
-            accessory: 'belt_black'
-        }
-    ],
-    female: [
-        {
-            name: 'Ejecutivo Formal',
-            description: 'Corporativos, alta dirección',
-            top: 'blazer_navy',
-            bottom: 'pants_navy',
-            shoes: 'heels_black',
-            accessory: 'necklace_simple'
-        },
-        {
-            name: 'Profesional Elegante',
-            description: 'Oficinas, reuniones importantes',
-            top: 'blazer_black',
-            bottom: 'skirt_black',
-            shoes: 'heels_nude',
-            accessory: 'earrings_small'
-        },
-        {
-            name: 'Business Moderno',
-            description: 'Empresas modernas, creativas',
-            top: 'blouse_white',
-            bottom: 'pants_gray',
-            shoes: 'flats_black',
-            accessory: 'watch_silver'
-        }
-    ]
-};
+// Sistema de favoritos
+let myCloset = [];
 
-// Iniciar actividad interactiva
-function startDressCodeActivity() {
-    document.getElementById('dressCodeVideoSection').style.display = 'none';
-    document.getElementById('dressCodeActivitySection').style.display = 'block';
-    loadRecommendedOutfits();
-    loadClothing();
-    renderAvatar();
-    loadBeforeAfterExamples();
+//Iniciar lookbook
+function initLookbook() {
+    renderLookbookGrid();
+    updateClosetCount();
 }
 
-// Cargar galería de outfits recomendados
-function loadRecommendedOutfits() {
-    const gallery = document.getElementById('outfitsGallery');
-    const outfits = recommendedOutfits[currentGender];
+// Renderizar grid de outfits
+function renderLookbookGrid(filter = 'all', tag = 'all') {
+    const grid = document.getElementById('lookbookGrid');
 
-    gallery.innerHTML = outfits.map(outfit => `
-        <div class="outfit-card" onclick="applyRecommendedOutfit('${outfit.top}', '${outfit.bottom}', '${outfit.shoes}', '${outfit.accessory}')">
-            <div class="outfit-card-header">
-                <h4>${outfit.name}</h4>
-                <span class="outfit-badge">Recomendado</span>
+    let filteredOutfits = lookbookOutfits.filter(outfit => {
+        const genderMatch = filter === 'all' || outfit.gender === filter;
+        const tagMatch = tag === 'all' || outfit.tags.includes(tag);
+        return genderMatch && tagMatch;
+    });
+
+    grid.innerHTML = filteredOutfits.map(outfit => `
+        <div class="lookbook-card" onclick="showOutfitDetails(${outfit.id})">
+            <div class="card-image" style="background-image: url('${outfit.image}')">
+                <div class="card-overlay">
+                    <button class="btn-fav ${isInCloset(outfit.id) ? 'active' : ''}"
+                            onclick="event.stopPropagation(); toggleFavorite(${outfit.id})">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </button>
+                    <div class="card-tags">
+                        ${outfit.tags.map(tag => `<span class="card-tag">#${tag}</span>`).join('')}
+                    </div>
+                </div>
             </div>
-            <div class="outfit-preview">
-                <div class="outfit-preview-avatar"></div>
+            <div class="card-content">
+                <h3>${outfit.name}</h3>
+                <p class="card-level">${outfit.level}</p>
+                <p class="card-desc">${outfit.description}</p>
+                <div class="card-footer">
+                    <span class="card-price">${outfit.price}</span>
+                    <span class="card-gender">${outfit.gender === 'male' ? 'Hombre' : 'Mujer'}</span>
+                </div>
             </div>
-            <p class="outfit-description">${outfit.description}</p>
-            <button class="btn-apply-outfit">Aplicar este Outfit</button>
         </div>
     `).join('');
 }
 
-// Aplicar outfit recomendado
-function applyRecommendedOutfit(topId, bottomId, shoesId, accessoryId) {
-    const catalog = clothingCatalog[currentGender];
+// Filtrar por género
+function filterByGender(gender) {
+    const currentTag = document.querySelector('.tag-btn.active')?.dataset.tag || 'all';
 
-    selectedOutfit.top = catalog.tops.find(item => item.id === topId);
-    selectedOutfit.bottom = catalog.bottoms.find(item => item.id === bottomId);
-    selectedOutfit.shoes = catalog.shoes.find(item => item.id === shoesId);
-    selectedOutfit.accessories = catalog.accessories.find(item => item.id === accessoryId);
-
-    renderAvatar();
-    updateFeedback();
-}
-
-// Cargar ejemplos Antes/Después
-function loadBeforeAfterExamples() {
-    const inappropriateDiv = document.getElementById('inappropriateAvatar');
-    const appropriateDiv = document.getElementById('appropriateAvatar');
-
-    inappropriateDiv.innerHTML = createAvatarSVG(currentGender, 'inappropriate');
-    appropriateDiv.innerHTML = createAvatarSVG(currentGender, 'appropriate');
-}
-
-// Volver al video
-function backToVideo() {
-    document.getElementById('dressCodeActivitySection').style.display = 'none';
-    document.getElementById('dressCodeVideoSection').style.display = 'block';
-}
-
-// Seleccionar género
-function selectGender(gender) {
-    currentGender = gender;
-
-    // Actualizar botones
-    document.getElementById('genderBtnMale').classList.toggle('active', gender === 'male');
-    document.getElementById('genderBtnFemale').classList.toggle('active', gender === 'female');
-
-    // Limpiar outfit
-    clearOutfit();
-
-    // Recargar todo
-    loadRecommendedOutfits();
-    loadClothing();
-    renderAvatar();
-    loadBeforeAfterExamples();
-}
-
-// Cargar catálogo de ropa
-function loadClothing() {
-    const catalog = clothingCatalog[currentGender];
-
-    loadClothingCategory('tops', catalog.tops);
-    loadClothingCategory('bottoms', catalog.bottoms);
-    loadClothingCategory('shoes', catalog.shoes);
-    loadClothingCategory('accessories', catalog.accessories);
-}
-
-function loadClothingCategory(category, items) {
-    const container = document.getElementById(category + 'Container');
-    container.innerHTML = '';
-
-    items.forEach(item => {
-        const itemEl = document.createElement('div');
-        itemEl.className = 'clothing-item-card';
-        itemEl.onclick = () => selectClothing(category, item);
-
-        const isSelected = selectedOutfit[category.replace('s', '')] === item ||
-                          selectedOutfit[category] === item ||
-                          (category === 'accessories' && selectedOutfit.accessories === item);
-
-        itemEl.innerHTML = `
-            <div class="clothing-item-visual" style="background: linear-gradient(135deg, ${item.color} 0%, ${adjustColor(item.color, -20)} 100%);">
-                ${item.appropriate ?
-                    '<span class="visual-checkmark">✓</span>' :
-                    '<span class="visual-cross">×</span>'}
-            </div>
-            <div class="clothing-item-info">
-                <div class="clothing-item-name">${item.name}</div>
-                <div class="clothing-item-tip">${item.tip}</div>
-            </div>
-            <div class="clothing-item-badge ${item.appropriate ? 'badge-appropriate' : 'badge-inappropriate'}">
-                ${item.appropriate ? 'Apropiado' : 'Evitar'}
-            </div>
-            ${isSelected ? '<div class="selected-indicator">Seleccionado</div>' : ''}
-        `;
-
-        container.appendChild(itemEl);
+    // Actualizar botones activos
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === gender);
     });
+
+    renderLookbookGrid(gender, currentTag);
 }
 
-// Función auxiliar para ajustar colores
-function adjustColor(color, percent) {
-    const num = parseInt(color.replace("#", ""), 16);
-    const amt = Math.round(2.55 * percent);
-    const R = (num >> 16) + amt;
-    const G = (num >> 8 & 0x00FF) + amt;
-    const B = (num & 0x0000FF) + amt;
-    return "#" + (0x1000000 + (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
-        (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
-        (B < 255 ? B < 1 ? 0 : B : 255))
-        .toString(16).slice(1);
+// Filtrar por tag
+function filterByTag(tag) {
+    const currentGender = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+
+    // Actualizar botones activos
+    document.querySelectorAll('.tag-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tag === tag);
+    });
+
+    renderLookbookGrid(currentGender, tag);
 }
 
-// Seleccionar prenda
-function selectClothing(category, item) {
-    let outfitKey;
+// Mostrar detalles del outfit
+function showOutfitDetails(outfitId) {
+    const outfit = lookbookOutfits.find(o => o.id === outfitId);
+    const modal = document.getElementById('outfitModal');
+    const modalBody = document.getElementById('modalBody');
 
-    switch(category) {
-        case 'tops':
-            outfitKey = 'top';
-            break;
-        case 'bottoms':
-            outfitKey = 'bottom';
-            break;
-        case 'shoes':
-            outfitKey = 'shoes';
-            break;
-        case 'accessories':
-            outfitKey = 'accessories';
-            break;
-    }
+    modalBody.innerHTML = `
+        <div class="modal-outfit-details">
+            <div class="modal-image-section">
+                <img src="${outfit.image}" alt="${outfit.name}">
+                <button class="btn-fav-large ${isInCloset(outfit.id) ? 'active' : ''}"
+                        onclick="toggleFavorite(${outfit.id})">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    ${isInCloset(outfit.id) ? 'En Mi Closet' : 'Guardar en Mi Closet'}
+                </button>
+            </div>
+            <div class="modal-info-section">
+                <div class="modal-header-info">
+                    <h2>${outfit.name}</h2>
+                    <div class="modal-tags">
+                        ${outfit.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="modal-level-price">
+                    <span class="level-badge">${outfit.level}</span>
+                    <span class="price-badge">${outfit.price}</span>
+                </div>
+                <p class="modal-description">${outfit.description}</p>
 
-    selectedOutfit[outfitKey] = item;
-    renderAvatar();
-    updateFeedback();
-    loadClothing(); // Recargar para actualizar indicador de selección
-}
+                <h3>Prendas que incluye:</h3>
+                <ul class="items-list">
+                    ${outfit.items.map(item => `
+                        <li>
+                            <strong>${item.type}:</strong> ${item.detail}
+                        </li>
+                    `).join('')}
+                </ul>
 
-// Renderizar avatar SVG con outfit
-function renderAvatar() {
-    const container = document.getElementById('avatarContainer');
-    container.innerHTML = createAvatarSVG(currentGender, 'custom', selectedOutfit);
-}
+                <div class="modal-tips">
+                    <h4>Consejos para este look:</h4>
+                    <ul>
+                        <li>Asegúrate de que todo esté limpio y planchado</li>
+                        <li>Los colores deben ser coordinados y profesionales</li>
+                        <li>El calzado debe estar impecable y lustrado</li>
+                        <li>Evita accesorios excesivos o muy llamativos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
 
-// Crear SVG de avatar profesional
-function createAvatarSVG(gender, type, outfit = null) {
-    const skinTone = '#f4d3b0';
-    const hairColor = '#3d2817';
-
-    // Determinar colores del outfit
-    let topColor = '#e0e0e0';
-    let bottomColor = '#e0e0e0';
-    let shoesColor = '#808080';
-    let accessoryColor = '#4a5568';
-
-    if (type === 'inappropriate') {
-        // Outfit inapropiado de ejemplo
-        topColor = '#ff6b6b';
-        bottomColor = '#ffd93d';
-        shoesColor = '#95e1d3';
-        accessoryColor = '#f38181';
-    } else if (type === 'appropriate') {
-        // Outfit apropiado de ejemplo
-        topColor = '#1e3a5f';
-        bottomColor = '#1e3a5f';
-        shoesColor = '#2d3748';
-        accessoryColor = '#1e3a5f';
-    } else if (outfit) {
-        // Outfit personalizado
-        topColor = outfit.top ? outfit.top.color : '#e0e0e0';
-        bottomColor = outfit.bottom ? outfit.bottom.color : '#e0e0e0';
-        shoesColor = outfit.shoes ? outfit.shoes.color : '#808080';
-        accessoryColor = outfit.accessories ? outfit.accessories.color : '#4a5568';
-    }
-
-    if (gender === 'male') {
-        return `
-            <svg viewBox="0 0 200 400" class="avatar-svg">
-                <!-- Cabeza -->
-                <ellipse cx="100" cy="60" rx="35" ry="40" fill="${skinTone}" stroke="#d4a574" stroke-width="2"/>
-
-                <!-- Cabello -->
-                <path d="M 65 50 Q 65 25 100 25 Q 135 25 135 50" fill="${hairColor}" stroke="${hairColor}" stroke-width="2"/>
-
-                <!-- Ojos -->
-                <circle cx="85" cy="60" r="3" fill="#2d3748"/>
-                <circle cx="115" cy="60" r="3" fill="#2d3748"/>
-
-                <!-- Boca -->
-                <path d="M 85 75 Q 100 80 115 75" stroke="#d4a574" stroke-width="2" fill="none"/>
-
-                <!-- Cuello -->
-                <rect x="90" y="95" width="20" height="15" fill="${skinTone}"/>
-
-                <!-- Parte Superior (Jacket/Camisa) -->
-                <path d="M 60 110 L 70 140 L 70 220 L 130 220 L 130 140 L 140 110 L 120 110 L 110 105 L 90 105 L 80 110 Z"
-                      fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
-
-                <!-- Solapa del saco -->
-                ${outfit && outfit.top && outfit.top.id.includes('jacket') ? `
-                    <path d="M 80 110 L 90 140 L 100 130" fill="${adjustColor(topColor, -30)}" stroke="${adjustColor(topColor, -40)}" stroke-width="1"/>
-                    <path d="M 120 110 L 110 140 L 100 130" fill="${adjustColor(topColor, -30)}" stroke="${adjustColor(topColor, -40)}" stroke-width="1"/>
-                ` : ''}
-
-                <!-- Corbata/Accesorio de cuello -->
-                ${outfit && outfit.accessories && outfit.accessories.id.includes('tie') ? `
-                    <path d="M 100 110 L 95 140 L 97 200 L 100 210 L 103 200 L 105 140 Z"
-                          fill="${accessoryColor}" stroke="${adjustColor(accessoryColor, -20)}" stroke-width="1"/>
-                ` : ''}
-
-                <!-- Brazos -->
-                <rect x="50" y="140" width="20" height="80" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
-                <rect x="130" y="140" width="20" height="80" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
-
-                <!-- Manos -->
-                <circle cx="60" cy="220" r="10" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
-                <circle cx="140" cy="220" r="10" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
-
-                <!-- Parte Inferior (Pantalones) -->
-                <rect x="70" y="220" width="60" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
-
-                <!-- Pliegue del pantalón -->
-                <line x1="100" y1="220" x2="100" y2="340" stroke="${adjustColor(bottomColor, -30)}" stroke-width="1"/>
-
-                <!-- Piernas separadas -->
-                <rect x="70" y="220" width="28" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
-                <rect x="102" y="220" width="28" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
-
-                <!-- Zapatos -->
-                <ellipse cx="84" cy="350" rx="18" ry="10" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
-                <ellipse cx="116" cy="350" rx="18" ry="10" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
-
-                <!-- Detalles de zapatos -->
-                <ellipse cx="84" cy="348" rx="12" ry="6" fill="${adjustColor(shoesColor, 20)}"/>
-                <ellipse cx="116" cy="348" rx="12" ry="6" fill="${adjustColor(shoesColor, 20)}"/>
-            </svg>
-        `;
-    } else {
-        // Avatar femenino
-        return `
-            <svg viewBox="0 0 200 400" class="avatar-svg">
-                <!-- Cabeza -->
-                <ellipse cx="100" cy="60" rx="32" ry="38" fill="${skinTone}" stroke="#d4a574" stroke-width="2"/>
-
-                <!-- Cabello -->
-                <path d="M 68 45 Q 68 20 100 20 Q 132 20 132 45 L 132 80 Q 120 85 100 85 Q 80 85 68 80 Z"
-                      fill="${hairColor}" stroke="${hairColor}" stroke-width="2"/>
-
-                <!-- Ojos -->
-                <circle cx="85" cy="58" r="3" fill="#2d3748"/>
-                <circle cx="115" cy="58" r="3" fill="#2d3748"/>
-
-                <!-- Pestañas -->
-                <path d="M 82 55 L 80 52" stroke="#2d3748" stroke-width="1"/>
-                <path d="M 118 55 L 120 52" stroke="#2d3748" stroke-width="1"/>
-
-                <!-- Boca -->
-                <path d="M 88 73 Q 100 78 112 73" stroke="#d4a574" stroke-width="2" fill="none"/>
-
-                <!-- Cuello -->
-                <rect x="92" y="93" width="16" height="12" fill="${skinTone}"/>
-
-                <!-- Parte Superior (Blazer/Blusa) -->
-                <path d="M 65 105 L 72 135 L 72 220 L 128 220 L 128 135 L 135 105 L 118 105 L 108 100 L 92 100 L 82 105 Z"
-                      fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
-
-                <!-- Solapas de blazer -->
-                ${outfit && outfit.top && outfit.top.id.includes('blazer') ? `
-                    <path d="M 82 105 L 92 140 L 100 125" fill="${adjustColor(topColor, -25)}" stroke="${adjustColor(topColor, -35)}" stroke-width="1"/>
-                    <path d="M 118 105 L 108 140 L 100 125" fill="${adjustColor(topColor, -25)}" stroke="${adjustColor(topColor, -35)}" stroke-width="1"/>
-                    <circle cx="95" cy="150" r="3" fill="${adjustColor(topColor, -40)}"/>
-                    <circle cx="95" cy="170" r="3" fill="${adjustColor(topColor, -40)}"/>
-                ` : ''}
-
-                <!-- Collar/Accesorio -->
-                ${outfit && outfit.accessories && (outfit.accessories.id.includes('necklace') || outfit.accessories.id.includes('scarf')) ? `
-                    <ellipse cx="100" cy="105" rx="15" ry="3" fill="${accessoryColor}" opacity="0.8"/>
-                    ${outfit.accessories.id.includes('necklace') ? `
-                        <circle cx="100" cy="115" r="4" fill="${accessoryColor}"/>
-                    ` : ''}
-                ` : ''}
-
-                <!-- Brazos -->
-                <rect x="52" y="135" width="20" height="85" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
-                <rect x="128" y="135" width="20" height="85" rx="10" fill="${topColor}" stroke="${adjustColor(topColor, -20)}" stroke-width="2"/>
-
-                <!-- Manos -->
-                <circle cx="62" cy="218" r="9" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
-                <circle cx="138" cy="218" r="9" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
-
-                <!-- Parte Inferior (Falda o Pantalones) -->
-                ${outfit && outfit.bottom && (outfit.bottom.id.includes('skirt') || outfit.bottom.id.includes('dress')) ? `
-                    <!-- Falda -->
-                    <path d="M 72 220 L 65 290 L 135 290 L 128 220 Z"
-                          fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
-                    <!-- Piernas visibles -->
-                    <rect x="78" y="290" width="16" height="50" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
-                    <rect x="106" y="290" width="16" height="50" fill="${skinTone}" stroke="#d4a574" stroke-width="1"/>
-                ` : `
-                    <!-- Pantalones -->
-                    <rect x="72" y="220" width="26" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
-                    <rect x="102" y="220" width="26" height="120" fill="${bottomColor}" stroke="${adjustColor(bottomColor, -20)}" stroke-width="2"/>
-                `}
-
-                <!-- Zapatos -->
-                ${outfit && outfit.shoes && outfit.shoes.id.includes('heels') ? `
-                    <!-- Tacones -->
-                    <path d="M 80 345 L 78 360 L 92 360 L 90 345 Z" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="1"/>
-                    <path d="M 110 345 L 108 360 L 122 360 L 120 345 Z" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="1"/>
-                    <rect x="78" y="360" width="4" height="15" fill="${shoesColor}"/>
-                    <rect x="108" y="360" width="4" height="15" fill="${shoesColor}"/>
-                ` : `
-                    <!-- Zapatos planos -->
-                    <ellipse cx="86" cy="350" rx="16" ry="9" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
-                    <ellipse cx="114" cy="350" rx="16" ry="9" fill="${shoesColor}" stroke="${adjustColor(shoesColor, -20)}" stroke-width="2"/>
-                `}
-            </svg>
-        `;
-    }
-}
-
-// Actualizar feedback en tiempo real
-function updateFeedback() {
-    const feedbackContent = document.getElementById('feedbackContent');
-    const scorePercentage = document.getElementById('scorePercentage');
-    const scoreCircle = document.getElementById('scoreCircleMini');
-    const items = Object.values(selectedOutfit).filter(item => item !== null);
-
-    if (items.length === 0) {
-        feedbackContent.innerHTML = '<p class="feedback-placeholder">Comienza a seleccionar prendas para recibir retroalimentación personalizada...</p>';
-        scorePercentage.textContent = '0%';
-        scoreCircle.style.background = 'linear-gradient(135deg, #e2e8f0 0%, #cbd5e0 100%)';
-        return;
-    }
-
-    let html = '';
-    const appropriate = items.filter(item => item.appropriate);
-    const inappropriate = items.filter(item => !item.appropriate);
-
-    const totalItems = items.length;
-    const appropriateCount = appropriate.length;
-    const percentage = Math.round((appropriateCount / totalItems) * 100);
-
-    // Actualizar score circle
-    scorePercentage.textContent = percentage + '%';
-
-    if (percentage >= 80) {
-        scoreCircle.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
-    } else if (percentage >= 60) {
-        scoreCircle.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-    } else {
-        scoreCircle.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-    }
-
-    // Mensaje general
-    if (percentage >= 80) {
-        html += '<div class="feedback-section excellent"><h5>Excelente Selección</h5><p>Tu outfit proyecta profesionalismo y es apropiado para una entrevista formal.</p></div>';
-    } else if (percentage >= 60) {
-        html += '<div class="feedback-section good"><h5>Buen Camino</h5><p>Tu outfit es aceptable, pero puedes mejorarlo para causar una mejor impresión.</p></div>';
-    } else {
-        html += '<div class="feedback-section needs-work"><h5>Necesita Mejoras</h5><p>Tu outfit actual no es apropiado para una entrevista. Te recomendamos revisar las prendas seleccionadas.</p></div>';
-    }
-
-    // Prendas apropiadas
-    if (appropriate.length > 0) {
-        html += '<div class="feedback-detail good">';
-        html += '<h6><span class="icon-check">✓</span> Prendas Apropiadas (' + appropriate.length + ')</h6>';
-        html += '<ul>';
-        appropriate.forEach(item => {
-            html += `<li><strong>${item.name}</strong> - ${item.tip}</li>`;
-        });
-        html += '</ul></div>';
-    }
-
-    // Prendas inapropiadas
-    if (inappropriate.length > 0) {
-        html += '<div class="feedback-detail warning">';
-        html += '<h6><span class="icon-cross">×</span> Prendas a Evitar (' + inappropriate.length + ')</h6>';
-        html += '<ul>';
-        inappropriate.forEach(item => {
-            html += `<li><strong>${item.name}</strong> - ${item.tip}</li>`;
-        });
-        html += '</ul></div>';
-    }
-
-    // Sugerencias
-    if (inappropriate.length > 0) {
-        html += '<div class="feedback-suggestions">';
-        html += '<h6>Sugerencias de Mejora:</h6>';
-        html += '<ul>';
-
-        if (inappropriate.some(i => i.id.includes('jeans') || i.id.includes('shorts'))) {
-            html += '<li>Opta por pantalones de vestir en colores neutros</li>';
-        }
-        if (inappropriate.some(i => i.id.includes('tshirt') || i.id.includes('polo') || i.id.includes('hoodie'))) {
-            html += '<li>Elige camisa de vestir o blazer para mayor formalidad</li>';
-        }
-        if (inappropriate.some(i => i.id.includes('sneakers') || i.id.includes('sandals') || i.id.includes('flip'))) {
-            html += '<li>Usa calzado formal cerrado y en buen estado</li>';
-        }
-        if (inappropriate.some(i => i.id.includes('cap') || i.id.includes('sunglasses'))) {
-            html += '<li>Evita accesorios casuales en entrevistas</li>';
-        }
-
-        html += '</ul></div>';
-    }
-
-    feedbackContent.innerHTML = html;
-}
-
-// Limpiar outfit
-function clearOutfit() {
-    selectedOutfit = {
-        top: null,
-        bottom: null,
-        shoes: null,
-        accessories: null
-    };
-    renderAvatar();
-    updateFeedback();
-    loadClothing(); // Recargar para quitar indicadores de selección
-}
-
-// Enviar y ver resultados
-function submitDressCode() {
-    const items = Object.values(selectedOutfit).filter(item => item !== null);
-
-    if (items.length < 3) {
-        alert('⚠️ Por favor, selecciona al menos 3 prendas (parte superior, inferior y calzado)');
-        return;
-    }
-
-    // Calcular puntuación
-    const appropriate = items.filter(item => item.appropriate);
-    const score = Math.round((appropriate.length / items.length) * 100);
-
-    // Mostrar resultados
-    showResults(score, items, appropriate);
-}
-
-function showResults(score, allItems, appropriateItems) {
-    const modal = document.getElementById('dressCodeResultsModal');
-    const title = document.getElementById('resultsTitle');
-    const scoreNumber = document.getElementById('scoreNumber');
-    const scoreCircle = document.getElementById('scoreCircle');
-    const feedbackDiv = document.getElementById('resultsFeedback');
-    const detailsDiv = document.getElementById('resultsDetails');
-
-    // Título según puntuación
-    if (score >= 80) {
-        title.textContent = '🎉 ¡Excelente!';
-        title.style.color = '#22c55e';
-    } else if (score >= 60) {
-        title.textContent = '👍 ¡Bien!';
-        title.style.color = '#f59e0b';
-    } else {
-        title.textContent = '💡 Puedes Mejorar';
-        title.style.color = '#ef4444';
-    }
-
-    scoreNumber.textContent = score;
-
-    // Cambiar color del círculo
-    if (score >= 80) {
-        scoreCircle.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
-    } else if (score >= 60) {
-        scoreCircle.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
-    } else {
-        scoreCircle.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
-    }
-
-    // Feedback
-    let feedbackHTML = '<h3>Análisis de tu Vestimenta</h3>';
-    if (score >= 80) {
-        feedbackHTML += '<p>¡Perfecto! Tu vestimenta es completamente apropiada para una entrevista de trabajo. Demuestras profesionalismo y respeto por la ocasión.</p>';
-    } else if (score >= 60) {
-        feedbackHTML += '<p>Vas por buen camino, pero hay algunos elementos que podrías mejorar para proyectar una imagen más profesional.</p>';
-    } else {
-        feedbackHTML += '<p>Tu vestimenta necesita ajustes importantes. Recuerda que la primera impresión es crucial en una entrevista.</p>';
-    }
-    feedbackDiv.innerHTML = feedbackHTML;
-
-    // Detalles
-    const inappropriate = allItems.filter(item => !item.appropriate);
-    let detailsHTML = '<h4>Detalles de tu Selección:</h4>';
-
-    if (appropriateItems.length > 0) {
-        detailsHTML += '<div class="detail-item" style="border-left: 3px solid #22c55e;">';
-        detailsHTML += '<div class="detail-icon">✅</div>';
-        detailsHTML += '<div class="detail-text">';
-        detailsHTML += '<strong>Prendas Apropiadas (' + appropriateItems.length + ')</strong>';
-        detailsHTML += '<span>' + appropriateItems.map(item => item.name).join(', ') + '</span>';
-        detailsHTML += '</div></div>';
-    }
-
-    if (inappropriate.length > 0) {
-        detailsHTML += '<div class="detail-item" style="border-left: 3px solid #ef4444;">';
-        detailsHTML += '<div class="detail-icon">❌</div>';
-        detailsHTML += '<div class="detail-text">';
-        detailsHTML += '<strong>Prendas a Evitar (' + inappropriate.length + ')</strong>';
-        detailsHTML += '<span>' + inappropriate.map(item => item.name).join(', ') + '</span>';
-        detailsHTML += '</div></div>';
-    }
-
-    detailsDiv.innerHTML = detailsHTML;
-
-    // Mostrar modal
     modal.style.display = 'flex';
+}
+
+// Cerrar modal
+function closeOutfitModal() {
+    document.getElementById('outfitModal').style.display = 'none';
+}
+
+// Toggle favorito
+function toggleFavorite(outfitId) {
+    const index = myCloset.indexOf(outfitId);
+
+    if (index > -1) {
+        myCloset.splice(index, 1);
+    } else {
+        myCloset.push(outfitId);
+    }
+
+    localStorage.setItem('myCloset', JSON.stringify(myCloset));
+    updateClosetCount();
+
+    // Actualizar UI
+    const currentFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    const currentTag = document.querySelector('.tag-btn.active')?.dataset.tag || 'all';
+    renderLookbookGrid(currentFilter, currentTag);
+
+    // Si el modal está abierto, actualizarlo
+    const modal = document.getElementById('outfitModal');
+    if (modal.style.display === 'flex') {
+        const outfit = lookbookOutfits.find(o => o.id === outfitId);
+        if (outfit) {
+            showOutfitDetails(outfitId);
+        }
+    }
+}
+
+// Verificar si está en closet
+function isInCloset(outfitId) {
+    return myCloset.includes(outfitId);
+}
+
+// Actualizar contador de closet
+function updateClosetCount() {
+    document.getElementById('closetCount').textContent = myCloset.length;
+}
+
+// Toggle panel de closet
+function toggleMyCloset() {
+    const panel = document.getElementById('myClosetPanel');
+    const isVisible = panel.style.display === 'block';
+
+    if (isVisible) {
+        panel.style.display = 'none';
+    } else {
+        panel.style.display = 'block';
+        renderMyCloset();
+    }
+}
+
+// Renderizar mi closet
+function renderMyCloset() {
+    const container = document.getElementById('closetItems');
+
+    if (myCloset.length === 0) {
+        container.innerHTML = '<p class="closet-empty">Aún no has guardado ningún outfit. Haz clic en el corazón de tus favoritos.</p>';
+        return;
+    }
+
+    const savedOutfits = lookbookOutfits.filter(o => myCloset.includes(o.id));
+
+    container.innerHTML = savedOutfits.map(outfit => `
+        <div class="closet-item" onclick="showOutfitDetails(${outfit.id})">
+            <img src="${outfit.image}" alt="${outfit.name}">
+            <div class="closet-item-info">
+                <h4>${outfit.name}</h4>
+                <p>${outfit.level}</p>
+            </div>
+            <button class="closet-remove" onclick="event.stopPropagation(); toggleFavorite(${outfit.id})">
+                ×
+            </button>
+        </div>
+    `).join('');
+}
+
+// Exportar a PDF (simulado)
+function exportMyCloset() {
+    if (myCloset.length === 0) {
+        alert('Primero guarda algunos outfits en tu closet');
+        return;
+    }
+
+    alert(`📄 Generando tu guía personalizada con ${myCloset.length} outfit${myCloset.length > 1 ? 's' : ''}...\n\n(Funcionalidad de PDF próximamente)`);
+}
+
+// Cargar closet desde localStorage
+function loadMyCloset() {
+    const saved = localStorage.getItem('myCloset');
+    if (saved) {
+        myCloset = JSON.parse(saved);
+    }
+}
+
+// Inicializar cuando cargue la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo inicializar si estamos en la pantalla de dress code
+    if (document.getElementById('lookbookSection')) {
+        loadMyCloset();
+        initLookbook();
+    }
+});
+
+// FUNCIONES ANTIGUAS MANTENIDAS PARA COMPATIBILIDAD
+function startDressCodeActivity() {
+    // Ya no se usa, lookbook se muestra directo
+    initLookbook();
+}
+
+function selectGender(gender) {
+    filterByGender(gender);
+}
+
+function backToVideo() {
+    // Ya no hay video separado
+}
+
+function clearOutfit() {
+    // Funcionalidad removida en lookbook
+}
+
+function selectClothing() {
+    // Funcionalidad removida en lookbook
+}
+
+function renderAvatar() {
+    // Funcionalidad removida en lookbook
+}
+
+// Funciones antiguas de compatibilidad
+function updateFeedback() {
+    // Ya no se usa
+}
+
+function submitDressCode() {
+    // Ya no se usa
 }
 
 function closeDressCodeResults() {
@@ -2970,18 +2671,17 @@ function closeDressCodeResults() {
 
 function tryAgainDressCode() {
     closeDressCodeResults();
-    clearOutfit();
 }
 
 function finishDressCode() {
     closeDressCodeResults();
-    // Aquí podrías agregar lógica para guardar resultados o volver al menú
     if (typeof showScreen === 'function') {
         showScreen('welcomeScreen');
     } else if (typeof window.showScreen === 'function') {
         window.showScreen('welcomeScreen');
     }
 }
+
 </script>
 
 <script src="script-pro.js"></script>

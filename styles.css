@@ -7645,3 +7645,675 @@ body.dark-theme .btn-nav.secondary:hover {
         width: 100%;
     }
 }
+
+/* ===================================
+   LOOKBOOK PROFESIONAL - ESTILOS
+   =================================== */
+
+/* Header del Lookbook */
+.lookbook-header {
+    margin-bottom: 3rem;
+}
+
+.lookbook-title-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.lookbook-title-section h1 {
+    font-size: 2.5em;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.lookbook-title-section p {
+    font-size: 1.2em;
+    color: var(--gray-600);
+}
+
+/* Video Card */
+.lookbook-video-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.lookbook-video-card h3 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+/* Filtros */
+.lookbook-filters {
+    background: white;
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.filter-group {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-btn {
+    padding: 0.75rem 2rem;
+    border: 2px solid var(--gray-300);
+    background: white;
+    color: var(--gray-700);
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+    transform: translateY(-2px);
+}
+
+.filter-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.filter-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+.tag-label {
+    color: var(--gray-600);
+    font-weight: 600;
+    margin-right: 0.5rem;
+}
+
+.tag-btn {
+    padding: 0.5rem 1.25rem;
+    border: 1px solid var(--gray-300);
+    background: var(--gray-50);
+    color: var(--gray-700);
+    border-radius: 20px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tag-btn:hover {
+    background: var(--primary-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.tag-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.my-closet-btn-container {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.btn-my-closet {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-my-closet:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.closet-count {
+    background: white;
+    color: var(--primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 700;
+}
+
+/* Grid de Lookbook (Estilo Instagram) */
+.lookbook-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+/* Cards de Outfit */
+.lookbook-card {
+    background: white;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.lookbook-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+}
+
+.card-image {
+    position: relative;
+    height: 400px;
+    background-size: cover;
+    background-position: center;
+}
+
+.card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 50%, rgba(0,0,0,0.4) 100%);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.btn-fav {
+    align-self: flex-end;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.btn-fav svg {
+    fill: var(--gray-400);
+    transition: all 0.3s ease;
+}
+
+.btn-fav:hover svg,
+.btn-fav.active svg {
+    fill: #e74c3c;
+    transform: scale(1.2);
+}
+
+.card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.card-tag {
+    background: rgba(255,255,255,0.95);
+    color: var(--primary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.75em;
+    font-weight: 600;
+}
+
+.card-content {
+    padding: 1.5rem;
+}
+
+.card-content h3 {
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    font-size: 1.3em;
+}
+
+.card-level {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 0.9em;
+    margin-bottom: 0.75rem;
+}
+
+.card-desc {
+    color: var(--gray-600);
+    font-size: 0.9em;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.card-price {
+    font-weight: 700;
+    color: var(--success);
+}
+
+.card-gender {
+    background: var(--gray-100);
+    color: var(--gray-700);
+    padding: 0.25rem 0.75rem;
+    border-radius: 15px;
+    font-size: 0.85em;
+}
+
+/* Modal de Detalles del Outfit */
+.outfit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 2rem;
+}
+
+.outfit-modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    max-width: 1000px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(0,0,0,0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 1.5em;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+.modal-close:hover {
+    background: rgba(0,0,0,0.9);
+    transform: rotate(90deg);
+}
+
+.modal-outfit-details {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+    padding: 2rem;
+}
+
+.modal-image-section {
+    position: relative;
+}
+
+.modal-image-section img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius);
+    object-fit: cover;
+}
+
+.btn-fav-large {
+    margin-top: 1.5rem;
+    width: 100%;
+    padding: 1rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: var(--radius);
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.btn-fav-large.active {
+    background: #e74c3c;
+}
+
+.btn-fav-large:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.modal-info-section h2 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+    font-size: 2em;
+}
+
+.modal-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-tags .tag {
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.modal-level-price {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.level-badge,
+.price-badge {
+    padding: 0.5rem 1.25rem;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.level-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.price-badge {
+    background: var(--success);
+    color: white;
+}
+
+.modal-description {
+    color: var(--gray-700);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    font-size: 1.05em;
+}
+
+.modal-info-section h3 {
+    color: var(--dark);
+    margin: 2rem 0 1rem 0;
+    font-size: 1.3em;
+}
+
+.items-list {
+    list-style: none;
+    padding: 0;
+}
+
+.items-list li {
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    border-left: 3px solid var(--primary);
+}
+
+.items-list strong {
+    color: var(--primary);
+}
+
+.modal-tips {
+    background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    margin-top: 2rem;
+}
+
+.modal-tips h4 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.modal-tips ul {
+    list-style-position: inside;
+}
+
+.modal-tips li {
+    color: var(--gray-800);
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+/* Panel Mi Closet */
+.my-closet-panel {
+    position: fixed;
+    right: -400px;
+    top: 0;
+    width: 400px;
+    height: 100vh;
+    background: white;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.3);
+    transition: right 0.4s ease;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+}
+
+.my-closet-panel[style*="display: block"] {
+    right: 0;
+}
+
+.closet-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 2px solid var(--gray-200);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.closet-panel-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+}
+
+.closet-close {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.closet-close:hover {
+    background: rgba(255,255,255,0.3);
+    transform: rotate(90deg);
+}
+
+.closet-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.closet-empty {
+    text-align: center;
+    color: var(--gray-500);
+    padding: 3rem 2rem;
+    font-style: italic;
+}
+
+.closet-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: var(--gray-50);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.closet-item:hover {
+    background: var(--gray-100);
+    transform: translateX(-5px);
+}
+
+.closet-item img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: var(--radius);
+}
+
+.closet-item-info {
+    flex: 1;
+}
+
+.closet-item-info h4 {
+    color: var(--dark);
+    margin: 0 0 0.5rem 0;
+    font-size: 1em;
+}
+
+.closet-item-info p {
+    color: var(--gray-600);
+    margin: 0;
+    font-size: 0.85em;
+}
+
+.closet-remove {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--danger);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.closet-remove:hover {
+    background: #c0392b;
+    transform: rotate(90deg);
+}
+
+/* Acciones del Lookbook */
+.lookbook-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    padding: 2rem 0;
+}
+
+/* Responsive Design - Lookbook */
+@media (max-width: 1024px) {
+    .lookbook-grid {
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+
+    .modal-outfit-details {
+        grid-template-columns: 1fr;
+    }
+
+    .my-closet-panel {
+        width: 100%;
+        right: -100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .lookbook-title-section h1 {
+        font-size: 2em;
+    }
+
+    .lookbook-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-group {
+        flex-direction: column;
+    }
+
+    .filter-btn {
+        width: 100%;
+    }
+
+    .filter-tags {
+        justify-content: flex-start;
+    }
+
+    .outfit-modal {
+        padding: 1rem;
+    }
+
+    .modal-outfit-details {
+        padding: 1rem;
+    }
+
+    .lookbook-actions {
+        flex-direction: column;
+    }
+
+    .lookbook-actions button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .lookbook-title-section h1 {
+        font-size: 1.75em;
+    }
+
+    .card-image {
+        height: 300px;
+    }
+
+    .btn-my-closet {
+        width: 100%;
+        justify-content: center;
+    }
+}
