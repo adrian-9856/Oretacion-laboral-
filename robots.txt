@@ -1,0 +1,10 @@
+# robots.txt para Sistema de Evaluación Laboral PRO
+User-agent: *
+Allow: /
+
+# Rutas que no queremos indexar
+Disallow: /admin
+Disallow: /private
+
+# Sitemap (si existe)
+# Sitemap: https://tudominio.com/sitemap.xml

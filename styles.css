@@ -6279,15 +6279,17 @@ textarea.input-modern {
     width: 100%;
     max-width: 800px;
     margin: 0 auto 2rem;
-    border-radius: var(--radius);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.2);
+    background: #000;
 }
 
 .video-wrapper iframe {
     width: 100%;
     height: 450px;
     border: none;
+    display: block;
 }
 
 .btn-large {
@@ -7653,48 +7655,79 @@ body.dark-theme .btn-nav.secondary:hover {
 /* Header del Lookbook */
 .lookbook-header {
     margin-bottom: 3rem;
+    animation: fadeInUp 0.6s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .lookbook-title-section {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    border-radius: var(--radius-lg);
 }
 
 .lookbook-title-section h1 {
-    font-size: 2.5em;
-    color: var(--dark);
+    font-size: 2.8em;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin-bottom: 0.5rem;
-    font-weight: 700;
+    font-weight: 800;
+    letter-spacing: -0.5px;
 }
 
 .lookbook-title-section p {
-    font-size: 1.2em;
-    color: var(--gray-600);
+    font-size: 1.3em;
+    color: var(--gray-700);
+    font-weight: 500;
 }
 
 /* Video Card */
 .lookbook-video-card {
-    background: white;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
     border-radius: var(--radius-lg);
-    padding: 2rem;
-    box-shadow: var(--shadow-lg);
+    padding: 2.5rem;
+    box-shadow: 0 10px 40px rgba(102, 126, 234, 0.15);
     max-width: 900px;
-    margin: 0 auto;
+    margin: 0 auto 2rem auto;
+    border: 2px solid rgba(102, 126, 234, 0.1);
+    transition: all 0.3s ease;
+}
+
+.lookbook-video-card:hover {
+    box-shadow: 0 15px 50px rgba(102, 126, 234, 0.25);
+    transform: translateY(-5px);
 }
 
 .lookbook-video-card h3 {
     color: var(--dark);
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     text-align: center;
+    font-size: 1.5em;
+    font-weight: 700;
 }
 
 /* Filtros */
 .lookbook-filters {
     background: white;
     border-radius: var(--radius-lg);
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-    box-shadow: var(--shadow);
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    animation: fadeInUp 0.7s ease-out;
 }
 
 .filter-group {
@@ -7804,8 +7837,9 @@ body.dark-theme .btn-nav.secondary:hover {
 .lookbook-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 2rem;
+    gap: 2.5rem;
     margin-bottom: 3rem;
+    animation: fadeInUp 0.8s ease-out;
 }
 
 /* Cards de Outfit */
@@ -7813,14 +7847,16 @@ body.dark-theme .btn-nav.secondary:hover {
     background: white;
     border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid transparent;
 }
 
 .lookbook-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.15);
+    transform: translateY(-12px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(102, 126, 234, 0.2);
+    border-color: rgba(102, 126, 234, 0.3);
 }
 
 .card-image {
