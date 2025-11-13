@@ -1074,24 +1074,42 @@ function loadUserProgress() {
 // ========================================
 
 function loadDashboardData() {
-    const users = JSON.parse(localStorage.getItem('users') || '[]');
-    const results = getResults();
+    try {
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+        const results = getResults();
 
-    document.getElementById('totalUsers').textContent = users.length;
-    document.getElementById('totalTests').textContent = results.length;
+        // Validar que los elementos existen antes de actualizar
+        const totalUsersEl = document.getElementById('totalUsers');
+        const totalTestsEl = document.getElementById('totalTests');
+        const avgScoreEl = document.getElementById('avgScore');
+        const avgTimeEl = document.getElementById('avgTime');
 
-    const scores = results.map(r => r.score);
-    const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
-    document.getElementById('avgScore').textContent = avgScore + '%';
+        if (totalUsersEl) totalUsersEl.textContent = users.length;
+        if (totalTestsEl) totalTestsEl.textContent = results.length;
 
-    const times = results.map(r => r.time);
-    const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
-    document.getElementById('avgTime').textContent = avgTime + 's';
+        const scores = results.map(r => r.score).filter(s => !isNaN(s));
+        const avgScore = scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+        if (avgScoreEl) avgScoreEl.textContent = avgScore + '%';
 
-    loadResultsTable(results);
+        const times = results.map(r => r.time).filter(t => !isNaN(t));
+        const avgTime = times.length > 0 ? Math.round(times.reduce((a, b) => a + b, 0) / times.length) : 0;
+        if (avgTimeEl) avgTimeEl.textContent = avgTime + 's';
 
-    // Cargar gráficas
-    setTimeout(() => createCharts(), 100);
+        loadResultsTable(results);
+
+        // Cargar gráficas con manejo de errores
+        setTimeout(() => {
+            try {
+                createCharts();
+            } catch (chartError) {
+                console.error('Error al crear gráficas:', chartError);
+                // No mostrar mensaje al usuario, las gráficas son opcionales
+            }
+        }, 100);
+    } catch (error) {
+        console.error('Error al cargar dashboard:', error);
+        showToast('Error al cargar algunos datos del dashboard', 'warning');
+    }
 }
 
 function loadResultsTable(results) {
@@ -1124,9 +1142,13 @@ function loadResultsTable(results) {
 }
 
 function refreshDashboard() {
-    loadDashboardData();
-    createCharts();
-    showToast('Dashboard actualizado', 'success');
+    try {
+        loadDashboardData();
+        showToast('Dashboard actualizado', 'success');
+    } catch (error) {
+        console.error('Error al refrescar dashboard:', error);
+        showToast('Error al actualizar el dashboard', 'error');
+    }
 }
 
 function exportToExcel() {
@@ -1690,8 +1712,9 @@ window.addEventListener('error', function(e) {
             return;
         }
 
-        // Solo mostrar un mensaje genérico sin forzar recarga
-        showToast('⚠️ Algo salió mal. Si persiste, intenta refrescar la página.', 'warning');
+        // Solo mostrar un mensaje si el error es crítico
+        // Evitamos mostrar mensajes molestos por errores menores
+        console.warn('Error capturado:', event.error);
     }
 
     // Si hay más de 5 errores en poco tiempo, podría ser algo serio
@@ -5435,10 +5458,12 @@ function finishFormalInformalTest() {
 const dressCodeScenarios = [
     {
         scenario: "Entrevista de trabajo en una empresa corporativa",
-        image: "👔",
+        image: "business-suit",
+        avatarDesc: "Persona profesional con traje oscuro, camisa blanca y corbata",
+        visualTip: "Traje de dos piezas (saco y pantalón), camisa de botones, corbata conservadora, zapatos formales lustrados",
         question: "¿Qué vestimenta es apropiada?",
         options: [
-            { text: "Traje formal, camisa y corbata", correct: true, feedback: "¡Excelente! Para entrevistas corporativas es esencial vestir formalmente." },
+            { text: "Traje formal, camisa y corbata", correct: true, feedback: "¡Excelente! Para entrevistas corporativas es esencial vestir formalmente. Un traje bien ajustado proyecta profesionalismo y seriedad." },
             { text: "Jeans y camiseta deportiva", correct: false, feedback: "Demasiado casual. Las empresas corporativas esperan vestimenta formal." },
             { text: "Short y sandalias", correct: false, feedback: "Totalmente inapropiado para una entrevista formal." },
             { text: "Ropa deportiva", correct: false, feedback: "La ropa deportiva no es apropiada para entrevistas de trabajo." }
@@ -5446,32 +5471,38 @@ const dressCodeScenarios = [
     },
     {
         scenario: "Primer día de trabajo en una oficina",
-        image: "🏢",
+        image: "business-casual",
+        avatarDesc: "Persona en vestimenta business casual: pantalón de vestir y camisa",
+        visualTip: "Pantalón de vestir, camisa de botones (sin corbata), zapatos formales pero cómodos, accesorios discretos",
         question: "¿Cómo debes vestir?",
         options: [
             { text: "Ropa de playa", correct: false, feedback: "Completamente inapropiado para una oficina." },
-            { text: "Vestimenta business casual (pantalón de vestir, camisa)", correct: true, feedback: "¡Correcto! Business casual es apropiado para la mayoría de oficinas." },
+            { text: "Vestimenta business casual (pantalón de vestir, camisa)", correct: true, feedback: "¡Correcto! Business casual es apropiado para la mayoría de oficinas. Es profesional pero no tan rígido como traje completo." },
             { text: "Pijama", correct: false, feedback: "El pijama es solo para casa, nunca para el trabajo." },
             { text: "Disfraz", correct: false, feedback: "Los disfraces no son apropiados para el trabajo (excepto eventos especiales)." }
         ]
     },
     {
         scenario: "Reunión importante con clientes",
-        image: "🤝",
+        image: "executive-meeting",
+        avatarDesc: "Ejecutivo/a en traje completo presentando profesionalismo",
+        visualTip: "Traje impecable (oscuro: azul marino o gris), camisa clara bien planchada, corbata clásica, maletín profesional",
         question: "¿Qué vestimenta proyecta profesionalismo?",
         options: [
             { text: "Sudadera con capucha", correct: false, feedback: "Demasiado casual para una reunión con clientes." },
-            { text: "Traje completo y zapatos formales", correct: true, feedback: "¡Perfecto! Un traje completo proyecta profesionalismo y respeto." },
+            { text: "Traje completo y zapatos formales", correct: true, feedback: "¡Perfecto! Un traje completo proyecta profesionalismo y respeto. Los clientes valorarán tu imagen cuidada." },
             { text: "Shorts y flip-flops", correct: false, feedback: "Totalmente inapropiado para una reunión de negocios." },
             { text: "Ropa arrugada y sucia", correct: false, feedback: "La apariencia descuidada proyecta falta de profesionalismo." }
         ]
     },
     {
         scenario: "Trabajo en call center / atención telefónica",
-        image: "📞",
+        image: "office-casual",
+        avatarDesc: "Persona vestida de manera profesional casual para trabajo remoto",
+        visualTip: "Business casual: pantalón/falda cómodos pero presentables, polo o blusa, calzado cerrado",
         question: "¿Qué nivel de formalidad se requiere?",
         options: [
-            { text: "Business casual (aunque no te vean, la actitud importa)", correct: true, feedback: "¡Correcto! Vestir bien ayuda a tu actitud y profesionalismo, aunque sea telefónico." },
+            { text: "Business casual (aunque no te vean, la actitud importa)", correct: true, feedback: "¡Correcto! Vestir bien ayuda a tu actitud y profesionalismo. Tu forma de vestir afecta tu confianza y cómo te expresas por teléfono." },
             { text: "Cualquier cosa, nadie me ve", correct: false, feedback: "La vestimenta afecta tu actitud y profesionalismo." },
             { text: "Ropa de dormir", correct: false, feedback: "Mantener estándares profesionales mejora tu desempeño." },
             { text: "No importa la vestimenta", correct: false, feedback: "Tu vestimenta influye en cómo te sientes y trabajas." }
@@ -5479,10 +5510,12 @@ const dressCodeScenarios = [
     },
     {
         scenario: "Trabajo en restaurante de alta categoría",
-        image: "🍽️",
+        image: "hospitality-uniform",
+        avatarDesc: "Personal de servicio con uniforme impecable y presentación pulcra",
+        visualTip: "Uniforme completo del establecimiento, perfectamente limpio y planchado, zapatos lustrados, cabello recogido/peinado",
         question: "¿Qué vestimenta se requiere?",
         options: [
-            { text: "Uniforme impecable, planchado y limpio", correct: true, feedback: "¡Exacto! En servicios de alta categoría la imagen es fundamental." },
+            { text: "Uniforme impecable, planchado y limpio", correct: true, feedback: "¡Exacto! En servicios de alta categoría la imagen es fundamental. Tu presentación refleja la calidad del establecimiento." },
             { text: "Ropa casual de calle", correct: false, feedback: "Los restaurantes formales exigen uniformes específicos." },
             { text: "Ropa deportiva", correct: false, feedback: "Inapropiado para un ambiente formal de servicio." },
             { text: "Lo que quieras", correct: false, feedback: "Los restaurantes tienen códigos de vestimenta estrictos." }
@@ -5490,10 +5523,12 @@ const dressCodeScenarios = [
     },
     {
         scenario: "Evento de networking profesional",
-        image: "🎯",
+        image: "networking-smart",
+        avatarDesc: "Profesional en vestimenta smart casual para evento de networking",
+        visualTip: "Smart casual: blazer sport, camisa/blusa sin corbata, pantalón/falda de vestir, zapatos elegantes pero cómodos",
         question: "¿Cómo debes vestir?",
         options: [
-            { text: "Casual elegante (smart casual)", correct: true, feedback: "¡Correcto! Smart casual es ideal para networking." },
+            { text: "Casual elegante (smart casual)", correct: true, feedback: "¡Correcto! Smart casual es ideal para networking. Te permite verte profesional pero accesible y crear conexiones genuinas." },
             { text: "Pijama de diseñador", correct: false, feedback: "Aunque sea de diseñador, un pijama no es apropiado." },
             { text: "Ropa de gimnasio", correct: false, feedback: "La ropa deportiva no es apropiada para eventos profesionales." },
             { text: "Traje de baño", correct: false, feedback: "Totalmente inapropiado para un evento profesional." }
@@ -5501,22 +5536,26 @@ const dressCodeScenarios = [
     },
     {
         scenario: "Presentación ante directivos de la empresa",
-        image: "📊",
+        image: "executive-presentation",
+        avatarDesc: "Profesional presentando con atuendo ejecutivo formal",
+        visualTip: "Traje oscuro de alta calidad, camisa blanca o celeste, corbata conservadora, accesorios mínimos pero elegantes",
         question: "¿Qué vestimenta es esencial?",
         options: [
             { text: "Camiseta con estampados", correct: false, feedback: "Demasiado informal para presentar ante directivos." },
-            { text: "Traje oscuro, camisa clara, corbata conservadora", correct: true, feedback: "¡Excelente! Esta es la vestimenta ideal para presentaciones ejecutivas." },
+            { text: "Traje oscuro, camisa clara, corbata conservadora", correct: true, feedback: "¡Excelente! Esta es la vestimenta ideal para presentaciones ejecutivas. Proyecta autoridad y credibilidad." },
             { text: "Jeans rotos y zapatillas", correct: false, feedback: "Completamente inapropiado para el ámbito ejecutivo." },
             { text: "Ropa con manchas", correct: false, feedback: "La apariencia descuidada es inaceptable en el ámbito ejecutivo." }
         ]
     },
     {
         scenario: "Video conferencia importante",
-        image: "💻",
+        image: "video-professional",
+        avatarDesc: "Persona en videollamada con vestimenta profesional completa",
+        visualTip: "Atuendo profesional completo (no solo la parte superior), colores sólidos que se vean bien en cámara, fondo ordenado",
         question: "¿Qué debes considerar?",
         options: [
             { text: "Solo vestir bien de la cintura para arriba", correct: false, feedback: "Aunque tentador, debes estar completamente presentable por si necesitas pararte." },
-            { text: "Vestir completamente profesional como si fuera presencial", correct: true, feedback: "¡Correcto! Siempre debes estar completamente presentable en videollamadas." },
+            { text: "Vestir completamente profesional como si fuera presencial", correct: true, feedback: "¡Correcto! Siempre debes estar completamente presentable en videollamadas. Los accidentes pasan y siempre es mejor estar preparado." },
             { text: "Pijama completa", correct: false, feedback: "Las videollamadas laborales requieren vestimenta profesional." },
             { text: "Sin camisa", correct: false, feedback: "Totalmente inapropiado, incluso en videollamadas." }
         ]
@@ -5544,14 +5583,44 @@ function loadDressCodeQuestion() {
 
     const scenario = dressCodeScenarios[dressCodeCurrentQ];
 
+    // Generar icono visual basado en el tipo de imagen
+    const iconMap = {
+        'business-suit': '👔',
+        'business-casual': '👕',
+        'executive-meeting': '💼',
+        'office-casual': '🏢',
+        'hospitality-uniform': '🍽️',
+        'networking-smart': '🤝',
+        'executive-presentation': '📊',
+        'video-professional': '💻'
+    };
+
+    const icon = iconMap[scenario.image] || '👔';
+
     container.innerHTML = `
         <div class="scenario-progress">
             <span>Escenario ${dressCodeCurrentQ + 1} de ${dressCodeScenarios.length}</span>
         </div>
 
         <div class="scenario-card">
-            <div class="scenario-icon">${scenario.image}</div>
+            <div class="scenario-visual-section">
+                <div class="scenario-icon-large">${icon}</div>
+                <div class="avatar-description">
+                    <strong>👤 Imagen profesional:</strong>
+                    <p>${scenario.avatarDesc}</p>
+                </div>
+            </div>
+
             <h2 class="scenario-title">${scenario.scenario}</h2>
+
+            <div class="visual-tip-box">
+                <div class="tip-icon">💡</div>
+                <div class="tip-content">
+                    <strong>Consejo visual:</strong>
+                    <p>${scenario.visualTip}</p>
+                </div>
+            </div>
+
             <h3 class="scenario-question">${scenario.question}</h3>
 
             <div class="dress-options">

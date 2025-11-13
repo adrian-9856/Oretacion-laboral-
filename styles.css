@@ -1567,12 +1567,35 @@ body.dark-theme h6 {
 body.dark-theme p,
 body.dark-theme span,
 body.dark-theme label {
-    color: #E5E7EB;
+    color: #F3F4F6;
 }
 
 body.dark-theme .text-muted,
 body.dark-theme .subtitle {
-    color: #9CA3AF !important;
+    color: #D1D5DB !important;
+}
+
+/* Mejorar visibilidad de todos los textos */
+body.dark-theme .option-text,
+body.dark-theme .test-description,
+body.dark-theme .info-text,
+body.dark-theme .question-text {
+    color: #F9FAFB;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-theme .btn,
+body.dark-theme button {
+    color: #FFFFFF;
+}
+
+body.dark-theme .btn-secondary {
+    color: #FFFFFF;
+    background: rgba(99, 102, 241, 0.3);
+}
+
+body.dark-theme .btn-secondary:hover {
+    background: rgba(99, 102, 241, 0.5);
 }
 
 /* Inputs y formularios con mejor visibilidad */
@@ -6825,15 +6848,334 @@ textarea.input-modern {
     flex: 1;
 }
 
+/* ========================================
+   SECCIÓN DE CÓDIGO DE VESTIMENTA - MEJORADO
+   ======================================== */
+
+.scenario-progress {
+    text-align: center;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-weight: 600;
+    font-size: 1rem;
+}
+
+.scenario-card {
+    background: white;
+    border-radius: 16px;
+    padding: 32px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    animation: slideInUp 0.4s ease-out;
+}
+
+.scenario-visual-section {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(93, 93, 255, 0.05), rgba(0, 196, 204, 0.05));
+    border-radius: 12px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.scenario-icon-large {
+    font-size: 4rem;
+    flex-shrink: 0;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.avatar-description {
+    flex: 1;
+}
+
+.avatar-description strong {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.avatar-description p {
+    color: var(--gray-700);
+    font-size: 1rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.scenario-title {
+    color: var(--gray-900);
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-align: center;
+    margin: 24px 0 16px;
+}
+
+.visual-tip-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 20px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(251, 191, 36, 0.08));
+    border-radius: 12px;
+    border-left: 4px solid var(--warning-color);
+    margin-bottom: 24px;
+}
+
+.tip-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.tip-content {
+    flex: 1;
+}
+
+.tip-content strong {
+    color: var(--warning-color);
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.tip-content p {
+    color: var(--gray-700);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.scenario-question {
+    color: var(--gray-800);
+    font-size: 1.3rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 24px 0;
+}
+
+.dress-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 24px 0;
+}
+
+.dress-option {
+    padding: 16px 20px;
+    background: white;
+    border: 2px solid var(--gray-300);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.dress-option:hover {
+    background: var(--gray-50);
+    border-color: var(--primary-color);
+    transform: translateX(4px);
+}
+
+.dress-option.selected {
+    background: linear-gradient(135deg, rgba(93, 93, 255, 0.1), rgba(0, 196, 204, 0.1));
+    border-color: var(--primary-color);
+    border-width: 2px;
+    box-shadow: 0 4px 12px rgba(93, 93, 255, 0.2);
+}
+
+.option-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.option-radio {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--gray-400);
+    border-radius: 50%;
+    flex-shrink: 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.option-radio.checked {
+    border-color: var(--primary-color);
+    background: var(--primary-color);
+}
+
+.option-radio.checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.option-label {
+    flex: 1;
+    color: var(--gray-800);
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.scenario-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    gap: 16px;
+}
+
+.btn-nav {
+    padding: 14px 32px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.btn-nav.primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.btn-nav.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(93, 93, 255, 0.3);
+}
+
+.btn-nav.secondary {
+    background: white;
+    color: var(--gray-700);
+    border: 2px solid var(--gray-300);
+}
+
+.btn-nav.secondary:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+}
+
+/* Modo oscuro para sección de vestimenta */
+body.dark-theme .scenario-card {
+    background: rgba(30, 35, 48, 0.95);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+body.dark-theme .scenario-visual-section {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+    border-left-color: #818CF8;
+}
+
+body.dark-theme .avatar-description strong {
+    color: #818CF8;
+}
+
+body.dark-theme .avatar-description p,
+body.dark-theme .tip-content p,
+body.dark-theme .option-label {
+    color: #E5E7EB;
+}
+
+body.dark-theme .scenario-title,
+body.dark-theme .scenario-question {
+    color: #F9FAFB;
+}
+
+body.dark-theme .visual-tip-box {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 191, 36, 0.15));
+    border-left-color: #FBBF24;
+}
+
+body.dark-theme .tip-content strong {
+    color: #FBBF24;
+}
+
+body.dark-theme .dress-option {
+    background: rgba(30, 35, 48, 0.6);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+body.dark-theme .dress-option:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: #818CF8;
+}
+
+body.dark-theme .dress-option.selected {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(16, 185, 129, 0.15));
+    border-color: #818CF8;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+body.dark-theme .option-radio {
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+body.dark-theme .option-radio.checked {
+    border-color: #818CF8;
+    background: #818CF8;
+}
+
+body.dark-theme .btn-nav.secondary {
+    background: rgba(30, 35, 48, 0.8);
+    color: #E5E7EB;
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+body.dark-theme .btn-nav.secondary:hover {
+    background: rgba(99, 102, 241, 0.2);
+    border-color: #818CF8;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
     .dresscode-main-area {
         grid-template-columns: 1fr;
     }
-    
+
     .wardrobe-panel,
     .tips-panel {
         max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .scenario-card {
+        padding: 20px;
+    }
+
+    .scenario-visual-section {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .scenario-icon-large {
+        font-size: 3rem;
+    }
+
+    .scenario-title {
+        font-size: 1.4rem;
+    }
+
+    .scenario-question {
+        font-size: 1.1rem;
+    }
+
+    .btn-nav {
+        padding: 12px 24px;
+        font-size: 0.9rem;
     }
 }
 
