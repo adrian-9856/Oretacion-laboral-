@@ -582,84 +582,62 @@ body {
 }
 
 .test-card.modern {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    border-radius: var(--radius-xl);
-    padding: 40px;
+    background: var(--white);
+    border-radius: var(--radius-md);
+    padding: var(--space-xl);
     text-align: center;
     cursor: pointer;
     transition: var(--transition);
-    box-shadow: var(--shadow-md);
-    border: 2px solid rgba(255, 255, 255, 0.5);
-    position: relative;
-    overflow: hidden;
-}
-
-.test-card.modern::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.05), transparent);
-    opacity: 0;
-    transition: var(--transition);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--gray-200);
 }
 
 .test-card.modern:hover {
-    transform: translateY(-10px) scale(1.03);
-    box-shadow: var(--shadow-primary);
-    border-color: rgba(99, 102, 241, 0.3);
-}
-
-.test-card.modern:hover::before {
-    opacity: 1;
-}
-
-.test-card-icon {
-    width: 100px;
-    height: 100px;
-    border-radius: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 24px;
-    transition: var(--transition);
+    border-color: var(--gray-300);
     box-shadow: var(--shadow-md);
 }
 
-.test-card.modern:hover .test-card-icon {
-    transform: rotateY(180deg) scale(1.1);
+.test-card-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto var(--space-lg);
+    transition: var(--transition);
 }
 
 .test-card-icon.quiz {
-    background: var(--gradient-primary);
-    box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+    background: var(--primary);
 }
 
 .test-card-icon.errors {
-    background: var(--gradient-secondary);
-    box-shadow: 0 8px 20px rgba(245, 87, 108, 0.3);
+    background: var(--error);
 }
 
 .test-card-icon.builder {
-    background: var(--gradient-warm);
-    box-shadow: 0 8px 20px rgba(250, 112, 154, 0.3);
+    background: var(--warning);
 }
 
 .test-card-icon svg {
-    width: 50px;
-    height: 50px;
+    width: 32px;
+    height: 32px;
     color: var(--white);
 }
 
 .test-card.modern h3 {
-    font-size: 1.5em;
+    font-size: 1.125rem;
     color: var(--dark);
-    margin-bottom: 12px;
+    margin-bottom: var(--space-sm);
+    font-weight: 600;
 }
 
 .test-card.modern p {
     color: var(--gray-600);
-    margin-bottom: 24px;
+    margin-bottom: var(--space-lg);
+    font-size: 0.875rem;
+    line-height: 1.5;
 }
 
 .test-start-btn {
@@ -4499,38 +4477,35 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
 .option-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem 1.5rem;
+    gap: var(--space-md);
+    padding: var(--space-md) var(--space-lg);
     background: var(--white);
-    border: 2px solid var(--gray-300);
-    border-radius: var(--radius-md);
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius);
     cursor: pointer;
-    transition: all 0.3s ease;
-    margin-bottom: 0.75rem;
+    transition: var(--transition);
+    margin-bottom: var(--space-sm);
 }
 
 .option-card:hover {
     border-color: var(--primary);
-    background: #f0f7ff;
-    transform: translateX(5px);
+    background: var(--gray-50);
 }
 
 .option-card.selected {
-    background: linear-gradient(135deg, var(--primary-light) 0%, var(--secondary-light) 100%);
-    border-color: #4facfe;
+    background: var(--primary);
+    border-color: var(--primary);
     color: white;
-    font-weight: 600;
-    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
 }
 
 .option-radio {
-    width: 24px;
-    height: 24px;
+    width: 20px;
+    height: 20px;
     border: 2px solid var(--gray-400);
     border-radius: 50%;
     flex-shrink: 0;
     position: relative;
-    transition: all 0.3s ease;
+    transition: var(--transition);
 }
 
 .option-radio::after {
@@ -4539,25 +4514,27 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0);
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     background: white;
     border-radius: 50%;
-    transition: transform 0.2s ease;
+    transition: var(--transition);
 }
 
 .option-card.selected .option-radio {
     border-color: white;
-    background: rgba(255, 255, 255, 0.3);
+    background: white;
 }
 
 .option-card.selected .option-radio::after {
     transform: translate(-50%, -50%) scale(1);
+    background: var(--primary);
 }
 
 .option-text {
     flex: 1;
     line-height: 1.5;
+    font-size: 0.9375rem;
 }
 
 /* Dark theme para opciones */
