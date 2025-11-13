@@ -1139,63 +1139,48 @@
         <!-- Lookbook Profesional -->
         <div class="lookbook-section" id="lookbookSection">
 
-            <!-- Header del Lookbook -->
-            <div class="lookbook-header">
-                <div class="lookbook-title-section">
-                    <h1>Tu Lookbook Profesional</h1>
-                    <p>Descubre outfits perfectos para tu próxima entrevista</p>
-                </div>
-
-                <!-- Video Tutorial -->
-                <div class="lookbook-video-card">
-                    <h3>Guía Profesional: Vestimenta para Entrevistas de Trabajo</h3>
-                    <div class="video-wrapper">
-                        <iframe
-                            width="100%"
-                            height="315"
-                            src="https://www.youtube.com/embed/vfYC3p3B2no"
-                            title="Cómo Vestirse para una Entrevista de Trabajo"
-                            frameborder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                            allowfullscreen
-                            loading="lazy">
-                        </iframe>
-                    </div>
-                </div>
+            <!-- Header Simple -->
+            <div class="lookbook-header-simple">
+                <h1>Código de Vestimenta Profesional</h1>
+                <p>Aprende la etiqueta y vestimenta profesional</p>
             </div>
 
-            <!-- Filtros y Búsqueda -->
-            <div class="lookbook-filters">
-                <div class="filter-group">
-                    <button class="filter-btn active" onclick="filterByGender('all')" data-filter="all">
-                        Todos
-                    </button>
-                    <button class="filter-btn" onclick="filterByGender('male')" data-filter="male">
-                        Hombre
-                    </button>
-                    <button class="filter-btn" onclick="filterByGender('female')" data-filter="female">
-                        Mujer
-                    </button>
-                </div>
+            <!-- Video Integrado -->
+            <div class="lookbook-video-simple">
+                <iframe
+                    width="100%"
+                    height="400"
+                    src="https://www.youtube.com/embed/vfYC3p3B2no"
+                    title="Cómo Vestirse para una Entrevista de Trabajo"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+            </div>
 
-                <div class="filter-tags">
-                    <span class="tag-label">Filtrar por industria:</span>
-                    <button class="tag-btn active" onclick="filterByTag('all')" data-tag="all">Todos</button>
-                    <button class="tag-btn" onclick="filterByTag('corporativo')" data-tag="corporativo">#Corporativo</button>
-                    <button class="tag-btn" onclick="filterByTag('tech')" data-tag="tech">#Tech</button>
-                    <button class="tag-btn" onclick="filterByTag('creativo')" data-tag="creativo">#Creativo</button>
-                    <button class="tag-btn" onclick="filterByTag('salud')" data-tag="salud">#Salud</button>
-                    <button class="tag-btn" onclick="filterByTag('casual')" data-tag="casual">#BusinessCasual</button>
-                </div>
-
-                <!-- Mi Closet Virtual -->
-                <div class="my-closet-btn-container">
-                    <button class="btn-my-closet" onclick="toggleMyCloset()">
-                        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+            <!-- Filtros Compactos -->
+            <div class="lookbook-filters-compact">
+                <div class="filter-row">
+                    <div class="filter-group-inline">
+                        <button class="filter-btn-simple active" onclick="filterByGender('all')" data-filter="all">Todos</button>
+                        <button class="filter-btn-simple" onclick="filterByGender('male')" data-filter="male">Hombre</button>
+                        <button class="filter-btn-simple" onclick="filterByGender('female')" data-filter="female">Mujer</button>
+                    </div>
+                    <div class="divider-vertical"></div>
+                    <div class="filter-tags-inline">
+                        <button class="tag-btn-simple active" onclick="filterByTag('all')" data-tag="all">Todos</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('corporativo')" data-tag="corporativo">Corporativo</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('tech')" data-tag="tech">Tech</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('creativo')" data-tag="creativo">Creativo</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('salud')" data-tag="salud">Salud</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('casual')" data-tag="casual">Business Casual</button>
+                    </div>
+                    <button class="btn-closet-simple" onclick="toggleMyCloset()">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
-                        <span>Mi Closet</span>
-                        <span class="closet-count" id="closetCount">0</span>
+                        Mi Closet (<span id="closetCount">0</span>)
                     </button>
                 </div>
             </div>
