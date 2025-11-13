@@ -1,154 +1,62 @@
 # ============================================
-# Configuración Optimizada de Netlify
+# Configuración de Netlify
 # Sistema de Evaluación Laboral PRO
 # ============================================
 
 [build]
-  # Directorio que se publicará (root del proyecto)
   publish = "."
-
-  # Como es un sitio estático, no necesita comando de build
   command = ""
 
-# Variables de entorno de producción
-[build.environment]
-  NODE_VERSION = "18"
-  # Optimización de Node
-  NODE_OPTIONS = "--max_old_space_size=4096"
-
 # ============================================
-# HEADERS DE SEGURIDAD Y OPTIMIZACIÓN
+# HEADERS DE SEGURIDAD
 # ============================================
 
-# Headers principales para todas las páginas
 [[headers]]
   for = "/*"
   [headers.values]
-    # Seguridad
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
 
-    # Permisos (permitir cámara y micrófono para entrevistas)
-    Permissions-Policy = "geolocation=(), microphone=(self), camera=(self), interest-cohort=()"
-
-    # CORS - Permitir acceso desde múltiples orígenes
-    Access-Control-Allow-Origin = "*"
-    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
-    Access-Control-Allow-Headers = "Content-Type, Authorization"
-
-    # Compresión y rendimiento
-    X-Compress-Hint = "on"
-
-    # Cache básico
-    Cache-Control = "public, max-age=3600, must-revalidate"
-
-# Headers para archivos JavaScript
 [[headers]]
   for = "/*.js"
   [headers.values]
     Content-Type = "application/javascript; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
-    X-Content-Type-Options = "nosniff"
 
-# Headers para archivos CSS
 [[headers]]
   for = "/*.css"
   [headers.values]
     Content-Type = "text/css; charset=utf-8"
     Cache-Control = "public, max-age=31536000, immutable"
-    X-Content-Type-Options = "nosniff"
 
-# Headers para HTML (sin cache agresivo para actualizaciones)
 [[headers]]
   for = "/*.html"
   [headers.values]
     Content-Type = "text/html; charset=utf-8"
     Cache-Control = "public, max-age=0, must-revalidate"
-    X-UA-Compatible = "IE=edge"
-
-# Headers para imágenes
-[[headers]]
-  for = "/*.jpg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.png"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*.svg"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "image/svg+xml"
-
-[[headers]]
-  for = "/*.webp"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Headers para fuentes
-[[headers]]
-  for = "/*.woff2"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "font/woff2"
-    Access-Control-Allow-Origin = "*"
-
-[[headers]]
-  for = "/*.woff"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-    Content-Type = "font/woff"
-    Access-Control-Allow-Origin = "*"
-
-# Headers para archivos JSON
-[[headers]]
-  for = "/*.json"
-  [headers.values]
-    Content-Type = "application/json; charset=utf-8"
-    Cache-Control = "public, max-age=3600"
-
-# Headers para archivos de configuración
-[[headers]]
-  for = "/*.xml"
-  [headers.values]
-    Content-Type = "application/xml; charset=utf-8"
 
 # ============================================
-# REDIRECCIONES Y RUTAS SPA
+# REDIRECCIONES
 # ============================================
 
-# Redireccionamiento de errores 404 a index.html (SPA)
-# Esto permite que todas las rutas del frontend funcionen correctamente
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
 # ============================================
-# CONFIGURACIÓN DE FUNCIONES SERVERLESS
+# OPTIMIZACIÓN
 # ============================================
 
-[functions]
-  directory = "api"
-  # Configuración de timeout (máximo 10 segundos en plan gratuito)
-  timeout = 10
-
-# ============================================
-# OPTIMIZACIÓN DE RENDIMIENTO
-# ============================================
-
-# Habilitar compresión automática
 [build.processing]
   skip_processing = false
 
 [build.processing.css]
   bundle = false
-  minify = false
+  minify = true
 
 [build.processing.js]
   bundle = false
@@ -159,31 +67,3 @@
 
 [build.processing.images]
   compress = true
-
-# ============================================
-# CONFIGURACIÓN DE CONTEXTOS
-# ============================================
-
-# Configuración para producción
-[context.production]
-  command = ""
-  publish = "."
-
-# Configuración para deploys de branches
-[context.branch-deploy]
-  command = ""
-  publish = "."
-
-# Configuración para deploy previews
-[context.deploy-preview]
-  command = ""
-  publish = "."
-
-# ============================================
-# CARACTERÍSTICAS ADICIONALES
-# ============================================
-
-# Habilitar Forms de Netlify (si se usan formularios)
-# [plugins]
-#   [[plugins]]
-#     package = "@netlify/plugin-forms"
