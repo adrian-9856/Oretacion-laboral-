@@ -7578,11 +7578,14 @@ function loadUsersGrid() {
         const profilePhoto = localStorage.getItem(`profilePhoto_${user.email}`) ||
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
 
+        const userName = (user.name || '') + ' ' + (user.lastName || '');
+        const userNameTrimmed = userName.trim() || 'Usuario sin nombre';
+
         return `
             <div class="user-card" data-user-email="${user.email}" onclick='showUserDetailByEmail("${user.email}")'>
-                <img src="${profilePhoto}" alt="${user.name}" class="user-card-photo">
+                <img src="${profilePhoto}" alt="${userNameTrimmed}" class="user-card-photo">
                 <div class="user-card-info">
-                    <h3>${user.name} ${user.lastName}</h3>
+                    <h3>${userNameTrimmed}</h3>
                     <p>${user.email}</p>
                     <div class="user-card-stats">
                         <span>${userResults.length} pruebas</span>
@@ -7598,9 +7601,9 @@ function filterUsers() {
     const searchTerm = document.getElementById('userSearchInput').value.toLowerCase();
     const users = JSON.parse(localStorage.getItem('users') || '[]');
     const filtered = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm) ||
-        user.lastName.toLowerCase().includes(searchTerm) ||
-        user.email.toLowerCase().includes(searchTerm)
+        (user.name || '').toLowerCase().includes(searchTerm) ||
+        (user.lastName || '').toLowerCase().includes(searchTerm) ||
+        (user.email || '').toLowerCase().includes(searchTerm)
     );
 
     const allResults = JSON.parse(localStorage.getItem('results') || '[]');
@@ -7615,11 +7618,14 @@ function filterUsers() {
         const profilePhoto = localStorage.getItem(`profilePhoto_${user.email}`) ||
             `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
 
+        const userName = (user.name || '') + ' ' + (user.lastName || '');
+        const userNameTrimmed = userName.trim() || 'Usuario sin nombre';
+
         return `
             <div class="user-card" data-user-email="${user.email}" onclick='showUserDetailByEmail("${user.email}")'>
-                <img src="${profilePhoto}" alt="${user.name}" class="user-card-photo">
+                <img src="${profilePhoto}" alt="${userNameTrimmed}" class="user-card-photo">
                 <div class="user-card-info">
-                    <h3>${user.name} ${user.lastName}</h3>
+                    <h3>${userNameTrimmed}</h3>
                     <p>${user.email}</p>
                     <div class="user-card-stats">
                         <span>${userResults.length} pruebas</span>
@@ -7637,14 +7643,17 @@ function showUserDetail(user) {
     const profilePhoto = localStorage.getItem(`profilePhoto_${user.email}`) ||
         `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.email}`;
 
+    const userName = (user.name || '') + ' ' + (user.lastName || '');
+    const userNameTrimmed = userName.trim() || 'Usuario sin nombre';
+
     document.getElementById('modalUserPhoto').src = profilePhoto;
-    document.getElementById('modalUserName').textContent = user.name + ' ' + user.lastName;
-    document.getElementById('modalUserEmail').textContent = user.email;
-    document.getElementById('modalUserFullName').textContent = user.name + ' ' + user.lastName;
+    document.getElementById('modalUserName').textContent = userNameTrimmed;
+    document.getElementById('modalUserEmail').textContent = user.email || '-';
+    document.getElementById('modalUserFullName').textContent = userNameTrimmed;
     document.getElementById('modalUserPhone').textContent = user.phone || '-';
     document.getElementById('modalUserAge').textContent = user.age || '-';
 
-    const registeredDate = new Date(user.registeredAt);
+    const registeredDate = user.registeredAt ? new Date(user.registeredAt) : new Date();
     document.getElementById('modalUserRegistered').textContent = registeredDate.toLocaleDateString();
 
     // Cargar resultados
