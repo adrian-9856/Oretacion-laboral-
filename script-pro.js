@@ -8714,3 +8714,93 @@ window.toggleUserAdmin = toggleUserAdmin;
 window.confirmDeleteUser = confirmDeleteUser;
 window.createCharts = createCharts;
 window.showMentorCoach = showMentorCoach;
+
+// ========================================
+// TUTORIAL / ONBOARDING PARA USUARIOS NUEVOS
+// ========================================
+
+// Mostrar tutorial al cargar la pantalla de bienvenida (solo la primera vez)
+function checkAndShowTutorial() {
+    const dontShow = localStorage.getItem('dontShowTutorial');
+    const tutorialShown = sessionStorage.getItem('tutorialShownThisSession');
+    
+    // Solo mostrar si no está marcado "no mostrar" y no se ha mostrado en esta sesión
+    if (!dontShow && !tutorialShown) {
+        setTimeout(() => {
+            showTutorial();
+            sessionStorage.setItem('tutorialShownThisSession', 'true');
+        }, 800);
+    }
+}
+
+// Mostrar el modal de tutorial
+function showTutorial() {
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.classList.add('show');
+        document.body.style.overflow = 'hidden'; // Prevenir scroll del body
+    }
+}
+
+// Cerrar el modal de tutorial
+function closeTutorial() {
+    const modal = document.getElementById('tutorialModal');
+    if (modal) {
+        modal.classList.remove('show');
+        document.body.style.overflow = ''; // Restaurar scroll del body
+    }
+}
+
+// Guardar preferencia de no mostrar tutorial
+function setDontShowTutorial(checked) {
+    if (checked) {
+        localStorage.setItem('dontShowTutorial', 'true');
+    } else {
+        localStorage.removeItem('dontShowTutorial');
+    }
+}
+
+// Cerrar tutorial al hacer clic fuera del contenido
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('tutorialModal');
+    if (modal && e.target === modal) {
+        closeTutorial();
+    }
+});
+
+// Cerrar tutorial con tecla Escape
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeTutorial();
+    }
+});
+
+// Hook en showScreen para mostrar tutorial cuando se muestra welcomeScreen
+const originalShowScreen = window.showScreen;
+if (typeof originalShowScreen === 'function') {
+    window.showScreen = function(screenId) {
+        originalShowScreen(screenId);
+        
+        // Si se está mostrando la pantalla de bienvenida, verificar si mostrar tutorial
+        if (screenId === 'welcomeScreen') {
+            checkAndShowTutorial();
+        }
+    };
+}
+
+// Exportar funciones para uso global
+window.showTutorial = showTutorial;
+window.closeTutorial = closeTutorial;
+window.setDontShowTutorial = setDontShowTutorial;
+window.checkAndShowTutorial = checkAndShowTutorial;
+
+// Verificar al cargar la página
+window.addEventListener('load', function() {
+    // Verificar si estamos en la pantalla de bienvenida
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    if (welcomeScreen && welcomeScreen.classList.contains('active')) {
+        checkAndShowTutorial();
+    }
+});
+
+console.log('✅ Sistema de tutorial inicializado correctamente');

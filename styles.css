@@ -395,7 +395,6 @@ body {
 .type-card:hover {
     box-shadow: var(--shadow-md);
     border-color: var(--primary);
-    transform: translateY(-2px);
 }
 
 .type-card-icon {
@@ -740,7 +739,6 @@ body {
 }
 
 .btn-nav.primary:hover {
-    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
@@ -908,7 +906,6 @@ body {
 }
 
 .btn-result.primary:hover {
-    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
@@ -1208,7 +1205,6 @@ body {
 }
 
 .btn-cert:hover {
-    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
 
@@ -2543,7 +2539,6 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
 }
 
 .cv-builder-navigation .btn-nav.primary:hover {
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
 }
 
@@ -2553,7 +2548,6 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
 }
 
 .cv-builder-navigation .btn-nav.secondary:hover {
-    transform: translateY(-3px);
     box-shadow: var(--shadow-lg);
     background: var(--gray-300);
 }
@@ -9298,4 +9292,287 @@ body.dark-theme .btn-nav.secondary:hover {
 
 .lookbook-card:hover .outfit-preview::after {
     opacity: 0.7;
+}
+
+/* ========================================
+   TUTORIAL MODAL - EXPERIENCIA USUARIO NUEVO
+======================================== */
+.tutorial-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 10000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(5px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.tutorial-modal.show {
+    display: flex;
+}
+
+.tutorial-content {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    max-width: 700px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: scaleIn 0.4s ease-out;
+}
+
+.tutorial-close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: var(--gray-200);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.5em;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gray-700);
+    z-index: 10;
+}
+
+.tutorial-close:hover {
+    background: var(--error);
+    color: var(--white);
+    transform: rotate(90deg);
+}
+
+.tutorial-header {
+    text-align: center;
+    padding: 40px 40px 30px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.tutorial-icon {
+    font-size: 4em;
+    margin-bottom: 16px;
+    animation: bounce 2s infinite;
+}
+
+.tutorial-header h2 {
+    font-size: 1.8em;
+    margin-bottom: 12px;
+    font-weight: 700;
+}
+
+.tutorial-header p {
+    font-size: 1.1em;
+    opacity: 0.95;
+}
+
+.tutorial-steps {
+    padding: 30px 40px;
+}
+
+.tutorial-step {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    align-items: flex-start;
+}
+
+.tutorial-step:last-child {
+    margin-bottom: 0;
+}
+
+.step-number {
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    color: var(--white);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5em;
+    font-weight: 700;
+    flex-shrink: 0;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.step-content h3 {
+    font-size: 1.3em;
+    color: var(--dark);
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.step-content p {
+    color: var(--gray-600);
+    line-height: 1.7;
+    font-size: 1em;
+}
+
+.step-content p strong {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.tutorial-footer {
+    padding: 20px 40px 40px;
+    text-align: center;
+}
+
+.btn-tutorial-start {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: var(--white);
+    border: none;
+    padding: 16px 40px;
+    border-radius: var(--radius);
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.btn-tutorial-start:hover {
+    box-shadow: 0 6px 20px rgba(30, 58, 138, 0.4);
+    transform: scale(1.02);
+}
+
+.tutorial-checkbox {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.9em;
+    color: var(--gray-600);
+    cursor: pointer;
+}
+
+.tutorial-checkbox input[type="checkbox"] {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+.tutorial-checkbox span {
+    user-select: none;
+}
+
+/* BOTÓN FLOTANTE DE AYUDA */
+.floating-help-btn {
+    position: fixed;
+    bottom: 90px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, var(--info) 0%, var(--primary) 100%);
+    border: none;
+    border-radius: 50%;
+    color: var(--white);
+    font-size: 1.8em;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(30, 58, 138, 0.4);
+    transition: all 0.3s ease;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.floating-help-btn svg {
+    width: 30px;
+    height: 30px;
+}
+
+.floating-help-btn:hover {
+    box-shadow: 0 6px 30px rgba(30, 58, 138, 0.6);
+    transform: scale(1.1);
+}
+
+.floating-help-btn:active {
+    transform: scale(0.95);
+}
+
+/* RESPONSIVE TUTORIAL */
+@media (max-width: 768px) {
+    .tutorial-content {
+        max-width: 100%;
+        margin: 0 10px;
+    }
+
+    .tutorial-header {
+        padding: 30px 20px 20px;
+    }
+
+    .tutorial-header h2 {
+        font-size: 1.4em;
+    }
+
+    .tutorial-header p {
+        font-size: 0.95em;
+    }
+
+    .tutorial-icon {
+        font-size: 3em;
+    }
+
+    .tutorial-steps {
+        padding: 20px;
+    }
+
+    .tutorial-step {
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        font-size: 1.2em;
+    }
+
+    .step-content h3 {
+        font-size: 1.1em;
+    }
+
+    .step-content p {
+        font-size: 0.9em;
+    }
+
+    .tutorial-footer {
+        padding: 20px;
+    }
+
+    .btn-tutorial-start {
+        font-size: 1em;
+        padding: 14px 30px;
+    }
+
+    .floating-help-btn {
+        bottom: 80px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+    }
+
+    .floating-help-btn svg {
+        width: 24px;
+        height: 24px;
+    }
 }

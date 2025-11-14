@@ -2220,6 +2220,75 @@
     </div>
 </div>
 
+<!-- Modal de Tutorial/Bienvenida para Usuarios Nuevos -->
+<div id="tutorialModal" class="tutorial-modal">
+    <div class="tutorial-content">
+        <button class="tutorial-close" onclick="closeTutorial()">✕</button>
+        <div class="tutorial-header">
+            <div class="tutorial-icon">🎓</div>
+            <h2>¡Bienvenido a la Plataforma de Orientación Laboral!</h2>
+            <p>Te ayudaremos a prepararte para tu futuro profesional</p>
+        </div>
+
+        <div class="tutorial-steps">
+            <div class="tutorial-step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Explora las Evaluaciones</h3>
+                    <p>Selecciona entre PRE-TEST (evaluación inicial) o POST-TEST (evaluación avanzada). Haz clic en las tarjetas para comenzar.</p>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Navega con los Iconos Superiores</h3>
+                    <p>
+                        <strong>🌙 Tema:</strong> Cambia entre modo claro/oscuro<br>
+                        <strong>🎓 Mentor:</strong> Accede a tu mentor virtual<br>
+                        <strong>👤 Perfil:</strong> Gestiona tu información personal<br>
+                        <strong>📊 Progreso:</strong> Revisa tus resultados y estadísticas<br>
+                        <strong>💻 Código:</strong> Ingresa exámenes con código específico
+                    </p>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Realiza las Pruebas</h3>
+                    <p>Completa cuestionarios, simuladores de entrevista, constructor de CV y más. Cada prueba te ayudará a mejorar tus habilidades profesionales.</p>
+                </div>
+            </div>
+
+            <div class="tutorial-step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Revisa tu Progreso</h3>
+                    <p>Ve a la sección de Progreso para ver tus calificaciones, descargar certificados y seguir tu evolución.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="tutorial-footer">
+            <button class="btn-tutorial-start" onclick="closeTutorial()">¡Entendido, Comenzar!</button>
+            <label class="tutorial-checkbox">
+                <input type="checkbox" id="dontShowAgain" onchange="setDontShowTutorial(this.checked)">
+                <span>No mostrar esto de nuevo</span>
+            </label>
+        </div>
+    </div>
+</div>
+
+<!-- Botón flotante de Ayuda -->
+<button class="floating-help-btn" onclick="showTutorial()" title="Ayuda - ¿Cómo usar la plataforma?" id="floatingHelpBtn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+</button>
+
 <!-- Botón flotante para crear avatar -->
 <button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
     🎨
