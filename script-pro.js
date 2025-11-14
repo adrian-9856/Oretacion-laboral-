@@ -4948,6 +4948,11 @@ function showScreen(screenId) {
             updateUserAvatarPro();
         }
     }
+
+    // Inicializar lookbook cuando se muestra la pantalla de dress code
+    if (screenId === 'dressCodeTestScreen' && typeof initLookbook === 'function') {
+        setTimeout(() => initLookbook(), 100);
+    }
 }
 
 // ========================================
