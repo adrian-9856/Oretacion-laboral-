@@ -8159,3 +8159,258 @@ body.dark-theme .btn-nav.secondary:hover {
         justify-content: center;
     }
 }
+
+/* Estilos adicionales para lookbook mejorados */
+.outfit-emoji {
+    font-size: 4em;
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.favorite-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}
+
+.favorite-btn.active {
+    background: #ff4757;
+}
+
+.favorite-btn.active svg {
+    fill: white;
+}
+
+.outfit-preview {
+    position: relative;
+    background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+    border-radius: 8px 8px 0 0;
+}
+
+.outfit-info {
+    padding: 1rem;
+}
+
+.outfit-title {
+    font-size: 1.1em;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.outfit-context {
+    font-size: 0.875em;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+.outfit-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.outfit-modal-content {
+    background: white;
+    border-radius: var(--radius-lg);
+    max-width: 600px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--gray-200);
+    border: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+    background: var(--gray-300);
+    transform: rotate(90deg);
+}
+
+.modal-body {
+    padding: 2rem;
+}
+
+.modal-outfit-preview {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.outfit-emoji-large {
+    font-size: 6em;
+}
+
+.modal-outfit-details h2 {
+    color: var(--dark);
+    margin-bottom: 1rem;
+}
+
+.outfit-description {
+    color: var(--gray-600);
+    margin-bottom: 2rem;
+}
+
+.outfit-section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--gray-100);
+    border-radius: var(--radius);
+}
+
+.outfit-section h4 {
+    color: var(--dark);
+    margin-bottom: 0.75rem;
+}
+
+.outfit-items-list {
+    list-style: none;
+    padding: 0;
+}
+
+.outfit-items-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--gray-700);
+}
+
+.outfit-items-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.my-closet-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 400px;
+    background: white;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+    display: none;
+    flex-direction: column;
+}
+
+.closet-panel-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--gray-200);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.closet-panel-header h3 {
+    margin: 0;
+    color: var(--dark);
+}
+
+.closet-close {
+    background: var(--gray-200);
+    border: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    font-size: 1.5em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.closet-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.closet-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--gray-100);
+    border-radius: var(--radius);
+    margin-bottom: 0.75rem;
+}
+
+.closet-item-emoji {
+    font-size: 2em;
+}
+
+.closet-item-info {
+    flex: 1;
+}
+
+.closet-item-info strong {
+    display: block;
+    color: var(--dark);
+    margin-bottom: 0.25rem;
+}
+
+.closet-item-info small {
+    color: var(--gray-600);
+}
+
+.closet-remove {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.closet-remove:hover {
+    background: #c0392b;
+    transform: rotate(90deg);
+}
+
+.closet-empty {
+    text-align: center;
+    color: var(--gray-500);
+    padding: 2rem 1rem;
+}
