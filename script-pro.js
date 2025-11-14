@@ -22,9 +22,9 @@ let currentUser = null;
 let currentTestType = '';
 let currentQuizQuestion = 0;
 let quizAnswers = [];
-let startTime;
-let timerInterval;
-let countdownInterval;
+let startTime = null;
+let timerInterval = null;
+let countdownInterval = null;
 let currentDifficulty = 'easy';
 let isPracticeMode = false;
 let remainingTime = 0;
@@ -1107,7 +1107,11 @@ function startTest(testType) {
 // ========================================
 
 function startCountdown(timerElementId = 'quizTimer') {
-    if (countdownInterval) clearInterval(countdownInterval);
+    // Limpiar intervalo anterior siempre
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
 
     const timerElement = document.getElementById(timerElementId);
     if (!timerElement) {
@@ -1136,6 +1140,7 @@ function startCountdown(timerElementId = 'quizTimer') {
 
         if (remainingTime <= 0) {
             clearInterval(countdownInterval);
+            countdownInterval = null;
             showToast('⏱️ Tiempo agotado', 'error');
 
             // Determinar qué función finalizar según el timer
@@ -1839,9 +1844,15 @@ function showResults(score, testName) {
 // ========================================
 
 function resetCurrentTest() {
-    if (timerInterval) clearInterval(timerInterval);
-    if (countdownInterval) clearInterval(countdownInterval);
-    
+    if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+    }
+    if (countdownInterval) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+    }
+
     currentQuizQuestion = 0;
     quizAnswers = [];
     remainingTime = 0;

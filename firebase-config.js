@@ -18,10 +18,10 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-let app;
-let auth;
-let db;
-let storage;
+let app = null;
+let auth = null;
+let db = null;
+let storage = null;
 
 try {
     app = initializeApp(firebaseConfig);
@@ -31,6 +31,7 @@ try {
     console.log('✅ Firebase inicializado correctamente');
 } catch (error) {
     console.error('❌ Error al inicializar Firebase:', error);
+    console.warn('⚠️ La aplicación continuará sin funcionalidades de Firebase');
 }
 
 // Exportar servicios

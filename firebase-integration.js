@@ -59,25 +59,33 @@ export function initializeFirebase() {
  * @param {Object} user - Usuario de Firebase
  */
 async function handleUserAuthenticated(user) {
-    // Actualizar UI con datos del usuario
-    if (window.currentUser) {
-        window.currentUser = {
-            ...window.currentUser,
-            firebaseId: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL
-        };
-    }
+    try {
+        // Actualizar UI con datos del usuario
+        if (window.currentUser) {
+            window.currentUser = {
+                ...window.currentUser,
+                firebaseId: user.uid,
+                email: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL
+            };
+        }
 
-    // Cargar perfil desde Firestore
-    const profile = await getUserProfile(user.uid);
-    if (profile.success) {
-        console.log('✅ Perfil cargado:', profile.data);
-    }
+        // Cargar perfil desde Firestore
+        const profile = await getUserProfile(user.uid);
+        if (profile.success) {
+            console.log('✅ Perfil cargado:', profile.data);
+        } else {
+            console.warn('⚠️ No se pudo cargar el perfil:', profile.error);
+        }
 
-    // Actualizar UI (puedes personalizar esto)
-    updateUserUI(user);
+        // Actualizar UI (puedes personalizar esto)
+        updateUserUI(user);
+    } catch (error) {
+        console.error('❌ Error al autenticar usuario:', error);
+        // Continuar con la autenticación básica aunque falle la carga del perfil
+        updateUserUI(user);
+    }
 }
 
 /**

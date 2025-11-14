@@ -170,7 +170,7 @@ export async function listUserCVs(userId) {
         const listRef = ref(storage, `cvs/${userId}`);
         const result = await listAll(listRef);
 
-        const files = await Promise.all(
+        const filesResults = await Promise.allSettled(
             result.items.map(async (itemRef) => {
                 const url = await getDownloadURL(itemRef);
                 return {
@@ -180,6 +180,17 @@ export async function listUserCVs(userId) {
                 };
             })
         );
+
+        // Filtrar solo los resultados exitosos
+        const files = filesResults
+            .filter(result => result.status === 'fulfilled')
+            .map(result => result.value);
+
+        // Registrar si hubo errores
+        const errors = filesResults.filter(result => result.status === 'rejected');
+        if (errors.length > 0) {
+            console.warn(`⚠️ ${errors.length} archivo(s) no se pudieron cargar`);
+        }
 
         console.log(`✅ ${files.length} CVs encontrados`);
         return { success: true, files: files };
