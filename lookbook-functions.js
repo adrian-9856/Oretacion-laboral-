@@ -10,6 +10,7 @@ const lookbookOutfits = [
         gender: "male",
         tags: ["corporativo", "formal"],
         emoji: "👔",
+        image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&h=300&fit=crop",
         description: "Traje oscuro de dos piezas, camisa blanca, corbata conservadora",
         items: ["Traje negro/azul marino", "Camisa blanca", "Corbata seda", "Zapatos cuero negros"],
         context: "Entrevistas ejecutivas, reuniones de directorio",
@@ -22,6 +23,7 @@ const lookbookOutfits = [
         gender: "male",
         tags: ["tech", "casual"],
         emoji: "👕",
+        image: "https://images.unsplash.com/photo-1521566652839-697aa473761a?w=400&h=300&fit=crop",
         description: "Pantalón chino, camisa sport, zapatos mocasines",
         items: ["Pantalón chino", "Camisa sport", "Blazer opcional", "Mocasines"],
         context: "Startups tech, empresas creativas",
@@ -34,6 +36,7 @@ const lookbookOutfits = [
         gender: "female",
         tags: ["corporativo", "formal"],
         emoji: "👗",
+        image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=300&fit=crop",
         description: "Traje sastre oscuro, blusa clara, zapatos cerrados",
         items: ["Traje sastre", "Blusa neutra", "Zapatos tacón bajo", "Accesorios mínimos"],
         context: "Banca, finanzas, corporativo tradicional",
@@ -46,6 +49,7 @@ const lookbookOutfits = [
         gender: "female",
         tags: ["casual", "tech"],
         emoji: "👚",
+        image: "https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=400&h=300&fit=crop",
         description: "Pantalón de vestir, blusa profesional, blazer",
         items: ["Pantalón vestir", "Blusa", "Blazer", "Zapatos planos/tacón bajo"],
         context: "Tech, consultoría, servicios profesionales",
@@ -58,6 +62,7 @@ const lookbookOutfits = [
         gender: "male",
         tags: ["corporativo"],
         emoji: "💼",
+        image: "https://images.unsplash.com/photo-1556157382-97eda2f9e2bf?w=400&h=300&fit=crop",
         description: "Camisa blanca, pantalón vestir, cinturón de cuero",
         items: ["Camisa blanca", "Pantalón gris/negro", "Cinturón cuero", "Zapatos formales"],
         context: "Oficinas corporativas, servicio al cliente",
@@ -70,6 +75,7 @@ const lookbookOutfits = [
         gender: "female",
         tags: ["creativo"],
         emoji: "🎨",
+        image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=300&fit=crop",
         description: "Combinación profesional con toques de personalidad",
         items: ["Vestido sencillo", "Cardigan", "Zapatos cómodos", "Accesorios statement"],
         context: "Industrias creativas, marketing, diseño",
@@ -82,6 +88,7 @@ const lookbookOutfits = [
         gender: "male",
         tags: ["salud"],
         emoji: "🏥",
+        image: "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&h=300&fit=crop",
         description: "Ropa cómoda, limpia y profesional para entornos de salud",
         items: ["Camisa polo", "Pantalón cómodo", "Zapatos cerrados antideslizantes"],
         context: "Hospitales, clínicas, servicios de salud",
@@ -94,6 +101,7 @@ const lookbookOutfits = [
         gender: "female",
         tags: ["salud"],
         emoji: "⚕️",
+        image: "https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=400&h=300&fit=crop",
         description: "Vestimenta práctica y profesional para entornos médicos",
         items: ["Blusa cómoda", "Pantalón/falda práctica", "Zapatos cerrados cómodos"],
         context: "Clínicas, consultorios, servicios médicos",
@@ -128,8 +136,9 @@ function renderLookbook(gender, tag) {
     grid.innerHTML = filtered.map(outfit => {
         return `
         <div class="lookbook-card" onclick="showOutfitDetails(${outfit.id})">
-            <div class="outfit-preview" style="background: ${outfit.gradient};">
-                <div class="outfit-emoji">${outfit.emoji}</div>
+            <div class="outfit-preview-image" style="background: ${outfit.gradient};">
+                ${outfit.image ? `<img src="${outfit.image}" alt="${outfit.title}" class="outfit-photo" loading="lazy">` : `<div class="outfit-emoji">${outfit.emoji}</div>`}
+                <div class="outfit-overlay"></div>
                 <button class="favorite-btn ${isInCloset(outfit.id) ? 'active' : ''}"
                         onclick="event.stopPropagation(); toggleClosetItem(${outfit.id})">
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
@@ -341,6 +350,38 @@ function exportMyCloset() {
     a.click();
 
     showToast('✅ Guía descargada exitosamente', 'success');
+}
+
+// Función para revelar la sección de outfits
+function revealOutfitsSection() {
+    const outfitsSection = document.getElementById('outfitsSection');
+    const revealContainer = document.getElementById('revealOutfitsContainer');
+
+    if (outfitsSection && revealContainer) {
+        // Ocultar el botón con animación
+        revealContainer.style.opacity = '0';
+        revealContainer.style.transform = 'scale(0.9)';
+
+        setTimeout(() => {
+            revealContainer.style.display = 'none';
+
+            // Mostrar la sección de outfits con animación
+            outfitsSection.style.display = 'block';
+            outfitsSection.style.opacity = '0';
+            outfitsSection.style.transform = 'translateY(30px)';
+
+            setTimeout(() => {
+                outfitsSection.style.transition = 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)';
+                outfitsSection.style.opacity = '1';
+                outfitsSection.style.transform = 'translateY(0)';
+
+                // Scroll suave a la sección
+                setTimeout(() => {
+                    outfitsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }, 50);
+        }, 400);
+    }
 }
 
 // Inicializar cuando la pantalla de dress-code esté activa
