@@ -1006,8 +1006,8 @@ function incrementAttempts(testType) {
 }
 
 function canTakeTest(testType) {
-    if (isPracticeMode) return true;
-    return getAttempts(testType) < CONFIG.MAX_ATTEMPTS;
+    // Sin límite de intentos - siempre permitir
+    return true;
 }
 
 function updateAttempts() {
@@ -6041,6 +6041,9 @@ function finishDressCodeTest() {
 // ========================================
 
 window.addEventListener('DOMContentLoaded', () => {
+    // Limpiar intentos guardados (ya no hay límite de intentos)
+    localStorage.removeItem('attempts');
+
     // Verificar si hay un usuario logueado
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
