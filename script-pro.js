@@ -905,7 +905,7 @@ function finishOnboarding() {
 
     // Llevar al usuario a la selección de PRE-TEST/POST-TEST
     setTimeout(() => {
-        showScreen('testMenuScreen');
+        showScreen('welcomeScreen');
         showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar tu evaluación', 'success');
     }, 500);
 }
