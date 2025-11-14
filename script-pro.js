@@ -9,7 +9,7 @@ const CONFIG = {
     GOOGLE_SHEET_URL: 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI',
     ADMIN_USER: 'admin',
     ADMIN_PASS: 'admin123',
-    MAX_ATTEMPTS: 3,
+    MAX_ATTEMPTS: 999, // Sin límite de intentos para pruebas
     QUIZ_TIME_LIMIT: 900,
     CV_ERRORS_TIME_LIMIT: 600,
     CV_BUILDER_TIME_LIMIT: 1200,
@@ -1011,9 +1011,10 @@ function canTakeTest(testType) {
 }
 
 function updateAttempts() {
-    const preAttempts = getAttempts('pre');
+    // Desactivado: visualización de intentos para permitir pruebas ilimitadas
+    /* const preAttempts = getAttempts('pre');
     const postAttempts = getAttempts('post');
-    
+
     if (document.getElementById('preAttempts')) {
         document.getElementById('preAttempts').innerHTML = `
             <small>Intentos: ${preAttempts}/${CONFIG.MAX_ATTEMPTS}</small>
@@ -1023,7 +1024,7 @@ function updateAttempts() {
         document.getElementById('postAttempts').innerHTML = `
             <small>Intentos: ${postAttempts}/${CONFIG.MAX_ATTEMPTS}</small>
         `;
-    }
+    } */
 }
 
 // ========================================

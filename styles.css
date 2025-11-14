@@ -818,12 +818,14 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 10; /* Asegurar que esté por encima del círculo de progreso */
+    pointer-events: none;
 }
 
 .score-number {
     font-size: 4em;
     font-weight: 700;
-    background: var(--primary);
+    background: linear-gradient(135deg, #E86C4A, #F4A261);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -832,7 +834,10 @@ body {
 .score-percent {
     font-size: 2em;
     font-weight: 600;
-    color: var(--gray-600);
+    background: linear-gradient(135deg, #E86C4A, #F4A261);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .results-info {
