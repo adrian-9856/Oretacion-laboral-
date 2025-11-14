@@ -1039,10 +1039,7 @@ function selectTest(type) {
         return;
     }
 
-    if (!canTakeTest(type) && !isPracticeMode) {
-        showToast(`❌ Has alcanzado el límite de ${CONFIG.MAX_ATTEMPTS} intentos para este test`, 'error');
-        return;
-    }
+    // Sin límite de intentos - eliminada la verificación completamente
 
     currentTestType = type;
     currentDifficulty = type === 'pre' ? 'easy' : 'hard';
