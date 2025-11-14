@@ -2,21 +2,21 @@
    DESIGN SYSTEM - INDUSTRIAL/MINIMAL
 ======================================== */
 :root {
-    /* Color System - Neutral & Professional */
-    --primary: #2563EB;        /* Azul profesional */
-    --primary-light: #3B82F6;
-    --primary-dark: #1D4ED8;
+    /* Color System - Corporate Navy Blue */
+    --primary: #1E3A8A;        /* Azul navy profundo */
+    --primary-light: #1E40AF;
+    --primary-dark: #1E293B;
 
-    --secondary: #4A5568;      /* Gris azulado */
+    --secondary: #475569;      /* Gris pizarra */
     --secondary-light: #64748B;
     --secondary-dark: #334155;
 
-    --accent: #2563EB;         /* Azul accent */
+    --accent: #334155;         /* Gris azulado oscuro */
 
-    --success: #10B981;        /* Verde */
-    --warning: #F59E0B;        /* Naranja */
-    --error: #EF4444;          /* Rojo */
-    --info: #3B82F6;           /* Azul info */
+    --success: #047857;        /* Verde bosque */
+    --warning: #92400E;        /* Marrón oscuro */
+    --error: #B91C1C;          /* Rojo ladrillo */
+    --info: #1E40AF;           /* Azul navy claro */
 
     --dark: #1A1A1A;           /* Casi negro */
     --white: #FFFFFF;
