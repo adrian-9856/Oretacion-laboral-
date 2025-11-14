@@ -1392,6 +1392,21 @@ body.dark-theme {
 
 body.dark-theme::before {
     background:
+        linear-gradient(135deg, rgba(30, 58, 138, 0.15) 0%, rgba(99, 102, 241, 0.1) 100%),
+        repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(99, 102, 241, 0.03) 35px, rgba(99, 102, 241, 0.03) 70px),
+        repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(30, 58, 138, 0.03) 35px, rgba(30, 58, 138, 0.03) 70px),
+        linear-gradient(to bottom, #0f1419 0%, #1a1f2e 100%);
+    background-size: 100% 100%, 100px 100px, 100px 100px, 100% 100%;
+    animation: backgroundMove 20s ease-in-out infinite;
+}
+
+@keyframes backgroundMove {
+    0%, 100% {
+        background-position: 0% 0%, 0px 0px, 0px 0px, 0% 0%;
+    }
+    50% {
+        background-position: 100% 100%, 100px 100px, -100px 100px, 0% 0%;
+    }
 }
 
 /* Tarjetas y contenedores principales */
@@ -10186,4 +10201,110 @@ body.dark-theme .btn-nav.secondary:hover {
         width: 28px;
         height: 28px;
     }
+}
+
+/* ========================================
+   ARREGLOS DARK MODE - Botones visibles
+======================================== */
+
+/* Arreglar botones con fondo blanco/claro que tenían texto blanco invisible */
+body.dark-theme .btn-primary,
+body.dark-theme .test-start-btn,
+body.dark-theme .btn-save-avatar-pro,
+body.dark-theme .btn-tutorial-start,
+body.dark-theme .btn-export {
+    color: var(--primary) !important;
+    background: var(--white);
+    text-shadow: none;
+}
+
+body.dark-theme .btn-primary:hover,
+body.dark-theme .test-start-btn:hover,
+body.dark-theme .btn-save-avatar-pro:hover,
+body.dark-theme .btn-tutorial-start:hover {
+    color: var(--white) !important;
+    background: var(--primary);
+}
+
+/* Botones de tipo card que son blancos */
+body.dark-theme .type-card {
+    background: rgba(255, 255, 255, 0.95);
+    color: var(--dark) !important;
+}
+
+body.dark-theme .type-card h3,
+body.dark-theme .type-card p {
+    color: var(--dark) !important;
+}
+
+body.dark-theme .type-card:hover {
+    background: var(--white);
+    transform: translateY(-8px);
+}
+
+/* Asegurar que los badges de dificultad sean visibles */
+body.dark-theme .difficulty {
+    background: rgba(30, 58, 138, 0.9);
+    color: var(--white) !important;
+}
+
+/* Arreglar iconos y badges en cards */
+body.dark-theme .type-card-icon {
+    background: var(--primary);
+}
+
+body.dark-theme .card-arrow {
+    color: var(--primary) !important;
+}
+
+/* Mejorar visibilidad de modales en dark mode */
+body.dark-theme .modal-content,
+body.dark-theme .tutorial-content {
+    background: rgba(26, 32, 44, 0.98);
+    border: 2px solid rgba(99, 102, 241, 0.3);
+}
+
+/* Asegurar contraste en tutoriales */
+body.dark-theme .tutorial-header {
+    background: linear-gradient(135deg, #1e3a8a 0%, #4f46e5 100%);
+}
+
+body.dark-theme .tutorial-step {
+    background: rgba(30, 35, 48, 0.6);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+body.dark-theme .step-content h3,
+body.dark-theme .step-content p,
+body.dark-theme .step-content li {
+    color: var(--gray-100) !important;
+}
+
+body.dark-theme .step-tip {
+    color: #fbbf24 !important;
+}
+
+/* Tutorial tip box */
+body.dark-theme .tutorial-tip-box {
+    background: rgba(59, 130, 246, 0.15);
+    border-left: 4px solid #3b82f6;
+}
+
+/* Checkbox en tutorial */
+body.dark-theme .tutorial-checkbox span {
+    color: var(--gray-300);
+}
+
+/* Botones de acción claros */
+body.dark-theme .action-buttons button,
+body.dark-theme .modal-actions button {
+    background: var(--primary);
+    color: var(--white) !important;
+}
+
+body.dark-theme .action-buttons button.secondary,
+body.dark-theme .btn-secondary {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--white) !important;
+    border: 1px solid rgba(99, 102, 241, 0.4);
 }

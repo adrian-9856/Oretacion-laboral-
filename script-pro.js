@@ -4501,8 +4501,11 @@ function saveAvatarPro() {
 
     showToast('¡Avatar guardado y sincronizado con tu perfil!', 'success');
 
-    // Si es un nuevo usuario, continuar con el flujo de onboarding
+    // Si es un nuevo usuario, marcar onboarding como completado y llevar a welcomeScreen
     if (currentUser.isNewUser) {
+        // Marcar como usuario no nuevo
+        markOnboardingAsCompleted();
+
         setTimeout(() => {
             // Cerrar el creador de avatar
             const avatarScreen = document.getElementById('avatarCreatorScreen');
@@ -4510,11 +4513,9 @@ function saveAvatarPro() {
                 avatarScreen.classList.remove('active');
             }
 
-            // Avanzar al siguiente paso del onboarding (Paso 2: PRE-TEST/POST-TEST)
-            currentOnboardingStep = 2; // Paso 2 es el índice 2 en el array
-            createOnboardingOverlay();
-            showOnboardingStep();
-            showToast('💡 Ahora conoce los tipos de evaluaciones disponibles', 'info');
+            // Llevar directo a la selección de PRE-TEST/POST-TEST
+            showScreen('welcomeScreen');
+            showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar tu evaluación', 'success');
         }, 1500);
     } else {
         // Usuario existente, volver a la pantalla anterior
