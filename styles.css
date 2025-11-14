@@ -7507,140 +7507,223 @@ body.dark-theme .btn-nav.secondary:hover {
    LOOKBOOK PROFESIONAL - ESTILOS
    =================================== */
 
-/* Header del Lookbook */
 /* ========================================
-   LOOKBOOK - DISEÑO INDUSTRIAL LIMPIO
+   LOOKBOOK - DISEÑO MODERNO ORGANIZADO
 ======================================== */
 
 .lookbook-section {
     max-width: 1200px;
     margin: 0 auto;
+    padding: 2rem 1rem 4rem;
+    background: #fafafa;
+}
+
+/* Header Principal */
+.lookbook-header-main {
+    text-align: center;
     padding: 2rem 1rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    color: white;
+    margin-bottom: 0;
 }
 
-/* Header Simple */
-.lookbook-header-simple {
-    margin-bottom: 2rem;
-    text-align: left;
+.lookbook-header-main h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
 }
 
-.lookbook-header-simple h1 {
-    font-size: 1.75rem;
+.lookbook-header-main p {
+    font-size: 1.05rem;
+    opacity: 0.95;
+    font-weight: 400;
+    margin: 0;
+}
+
+/* Separador Visual */
+.lookbook-divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #e0e0e0, transparent);
+    margin: 2.5rem 0;
+}
+
+/* Video Destacado */
+.lookbook-video-featured {
+    background: white;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 0;
+}
+
+.lookbook-video-featured .video-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.lookbook-video-featured .video-header h2 {
+    font-size: 1.5rem;
     color: var(--dark);
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     font-weight: 600;
-    letter-spacing: -0.3px;
 }
 
-.lookbook-header-simple p {
+.lookbook-video-featured .video-header p {
     font-size: 0.95rem;
     color: var(--gray-600);
-    font-weight: 400;
+    margin: 0;
 }
 
-/* Video Integrado */
-.lookbook-video-simple {
-    margin-bottom: 1.5rem;
+.lookbook-video-featured .video-wrapper {
     border-radius: 8px;
     overflow: hidden;
-    background: var(--dark);
-    border: 1px solid var(--gray-300);
+    background: #000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
-.lookbook-video-simple iframe {
+.lookbook-video-featured .video-wrapper iframe {
     display: block;
     width: 100%;
 }
 
-/* Filtros Compactos */
-.lookbook-filters-compact {
+/* Sección de Outfits */
+.outfits-section {
     background: white;
-    border: 1px solid var(--gray-300);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    margin-bottom: 0;
 }
 
-.filter-row {
+.outfits-section .section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.outfits-section .section-header h2 {
+    font-size: 1.5rem;
+    color: var(--dark);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.outfits-section .section-header p {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    margin: 0;
+}
+
+/* Filtros Organizados */
+.lookbook-filters-organized {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+}
+
+.filter-section {
     display: flex;
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
 }
 
-.filter-group-inline {
-    display: flex;
-    gap: 0.5rem;
+.filter-label {
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.9rem;
+    min-width: 80px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.divider-vertical {
-    width: 1px;
-    height: 24px;
-    background: var(--gray-300);
-}
-
-.filter-tags-inline {
+.filter-buttons {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.75rem;
     flex-wrap: wrap;
     flex: 1;
 }
 
-.filter-btn-simple,
-.tag-btn-simple {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--gray-300);
+.filter-buttons.tags-wrap {
+    gap: 0.5rem;
+}
+
+.filter-btn-modern,
+.tag-btn-modern {
+    padding: 0.6rem 1.2rem;
+    border: 2px solid #dee2e6;
     background: white;
     color: var(--gray-700);
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    text-transform: capitalize;
 }
 
-.filter-btn-simple:hover,
-.tag-btn-simple:hover {
-    border-color: var(--gray-400);
-    background: var(--gray-50);
+.filter-btn-modern:hover,
+.tag-btn-modern:hover {
+    border-color: #667eea;
+    background: #f8f9ff;
+    color: #667eea;
+    transform: translateY(-1px);
 }
 
-.filter-btn-simple.active,
-.tag-btn-simple.active {
-    background: var(--dark);
-    border-color: var(--dark);
+.filter-btn-modern.active,
+.tag-btn-modern.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
     color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
 }
 
-.btn-closet-simple {
+.btn-closet-modern {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: var(--gray-100);
-    color: var(--dark);
-    border: 1px solid var(--gray-300);
-    border-radius: 6px;
-    font-size: 0.875rem;
-    font-weight: 500;
+    gap: 0.75rem;
+    padding: 0.6rem 1.5rem;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    margin-left: auto;
+    box-shadow: 0 2px 8px rgba(245, 87, 108, 0.3);
 }
 
-.btn-closet-simple:hover {
-    background: var(--gray-200);
+.btn-closet-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 87, 108, 0.4);
 }
 
-.btn-closet-simple svg {
+.btn-closet-modern svg {
     flex-shrink: 0;
 }
 
-/* Grid Compacto */
+/* Grid Moderno */
+.lookbook-grid-modern {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Mantener compatibilidad con código existente */
 .lookbook-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+    gap: 1.5rem;
     margin-bottom: 2rem;
 }
 
@@ -8091,10 +8174,59 @@ body.dark-theme .btn-nav.secondary:hover {
     padding: 2rem 0;
 }
 
+/* Botones de Acción Modernos */
+.lookbook-actions-modern {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 0;
+}
+
+.btn-secondary-modern {
+    padding: 0.75rem 2rem;
+    background: white;
+    color: var(--dark);
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.btn-secondary-modern:hover {
+    background: #f8f9fa;
+    border-color: #667eea;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.btn-primary-modern {
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary-modern:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
 /* Responsive Design - Lookbook */
 @media (max-width: 1024px) {
-    .lookbook-grid {
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    .lookbook-grid,
+    .lookbook-grid-modern {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
 
     .modal-outfit-details {
@@ -8105,27 +8237,67 @@ body.dark-theme .btn-nav.secondary:hover {
         width: 100%;
         right: -100%;
     }
+
+    .lookbook-filters-organized {
+        padding: 1rem;
+    }
 }
 
 @media (max-width: 768px) {
-    .lookbook-title-section h1 {
-        font-size: 2em;
+    .lookbook-header-main h1 {
+        font-size: 1.5rem;
     }
 
-    .lookbook-grid {
+    .lookbook-header-main p {
+        font-size: 0.95rem;
+    }
+
+    .lookbook-header-main {
+        padding: 1.5rem 1rem;
+    }
+
+    .lookbook-video-featured {
+        padding: 1.5rem;
+    }
+
+    .lookbook-video-featured .video-wrapper iframe {
+        height: 300px;
+    }
+
+    .outfits-section {
+        padding: 1.5rem;
+    }
+
+    .lookbook-grid,
+    .lookbook-grid-modern {
         grid-template-columns: 1fr;
+        gap: 1rem;
     }
 
-    .filter-group {
+    .filter-section {
         flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
     }
 
-    .filter-btn {
+    .filter-label {
+        min-width: auto;
+    }
+
+    .filter-buttons {
         width: 100%;
     }
 
-    .filter-tags {
-        justify-content: flex-start;
+    .filter-btn-modern,
+    .tag-btn-modern {
+        flex: 1;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .btn-closet-modern {
+        width: 100%;
+        justify-content: center;
     }
 
     .outfit-modal {
@@ -8136,27 +8308,55 @@ body.dark-theme .btn-nav.secondary:hover {
         padding: 1rem;
     }
 
-    .lookbook-actions {
+    .lookbook-actions,
+    .lookbook-actions-modern {
         flex-direction: column;
+        gap: 1rem;
     }
 
-    .lookbook-actions button {
+    .lookbook-actions button,
+    .lookbook-actions-modern button {
         width: 100%;
+    }
+
+    .outfits-section .section-header h2 {
+        font-size: 1.25rem;
     }
 }
 
 @media (max-width: 480px) {
-    .lookbook-title-section h1 {
-        font-size: 1.75em;
+    .lookbook-header-main h1 {
+        font-size: 1.25rem;
+    }
+
+    .lookbook-header-main p {
+        font-size: 0.85rem;
+    }
+
+    .lookbook-video-featured .video-header h2 {
+        font-size: 1.15rem;
+    }
+
+    .lookbook-video-featured .video-header p {
+        font-size: 0.85rem;
+    }
+
+    .lookbook-video-featured .video-wrapper iframe {
+        height: 250px;
     }
 
     .card-image {
         height: 300px;
     }
 
-    .btn-my-closet {
-        width: 100%;
-        justify-content: center;
+    .lookbook-filters-organized {
+        padding: 1rem;
+    }
+
+    .filter-btn-modern,
+    .tag-btn-modern {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
     }
 }
 

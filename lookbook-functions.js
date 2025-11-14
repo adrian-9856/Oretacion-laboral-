@@ -140,9 +140,13 @@ function renderLookbook(gender, tag) {
 
 // Filtrar por género
 function filterByGender(gender) {
-    const currentTag = document.querySelector('.tag-btn-simple.active').dataset.tag || 'all';
+    // Soportar tanto clases nuevas como antiguas
+    const tagBtnSelector = '.tag-btn-modern.active, .tag-btn-simple.active';
+    const currentTagBtn = document.querySelector(tagBtnSelector);
+    const currentTag = currentTagBtn ? currentTagBtn.dataset.tag : 'all';
 
-    document.querySelectorAll('.filter-btn-simple').forEach(btn => {
+    // Actualizar botones de género (nuevos y antiguos)
+    document.querySelectorAll('.filter-btn-modern, .filter-btn-simple').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
@@ -152,9 +156,13 @@ function filterByGender(gender) {
 
 // Filtrar por tag
 function filterByTag(tag) {
-    const currentGender = document.querySelector('.filter-btn-simple.active').dataset.filter || 'all';
+    // Soportar tanto clases nuevas como antiguas
+    const genderBtnSelector = '.filter-btn-modern.active, .filter-btn-simple.active';
+    const currentGenderBtn = document.querySelector(genderBtnSelector);
+    const currentGender = currentGenderBtn ? currentGenderBtn.dataset.filter : 'all';
 
-    document.querySelectorAll('.tag-btn-simple').forEach(btn => {
+    // Actualizar botones de tag (nuevos y antiguos)
+    document.querySelectorAll('.tag-btn-modern, .tag-btn-simple').forEach(btn => {
         btn.classList.remove('active');
     });
     event.target.classList.add('active');
@@ -226,9 +234,16 @@ function toggleClosetItem(id) {
 
     localStorage.setItem('myCloset', JSON.stringify(myCloset));
     updateClosetCount();
+
+    // Soportar tanto clases nuevas como antiguas
+    const genderBtnSelector = '.filter-btn-modern.active, .filter-btn-simple.active';
+    const tagBtnSelector = '.tag-btn-modern.active, .tag-btn-simple.active';
+    const currentGenderBtn = document.querySelector(genderBtnSelector);
+    const currentTagBtn = document.querySelector(tagBtnSelector);
+
     renderLookbook(
-        document.querySelector('.filter-btn-simple.active').dataset.filter || 'all',
-        document.querySelector('.tag-btn-simple.active').dataset.tag || 'all'
+        currentGenderBtn ? currentGenderBtn.dataset.filter : 'all',
+        currentTagBtn ? currentTagBtn.dataset.tag : 'all'
     );
 
     if (document.getElementById('myClosetPanel').style.display === 'block') {
