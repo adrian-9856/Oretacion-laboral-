@@ -900,11 +900,13 @@ function skipOnboarding() {
 }
 
 function finishOnboarding() {
+    console.log('🔍 DEBUG: finishOnboarding() llamado');
     closeOnboarding();
     markOnboardingAsCompleted();
 
     // Llevar al usuario a la selección de PRE-TEST/POST-TEST
     setTimeout(() => {
+        console.log('🔍 DEBUG: Redirigiendo a welcomeScreen desde finishOnboarding');
         showScreen('welcomeScreen');
         showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar tu evaluación', 'success');
     }, 500);
@@ -4503,6 +4505,7 @@ function saveAvatarPro() {
 
     // Si es un nuevo usuario, marcar onboarding como completado y llevar a welcomeScreen
     if (currentUser.isNewUser) {
+        console.log('🔍 DEBUG: Usuario nuevo detectado, redirigiendo a welcomeScreen');
         // Marcar como usuario no nuevo
         markOnboardingAsCompleted();
 
@@ -4514,11 +4517,13 @@ function saveAvatarPro() {
             }
 
             // Llevar directo a la selección de PRE-TEST/POST-TEST
+            console.log('🔍 DEBUG: Mostrando welcomeScreen con PRE/POST-TEST');
             showScreen('welcomeScreen');
             showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar tu evaluación', 'success');
         }, 1500);
     } else {
         // Usuario existente, volver a la pantalla anterior
+        console.log('🔍 DEBUG: Usuario existente, volviendo a welcomeScreen');
         setTimeout(() => {
             showScreen('welcomeScreen');
         }, 1000);
@@ -8758,11 +8763,20 @@ function showTutorial() {
 
 // Cerrar el modal de tutorial
 function closeTutorial() {
+    console.log('🔍 DEBUG: closeTutorial() llamado');
     const modal = document.getElementById('tutorialModal');
     if (modal) {
         modal.classList.remove('show');
         document.body.style.overflow = ''; // Restaurar scroll del body
     }
+
+    // Asegurar que estamos en welcomeScreen después de cerrar el tutorial
+    const currentScreen = document.querySelector('.screen.active');
+    if (currentScreen && currentScreen.id !== 'welcomeScreen') {
+        console.log('🔍 DEBUG: No estamos en welcomeScreen, redirigiendo...');
+        showScreen('welcomeScreen');
+    }
+    console.log('🔍 DEBUG: Tutorial cerrado, pantalla actual:', currentScreen?.id);
 }
 
 // Guardar preferencia de no mostrar tutorial
