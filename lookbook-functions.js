@@ -13,7 +13,8 @@ const lookbookOutfits = [
         description: "Traje oscuro de dos piezas, camisa blanca, corbata conservadora",
         items: ["Traje negro/azul marino", "Camisa blanca", "Corbata seda", "Zapatos cuero negros"],
         context: "Entrevistas ejecutivas, reuniones de directorio",
-        tips: "Asegúrate de que el traje esté bien ajustado y planchado. Los zapatos deben estar bien lustrados."
+        tips: "Asegúrate de que el traje esté bien ajustado y planchado. Los zapatos deben estar bien lustrados.",
+        gradient: "linear-gradient(135deg, #1e3c72 0%, #2a5298 100%)"
     },
     {
         id: 2,
@@ -24,7 +25,8 @@ const lookbookOutfits = [
         description: "Pantalón chino, camisa sport, zapatos mocasines",
         items: ["Pantalón chino", "Camisa sport", "Blazer opcional", "Mocasines"],
         context: "Startups tech, empresas creativas",
-        tips: "Mantén los colores neutros. Un blazer añade profesionalismo sin ser demasiado formal."
+        tips: "Mantén los colores neutros. Un blazer añade profesionalismo sin ser demasiado formal.",
+        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
     },
     {
         id: 3,
@@ -35,7 +37,8 @@ const lookbookOutfits = [
         description: "Traje sastre oscuro, blusa clara, zapatos cerrados",
         items: ["Traje sastre", "Blusa neutra", "Zapatos tacón bajo", "Accesorios mínimos"],
         context: "Banca, finanzas, corporativo tradicional",
-        tips: "Elige un tacón cómodo de 3-5cm. Los accesorios deben ser discretos y elegantes."
+        tips: "Elige un tacón cómodo de 3-5cm. Los accesorios deben ser discretos y elegantes.",
+        gradient: "linear-gradient(135deg, #c31432 0%, #240b36 100%)"
     },
     {
         id: 4,
@@ -46,7 +49,8 @@ const lookbookOutfits = [
         description: "Pantalón de vestir, blusa profesional, blazer",
         items: ["Pantalón vestir", "Blusa", "Blazer", "Zapatos planos/tacón bajo"],
         context: "Tech, consultoría, servicios profesionales",
-        tips: "Combina colores complementarios. Un blazer siempre eleva el outfit."
+        tips: "Combina colores complementarios. Un blazer siempre eleva el outfit.",
+        gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)"
     },
     {
         id: 5,
@@ -57,7 +61,8 @@ const lookbookOutfits = [
         description: "Camisa blanca, pantalón vestir, cinturón de cuero",
         items: ["Camisa blanca", "Pantalón gris/negro", "Cinturón cuero", "Zapatos formales"],
         context: "Oficinas corporativas, servicio al cliente",
-        tips: "La camisa debe estar impecable. Plancha bien especialmente cuello y puños."
+        tips: "La camisa debe estar impecable. Plancha bien especialmente cuello y puños.",
+        gradient: "linear-gradient(135deg, #434343 0%, #000000 100%)"
     },
     {
         id: 6,
@@ -68,7 +73,8 @@ const lookbookOutfits = [
         description: "Combinación profesional con toques de personalidad",
         items: ["Vestido sencillo", "Cardigan", "Zapatos cómodos", "Accesorios statement"],
         context: "Industrias creativas, marketing, diseño",
-        tips: "Puedes añadir más color, pero mantén la profesionalidad. Un accesorio llamativo es suficiente."
+        tips: "Puedes añadir más color, pero mantén la profesionalidad. Un accesorio llamativo es suficiente.",
+        gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)"
     },
     {
         id: 7,
@@ -79,7 +85,8 @@ const lookbookOutfits = [
         description: "Ropa cómoda, limpia y profesional para entornos de salud",
         items: ["Camisa polo", "Pantalón cómodo", "Zapatos cerrados antideslizantes"],
         context: "Hospitales, clínicas, servicios de salud",
-        tips: "La comodidad es clave. Asegúrate de que la ropa esté impecable y sin manchas."
+        tips: "La comodidad es clave. Asegúrate de que la ropa esté impecable y sin manchas.",
+        gradient: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)"
     },
     {
         id: 8,
@@ -90,7 +97,8 @@ const lookbookOutfits = [
         description: "Vestimenta práctica y profesional para entornos médicos",
         items: ["Blusa cómoda", "Pantalón/falda práctica", "Zapatos cerrados cómodos"],
         context: "Clínicas, consultorios, servicios médicos",
-        tips: "Evita joyas colgantes. Todo debe permitir libertad de movimiento."
+        tips: "Evita joyas colgantes. Todo debe permitir libertad de movimiento.",
+        gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)"
     }
 ];
 
@@ -120,7 +128,7 @@ function renderLookbook(gender, tag) {
     grid.innerHTML = filtered.map(outfit => {
         return `
         <div class="lookbook-card" onclick="showOutfitDetails(${outfit.id})">
-            <div class="outfit-preview">
+            <div class="outfit-preview" style="background: ${outfit.gradient};">
                 <div class="outfit-emoji">${outfit.emoji}</div>
                 <button class="favorite-btn ${isInCloset(outfit.id) ? 'active' : ''}"
                         onclick="event.stopPropagation(); toggleClosetItem(${outfit.id})">
@@ -181,7 +189,7 @@ function showOutfitDetails(id) {
     const itemsList = outfit.items.map(item => '<li>' + item + '</li>').join('');
 
     modalBody.innerHTML = `
-        <div class="modal-outfit-preview">
+        <div class="modal-outfit-preview" style="background: ${outfit.gradient};">
             <div class="outfit-emoji-large">${outfit.emoji}</div>
         </div>
         <div class="modal-outfit-details">
