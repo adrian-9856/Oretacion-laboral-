@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Evaluación Laboral PRO</title>
+    <meta name="description" content="Sistema de Evaluación Laboral PRO - Plataforma completa para orientación laboral con tests profesionales, simulación de entrevistas, lookbook profesional y análisis de perfil. Prepárate para tu próxima entrevista de trabajo.">
+    <meta name="keywords" content="evaluación laboral, entrevista de trabajo, tests profesionales, orientación laboral, lookbook profesional, código de vestimenta">
+    <meta name="author" content="Sistema de Evaluación PRO">
+    <meta name="theme-color" content="#667eea">
+    <title>Sistema de Evaluación Laboral PRO - Plataforma de Orientación Profesional</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100'/><text x='50' y='60' text-anchor='middle' font-size='50' fill='white' font-family='Arial'>EP</text></svg>">
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <!-- LOGIN -->
@@ -127,6 +134,20 @@
             <div class="dashboard-header">
                 <h1>Dashboard de Administración</h1>
                 <div class="dashboard-actions">
+                    <button class="btn-action" onclick="showUsersManagement()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/>
+                        </svg>
+                        Gestionar Usuarios
+                    </button>
+                    <button class="btn-action" onclick="showExamCodesManager()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                        Gestionar Exámenes
+                    </button>
                     <button class="btn-action" onclick="exportToExcel()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4m14-7l-5-5m0 0L7 8m5-5v12"/>
@@ -187,6 +208,30 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Gráficas de estadísticas -->
+            <div class="charts-section">
+                <h2>Estadísticas Visuales</h2>
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3>Distribución de Puntuaciones</h3>
+                        <canvas id="scoresChart" width="400" height="250"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Pruebas por Tipo</h3>
+                        <canvas id="testsTypeChart" width="400" height="250"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Progreso de Usuarios (Top 5)</h3>
+                        <canvas id="topUsersChart" width="400" height="250"></canvas>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Actividad por Día</h3>
+                        <canvas id="activityChart" width="400" height="250"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div class="filters-section">
                 <input type="text" id="searchUser" placeholder="Buscar por nombre o email..." class="search-input">
                 <select id="filterTest" class="filter-select">
@@ -221,6 +266,269 @@
         </div>
     </div>
 
+    <!-- GESTIÓN DE EXÁMENES POR CÓDIGO -->
+    <div class="screen" id="examCodesManagerScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                    </svg>
+                    <span>Gestión de Exámenes por Código</span>
+                </div>
+                <div class="nav-user">
+                    <span class="admin-badge">👑 ADMIN</span>
+                    <button class="btn-logout" onclick="showScreen('adminDashboard')">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="dashboard-header">
+                <h1>Gestión de Exámenes por Código</h1>
+            </div>
+
+            <!-- Estadísticas de códigos -->
+            <div class="stats-grid" style="margin-bottom: 2rem;">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Códigos Activos</p>
+                        <p class="stat-value" id="totalActiveCodes">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Códigos Usados</p>
+                        <p class="stat-value" id="totalUsedCodes">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Generados</p>
+                        <p class="stat-value" id="totalGeneratedCodes">0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Exámenes en Códigos</p>
+                        <p class="stat-value" id="totalExamsInCodes">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulario de asignar códigos a exámenes -->
+            <div id="assignExamForm" style="margin-bottom: 2rem;">
+                <div class="code-generator-card">
+                    <div class="card-header-gradient">
+                        <h3>✨ Generar Código para Exámenes</h3>
+                        <p>Crea códigos de acceso únicos para tus estudiantes</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-modern"><strong>📚 Exámenes a Incluir:</strong></label>
+                        <div class="exams-checkbox-container">
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="quiz_easy" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">📝 Cuestionario - Nivel Fácil (PRE-TEST)</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="quiz_hard" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">📝 Cuestionario - Nivel Difícil (POST-TEST)</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="cv_errors" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🔍 Detectar Errores en CV</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="cv_builder" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">📄 Constructor de CV</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="interview" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🎭 Simulador de Entrevista</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="personality" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🧠 Test de Personalidad Laboral</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="formal" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">💼 Test Formal/Informal</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="dresscode" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">👔 Código de Vestimenta</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="strengths" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">💪 Test de Fortalezas y Debilidades</span>
+                            </label>
+                            <label class="exam-checkbox-item">
+                                <input type="checkbox" name="examSelection" value="wordsearch" onchange="updateSelectedCount()">
+                                <span class="checkbox-custom"></span>
+                                <span class="exam-label">🔤 Sopa de Letras Laboral</span>
+                            </label>
+                        </div>
+                        <div class="selected-count-badge">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <strong id="selectedCount">0</strong> exámenes seleccionados
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-modern">📝 Título del Paquete:</label>
+                        <input type="text" id="assignExamTitle" class="input-modern" placeholder="Ej: Evaluación Completa Grupo A - Semana 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label-modern">💬 Descripción:</label>
+                        <textarea id="assignExamDescription" class="input-modern" placeholder="Notas o instrucciones adicionales para tus estudiantes..." rows="3"></textarea>
+                    </div>
+
+                    <div id="examSummary" style="display: none;" class="exam-summary-card">
+                        <h4>✓ Resumen del Paquete</h4>
+                        <div id="examSummaryList"></div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button class="btn-modern secondary" onclick="clearExamSelection()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                            Limpiar
+                        </button>
+                        <button class="btn-modern primary" onclick="generateMultiExamCode()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14"/>
+                            </svg>
+                            Generar Código
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de exámenes creados -->
+            <div class="table-container modern-table">
+                <div class="table-header">
+                    <h2>📋 Códigos de Examen Generados</h2>
+                    <button class="btn-modern secondary small" onclick="loadExamCodesList()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Actualizar
+                    </button>
+                </div>
+                <div class="table-scroll">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Título</th>
+                                <th>Exámenes</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="examCodesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para mostrar código generado -->
+    <div id="codeGeneratedModal" class="modal-overlay" onclick="closeCodeModal(event)">
+        <div class="modal-content code-modal" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeCodeModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+
+            <div class="modal-header-success">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <h2>¡Código Generado Exitosamente!</h2>
+                <p>Comparte este código con tus estudiantes</p>
+            </div>
+
+            <div class="code-display-card">
+                <label>🎫 Código de Acceso:</label>
+                <div class="code-value">
+                    <span id="modalCodeValue">MULTI-XXXXXXXX</span>
+                    <button class="btn-copy" onclick="copyCodeToClipboard()" title="Copiar código">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="code-details">
+                <div class="detail-item">
+                    <span class="detail-label">📋 Título:</span>
+                    <span class="detail-value" id="modalCodeTitle">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📚 Exámenes incluidos:</span>
+                    <span class="detail-value" id="modalCodeExams">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">📅 Fecha de creación:</span>
+                    <span class="detail-value" id="modalCodeDate">-</span>
+                </div>
+            </div>
+
+            <div class="exams-list-modal" id="modalExamsList"></div>
+
+            <div class="modal-actions">
+                <button class="btn-modern secondary" onclick="closeCodeModal()">Cerrar</button>
+                <button class="btn-modern primary" onclick="copyCodeAndClose()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                        <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>
+                    </svg>
+                    Copiar y Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- BIENVENIDA -->
     <div class="screen" id="welcomeScreen">
         <nav class="navbar">
@@ -237,9 +545,27 @@
                             <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
                         </svg>
                     </button>
+                    <button class="btn-icon" onclick="showMentorCoach()" title="Mi Mentor Virtual">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 14l9-5-9-5-9 5 9 5z"/>
+                            <path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/>
+                            <path d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="showUserProfile()" title="Mi Perfil">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </button>
                     <button class="btn-icon" onclick="showProgress()" title="Mi progreso">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="showCodeExamInput()" title="Examen por Código">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                         </svg>
                     </button>
                     <span id="userName">Usuario</span>
@@ -282,14 +608,6 @@
                         </div>
                         <div class="card-arrow">→</div>
                     </div>
-                </div>
-                <div class="practice-mode-section">
-                    <button class="btn-practice" onclick="enablePracticeMode()">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-                        </svg>
-                        Modo Práctica
-                    </button>
                 </div>
             </div>
         </div>
@@ -404,6 +722,66 @@
     <p>Practica respuestas a preguntas comunes</p>
     <button class="test-start-btn">Iniciar →</button>
 </div>
+
+                <!-- SOPA DE LETRAS -->
+                <div class="test-card modern" onclick="startTest('wordsearch')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 7h16M4 12h16M4 17h16"/>
+        </svg>
+    </div>
+    <h3>Sopa de Letras</h3>
+    <p>Encuentra palabras de orientación laboral</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- FORTALEZAS Y DEBILIDADES -->
+                <div class="test-card modern" onclick="startTest('strengths')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+    </div>
+    <h3>Fortalezas y Debilidades</h3>
+    <p>Evalúa tus competencias personales</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- TEST DE PERSONALIDAD -->
+                <div class="test-card modern" onclick="startTest('personality')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #a8edea, #fed6e3);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+        </svg>
+    </div>
+    <h3>Test de Personalidad</h3>
+    <p>Descubre tu tipo de personalidad laboral</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- TEST FORMAL/INFORMAL -->
+                <div class="test-card modern" onclick="startTest('formal-informal')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+        </svg>
+    </div>
+    <h3>Trabajos Formales e Informales</h3>
+    <p>Aprende a distinguir tipos de trabajo</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+
+                <!-- CÓMO VESTIRSE PARA ENTREVISTA -->
+                <div class="test-card modern" onclick="startTest('dress-code')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #d299c2, #fef9d7);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+        </svg>
+    </div>
+    <h3>Cómo Vestirse para Entrevista</h3>
+    <p>Aprende la etiqueta y vestimenta profesional</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
             </div>
         </div>
     </div>
@@ -459,6 +837,7 @@
                         </svg>
                         <span id="errorTimer">10:00</span>
                     </span>
+                    <button class="btn-logout" onclick="confirmExit()">Salir (Nota: 0)</button>
                 </div>
             </div>
         </nav>
@@ -567,7 +946,6 @@
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
 
-    <script src="script-pro.js"></script>
     <!-- SIMULADOR DE ENTREVISTA -->
 <div class="screen" id="interviewSimulatorScreen">
     <nav class="navbar">
@@ -694,6 +1072,201 @@
         </div>
     </div>
 </div>
+
+<!-- TEST DE PERSONALIDAD -->
+<div class="screen" id="personalityTestScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>🧠 Test de Personalidad Laboral</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge6"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="personality-test-card">
+            <!-- Camera preview si está habilitado -->
+            <div class="camera-section" id="cameraSection" style="display: none;">
+                <video id="cameraPreview" autoplay playsinline muted></video>
+            </div>
+
+            <!-- Contenedor de preguntas -->
+            <div id="personalityQuestionContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- RESULTADOS DE PERSONALIDAD -->
+<div class="screen" id="personalityResultsScreen">
+    <div class="results-wrapper">
+        <div class="results-card">
+            <div id="personalityResultsContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TEST DE COMUNICACIÓN FORMAL/INFORMAL -->
+<div class="screen" id="formalInformalTestScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>💼 Trabajos Formales e Informales</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge7"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="quiz-card">
+            <div id="formalInformalQuestionContainer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- TEST DE CÓDIGO DE VESTIMENTA -->
+<div class="screen" id="dressCodeTestScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>👔 Código de Vestimenta Profesional</span></div>
+            <div class="nav-user">
+                <span class="test-badge" id="testTypeBadge8"></span>
+                <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <!-- Lookbook Profesional -->
+        <div class="lookbook-section" id="lookbookSection">
+
+            <!-- Header Simple -->
+            <div class="lookbook-header-simple">
+                <h1>Código de Vestimenta Profesional</h1>
+                <p>Aprende la etiqueta y vestimenta profesional</p>
+            </div>
+
+            <!-- Video Integrado -->
+            <div class="lookbook-video-simple">
+                <iframe
+                    width="100%"
+                    height="400"
+                    src="https://www.youtube.com/embed/vfYC3p3B2no"
+                    title="Cómo Vestirse para una Entrevista de Trabajo"
+                    frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy">
+                </iframe>
+            </div>
+
+            <!-- Filtros Compactos -->
+            <div class="lookbook-filters-compact">
+                <div class="filter-row">
+                    <div class="filter-group-inline">
+                        <button class="filter-btn-simple active" onclick="filterByGender('all')" data-filter="all">Todos</button>
+                        <button class="filter-btn-simple" onclick="filterByGender('male')" data-filter="male">Hombre</button>
+                        <button class="filter-btn-simple" onclick="filterByGender('female')" data-filter="female">Mujer</button>
+                    </div>
+                    <div class="divider-vertical"></div>
+                    <div class="filter-tags-inline">
+                        <button class="tag-btn-simple active" onclick="filterByTag('all')" data-tag="all">Todos</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('corporativo')" data-tag="corporativo">Corporativo</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('tech')" data-tag="tech">Tech</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('creativo')" data-tag="creativo">Creativo</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('salud')" data-tag="salud">Salud</button>
+                        <button class="tag-btn-simple" onclick="filterByTag('casual')" data-tag="casual">Business Casual</button>
+                    </div>
+                    <button class="btn-closet-simple" onclick="toggleMyCloset()">
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                        Mi Closet (<span id="closetCount">0</span>)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Grid de Outfits (Estilo Instagram) -->
+            <div class="lookbook-grid" id="lookbookGrid">
+                <!-- Se llenará dinámicamente con JavaScript -->
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="lookbook-actions">
+                <button class="btn-secondary" onclick="showScreen('welcomeScreen')">← Volver al Inicio</button>
+                <button class="btn-primary" onclick="exportMyCloset()">
+                    Descargar Mi Guía PDF
+                </button>
+            </div>
+
+            <!-- Modal de Detalles de Outfit -->
+            <div class="outfit-modal" id="outfitModal" style="display: none;">
+                <div class="outfit-modal-content">
+                    <button class="modal-close" onclick="closeOutfitModal()">×</button>
+                    <div class="modal-body" id="modalBody">
+                        <!-- Se llenará dinámicamente -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Mi Closet Virtual -->
+            <div class="my-closet-panel" id="myClosetPanel" style="display: none;">
+                <div class="closet-panel-header">
+                    <h3>Mi Closet Virtual</h3>
+                    <button class="closet-close" onclick="toggleMyCloset()">×</button>
+                </div>
+                <div class="closet-items" id="closetItems">
+                    <p class="closet-empty">Aún no has guardado ningún outfit. Haz clic en el corazón de tus favoritos.</p>
+                </div>
+            </div>
+
+            <!-- Modal de Resultados (Conservado) -->
+            <div class="dresscode-results-modal" id="dressCodeResultsModal" style="display: none;">
+                <div class="results-modal-content">
+                    <div class="results-header">
+                        <h2 id="resultsTitle">🎉 ¡Excelente!</h2>
+                        <button class="close-modal" onclick="closeDressCodeResults()">✕</button>
+                    </div>
+                    <div class="results-body">
+                        <div class="score-display">
+                            <div class="score-circle" id="scoreCircle">
+                                <span class="score-number" id="scoreNumber">0</span>
+                                <span class="score-label">puntos</span>
+                            </div>
+                        </div>
+                        <div class="results-feedback" id="resultsFeedback"></div>
+                        <div class="results-details" id="resultsDetails"></div>
+                    </div>
+                    <div class="results-actions">
+                        <button class="btn-secondary" onclick="tryAgainDressCode()">🔄 Intentar de Nuevo</button>
+                        <button class="btn-primary" onclick="finishDressCode()">✅ Finalizar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- VIDEO PLAYBACK (para entrevistas grabadas) -->
+<div class="screen" id="videoPlaybackScreen" style="display: none;">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand"><span>📹 Revisión de Video</span></div>
+            <div class="nav-user">
+                <button class="btn-logout" onclick="goToMenu()">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container-narrow">
+        <div class="video-review-card">
+            <h2>Tu Entrevista Grabada</h2>
+            <div class="video-container">
+                <video id="videoPlayback" controls></video>
+            </div>
+            <div id="videoAnalysisResults" class="analysis-section"></div>
+        </div>
+    </div>
+</div>
+
 <!-- DESAFÍOS Y COMPETENCIAS -->
 <div class="screen" id="challengesScreen">
     <nav class="navbar">
@@ -923,41 +1496,106 @@
 
                 <!-- Selector de Estilo -->
                 <div class="customization-group-pro">
-                    <h3>🎭 Estilo de Avatar</h3>
+                    <h3>🎭 Estilo de Avatar Profesional</h3>
+                    <p style="color: var(--gray-600); margin-bottom: 1rem; font-size: 0.9em;">Elige un estilo humano y profesional que te represente en tu perfil laboral</p>
+
                     <div class="avatar-styles-gallery">
+                        <!-- Estilos Profesionales Humanos -->
                         <div class="style-card" data-style="avataaars" onclick="changeAvatarStyle('avataaars')">
-                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=preview1" alt="Avataaars">
+                            <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=professional1" alt="Avataaars">
                             <span>Avataaars</span>
-                            <div class="style-badge popular">Popular</div>
+                            <div class="style-badge popular">⭐ Popular</div>
                         </div>
-                        <div class="style-card" data-style="adventurer" onclick="changeAvatarStyle('adventurer')">
-                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=preview2" alt="Adventurer">
-                            <span>Adventurer</span>
-                        </div>
+
                         <div class="style-card" data-style="avataaars-neutral" onclick="changeAvatarStyle('avataaars-neutral')">
-                            <img src="https://api.dicebear.com/7.x/avataaars-neutral/svg?seed=preview3" alt="Neutral">
-                            <span>Neutral</span>
+                            <img src="https://api.dicebear.com/7.x/avataaars-neutral/svg?seed=professional2" alt="Neutral">
+                            <span>Neutral Pro</span>
+                            <div class="style-badge new">💼 Profesional</div>
                         </div>
+
+                        <div class="style-card" data-style="adventurer" onclick="changeAvatarStyle('adventurer')">
+                            <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=professional3" alt="Adventurer">
+                            <span>Aventurero</span>
+                            <div class="style-badge">👔 Formal</div>
+                        </div>
+
+                        <div class="style-card" data-style="adventurer-neutral" onclick="changeAvatarStyle('adventurer-neutral')">
+                            <img src="https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=professional4" alt="Adventurer Neutral">
+                            <span>Formal Neutral</span>
+                            <div class="style-badge">🎯 Ejecutivo</div>
+                        </div>
+
                         <div class="style-card" data-style="big-smile" onclick="changeAvatarStyle('big-smile')">
-                            <img src="https://api.dicebear.com/7.x/big-smile/svg?seed=preview4" alt="Big Smile">
-                            <span>Big Smile</span>
-                            <div class="style-badge new">Nuevo</div>
+                            <img src="https://api.dicebear.com/7.x/big-smile/svg?seed=professional5" alt="Big Smile">
+                            <span>Sonrisa</span>
+                            <div class="style-badge">😊 Amigable</div>
                         </div>
-                        <div class="style-card" data-style="bottts" onclick="changeAvatarStyle('bottts')">
-                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=preview5" alt="Bottts">
-                            <span>Robots</span>
-                        </div>
-                        <div class="style-card" data-style="personas" onclick="changeAvatarStyle('personas')">
-                            <img src="https://api.dicebear.com/7.x/personas/svg?seed=preview6" alt="Personas">
-                            <span>Personas</span>
-                        </div>
+
                         <div class="style-card" data-style="lorelei" onclick="changeAvatarStyle('lorelei')">
-                            <img src="https://api.dicebear.com/7.x/lorelei/svg?seed=preview7" alt="Lorelei">
+                            <img src="https://api.dicebear.com/7.x/lorelei/svg?seed=professional6" alt="Lorelei">
                             <span>Lorelei</span>
+                            <div class="style-badge">👩 Femenino</div>
                         </div>
+
+                        <div class="style-card" data-style="lorelei-neutral" onclick="changeAvatarStyle('lorelei-neutral')">
+                            <img src="https://api.dicebear.com/7.x/lorelei-neutral/svg?seed=professional7" alt="Lorelei Neutral">
+                            <span>Lorelei Neutral</span>
+                            <div class="style-badge">👩‍💼 Empresarial</div>
+                        </div>
+
                         <div class="style-card" data-style="micah" onclick="changeAvatarStyle('micah')">
-                            <img src="https://api.dicebear.com/7.x/micah/svg?seed=preview8" alt="Micah">
+                            <img src="https://api.dicebear.com/7.x/micah/svg?seed=professional8" alt="Micah">
                             <span>Micah</span>
+                            <div class="style-badge">🧑 Moderno</div>
+                        </div>
+
+                        <div class="style-card" data-style="notionists" onclick="changeAvatarStyle('notionists')">
+                            <img src="https://api.dicebear.com/7.x/notionists/svg?seed=professional9" alt="Notionists">
+                            <span>Notionists</span>
+                            <div class="style-badge new">✨ Nuevo</div>
+                        </div>
+
+                        <div class="style-card" data-style="notionists-neutral" onclick="changeAvatarStyle('notionists-neutral')">
+                            <img src="https://api.dicebear.com/7.x/notionists-neutral/svg?seed=professional10" alt="Notionists Neutral">
+                            <span>Notion Neutral</span>
+                            <div class="style-badge">🎨 Minimalista</div>
+                        </div>
+
+                        <div class="style-card" data-style="personas" onclick="changeAvatarStyle('personas')">
+                            <img src="https://api.dicebear.com/7.x/personas/svg?seed=professional11" alt="Personas">
+                            <span>Personas</span>
+                            <div class="style-badge">👤 Clásico</div>
+                        </div>
+
+                        <div class="style-card" data-style="open-peeps" onclick="changeAvatarStyle('open-peeps')">
+                            <img src="https://api.dicebear.com/7.x/open-peeps/svg?seed=professional12" alt="Open Peeps">
+                            <span>Open Peeps</span>
+                            <div class="style-badge">🎭 Expresivo</div>
+                        </div>
+
+                        <!-- Estilos Adicionales -->
+                        <div class="style-card" data-style="bottts" onclick="changeAvatarStyle('bottts')">
+                            <img src="https://api.dicebear.com/7.x/bottts/svg?seed=tech1" alt="Bottts">
+                            <span>Tech Robot</span>
+                            <div class="style-badge">🤖 Tech</div>
+                        </div>
+
+                        <div class="style-card" data-style="bottts-neutral" onclick="changeAvatarStyle('bottts-neutral')">
+                            <img src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=tech2" alt="Bottts Neutral">
+                            <span>Robot Neutral</span>
+                            <div class="style-badge">⚙️ Digital</div>
+                        </div>
+
+                        <div class="style-card" data-style="fun-emoji" onclick="changeAvatarStyle('fun-emoji')">
+                            <img src="https://api.dicebear.com/7.x/fun-emoji/svg?seed=fun1" alt="Fun Emoji">
+                            <span>Emoji Fun</span>
+                            <div class="style-badge">🎉 Divertido</div>
+                        </div>
+
+                        <div class="style-card" data-style="thumbs" onclick="changeAvatarStyle('thumbs')">
+                            <img src="https://api.dicebear.com/7.x/thumbs/svg?seed=thumb1" alt="Thumbs">
+                            <span>Thumbs</span>
+                            <div class="style-badge">👍 Simple</div>
                         </div>
                     </div>
                 </div>
@@ -1025,10 +1663,1011 @@
     </div>
 </div>
 
+    <!-- SOPA DE LETRAS -->
+    <div class="screen" id="wordSearchScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Sopa de Letras - Orientación Laboral</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeWS"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="wordSearchTimer">10:00</span>
+                    </span>
+                    <button class="btn-logout" onclick="confirmExit()">Salir (Nota: 0)</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="wordsearch-layout">
+                <div class="wordsearch-sidebar">
+                    <h3>🔍 Palabras a encontrar</h3>
+                    <div id="wordsList" class="words-list"></div>
+                    <div class="wordsearch-stats">
+                        <div class="stat-item">
+                            <strong>Encontradas:</strong> <span id="wordsFound">0</span>/<span id="totalWords">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <strong>Puntuación:</strong> <span id="wsScore">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wordsearch-main">
+                    <div id="wordSearchGrid" class="wordsearch-grid"></div>
+                    <div class="wordsearch-instructions">
+                        <p>💡 Haz clic y arrastra para seleccionar palabras (horizontal, vertical o diagonal)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAMEN POR CÓDIGO -->
+    <div class="screen" id="codeExamInputScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">Examen por Código</div>
+                <div class="nav-user">
+                    <button class="btn-logout" onclick="showScreen('testMenuScreen')">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <h2>📝 Ingresa el Código del Examen</h2>
+                <p>Tu profesor o administrador te ha proporcionado un código único para realizar este examen.</p>
+                <div class="form-group">
+                    <label>Código del Examen:</label>
+                    <input type="text" id="examCodeInput" placeholder="Ej: EXAM-2024-ABC123" style="text-transform: uppercase;">
+                </div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="showScreen('testMenuScreen')">Cancelar</button>
+                    <button class="btn-nav primary" onclick="validateExamCode()">Iniciar Examen</button>
+                </div>
+                <div id="codeExamError" style="color: #ff4757; margin-top: 1rem; display: none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXAMEN POR CÓDIGO - PANTALLA DE EJECUCIÓN -->
+    <div class="screen" id="codeExamScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span id="codeExamTitle">Examen por Código</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeCE"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="codeExamTimer">15:00</span>
+                    </span>
+                    <button class="btn-logout" onclick="confirmExit()">Salir (Nota: 0)</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <div class="quiz-progress-section">
+                    <div class="progress-info">
+                        <span>Pregunta <strong id="codeExamCurrentQ">1</strong> de <strong id="codeExamTotalQ">10</strong></span>
+                        <span class="progress-percentage"><span id="codeExamProgress">0</span>%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="codeExamProgressBar"></div>
+                    </div>
+                </div>
+                <div id="codeExamQuestionContainer"></div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-nav primary" id="codeExamNextBtn" onclick="nextCodeExamQuestion()">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORTALEZAS Y DEBILIDADES -->
+    <div class="screen" id="strengthsScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Test de Fortalezas y Debilidades</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeSW"></span>
+                    <button class="btn-logout" onclick="confirmExit()">Cancelar</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <!-- Video Explicativo -->
+            <div class="video-section" style="margin-bottom: 2rem;">
+                <div class="quiz-card">
+                    <h3>📹 Video Explicativo: ¿Qué son las Fortalezas y Debilidades?</h3>
+                    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 1rem 0;">
+                        <iframe
+                            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 8px;"
+                            src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                            title="Fortalezas y Debilidades en el Ámbito Laboral"
+                            frameborder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen>
+                        </iframe>
+                    </div>
+                    <p style="color: #666; font-size: 0.9rem;">
+                        📌 <strong>Nota:</strong> Te recomendamos ver el video antes de comenzar el test para entender mejor
+                        cómo identificar tus fortalezas y debilidades en el contexto laboral.
+                    </p>
+                    <button class="btn-nav primary" onclick="startStrengthsTest()" style="width: 100%; margin-top: 1rem;">
+                        Comenzar Test
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FORTALEZAS Y DEBILIDADES - TEST -->
+    <div class="screen" id="strengthsTestScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>Test de Fortalezas y Debilidades</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadgeSWT"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="strengthsTimer">20:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container-narrow">
+            <div class="quiz-card">
+                <div class="quiz-progress-section">
+                    <div class="progress-info">
+                        <span>Pregunta <strong id="strengthsCurrentQ">1</strong> de <strong id="strengthsTotalQ">15</strong></span>
+                        <span class="progress-percentage"><span id="strengthsProgress">0</span>%</span>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill" id="strengthsProgressBar"></div>
+                    </div>
+                </div>
+                <div id="strengthsQuestionContainer"></div>
+                <div class="quiz-navigation">
+                    <button class="btn-nav secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-nav primary" id="strengthsNextBtn" onclick="nextStrengthsQuestion()">Siguiente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<!-- PERFIL DE USUARIO -->
+<div class="screen" id="userProfileScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="30" cy="30" r="28" fill="#E86C4A" stroke="#264653" stroke-width="2"/>
+                    <path d="M30 15C26 15 23 18 23 22C23 26 26 29 30 29C34 29 37 26 37 22C37 18 34 15 30 15Z" fill="white"/>
+                    <path d="M30 32C20 32 15 37 15 42V45H45V42C45 37 40 32 30 32Z" fill="white"/>
+                </svg>
+                <span>Mi Perfil</span>
+            </div>
+            <div class="nav-user">
+                <button class="btn-logout" onclick="showScreen('welcomeScreen')">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="profile-container">
+            <!-- Tarjeta de perfil -->
+            <div class="profile-card">
+                <div class="profile-header-section">
+                    <div class="profile-photo-container">
+                        <img id="userProfilePhoto" src="" alt="Foto de perfil" class="profile-photo">
+                        <button class="btn-change-photo" onclick="document.getElementById('profilePhotoInput').click()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                            </svg>
+                            Cambiar Foto
+                        </button>
+                        <input type="file" id="profilePhotoInput" accept="image/*" style="display: none" onchange="uploadProfilePhoto(event)">
+                    </div>
+                    <div class="profile-info">
+                        <h2 id="profileUserName">Usuario</h2>
+                        <p id="profileUserEmail">email@example.com</p>
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="profileTestsCompleted">0</span>
+                                <span class="stat-label">Pruebas Completadas</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="profileAvgScore">0%</span>
+                                <span class="stat-label">Promedio General</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="profileBestScore">0%</span>
+                                <span class="stat-label">Mejor Puntuación</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información personal -->
+                <div class="profile-details">
+                    <h3>Información Personal</h3>
+                    <div class="detail-row">
+                        <span class="detail-label">Teléfono:</span>
+                        <span class="detail-value" id="profilePhone">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Edad:</span>
+                        <span class="detail-value" id="profileAge">-</span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="detail-label">Registrado:</span>
+                        <span class="detail-value" id="profileRegistered">-</span>
+                    </div>
+                </div>
+
+                <!-- Cambiar contraseña -->
+                <div class="profile-section">
+                    <h3>Cambiar Contraseña</h3>
+                    <div class="form-group">
+                        <label>Contraseña Actual</label>
+                        <input type="password" id="currentPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Nueva Contraseña</label>
+                        <input type="password" id="newPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>Confirmar Nueva Contraseña</label>
+                        <input type="password" id="confirmPassword" placeholder="••••••••">
+                    </div>
+                    <button class="btn-action" onclick="changeUserPassword()">Cambiar Contraseña</button>
+                </div>
+            </div>
+
+            <!-- Historial de actividades -->
+            <div class="activity-section">
+                <h2>Historial de Actividades</h2>
+                <div id="userActivityHistory" class="activity-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- GESTIÓN DE USUARIOS (ADMIN) -->
+<div class="screen" id="usersManagementScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <path d="M23 21v-2a4 4 0 00-3-3.87m-4-12a4 4 0 010 7.75"/>
+                </svg>
+                <span>Gestión de Usuarios</span>
+            </div>
+            <div class="nav-user">
+                <span class="admin-badge">👑 ADMIN</span>
+                <button class="btn-logout" onclick="showScreen('adminDashboard')">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Usuarios Registrados</h1>
+            <div class="search-bar">
+                <input type="text" id="userSearchInput" placeholder="Buscar por nombre o email..." onkeyup="filterUsers()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <path d="M21 21l-4.35-4.35"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="users-grid" id="usersGrid"></div>
+
+        <!-- Modal de detalles de usuario -->
+        <div id="userDetailModal" class="modal" style="display: none;">
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h2>Detalles del Usuario</h2>
+                    <button class="modal-close" onclick="closeUserDetailModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="user-detail-container">
+                        <div class="user-detail-header">
+                            <img id="modalUserPhoto" src="" alt="Foto" class="modal-user-photo">
+                            <div>
+                                <h3 id="modalUserName">Usuario</h3>
+                                <p id="modalUserEmail">email@example.com</p>
+                            </div>
+                        </div>
+
+                        <div class="user-detail-tabs">
+                            <button class="tab-btn active" onclick="switchUserDetailTab('info')">Información</button>
+                            <button class="tab-btn" onclick="switchUserDetailTab('results')">Resultados</button>
+                            <button class="tab-btn" onclick="switchUserDetailTab('actions')">Acciones</button>
+                        </div>
+
+                        <div id="userDetailTabInfo" class="tab-content active">
+                            <div class="detail-row">
+                                <span class="detail-label">Nombre Completo:</span>
+                                <span class="detail-value" id="modalUserFullName">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Teléfono:</span>
+                                <span class="detail-value" id="modalUserPhone">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Edad:</span>
+                                <span class="detail-value" id="modalUserAge">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Registrado:</span>
+                                <span class="detail-value" id="modalUserRegistered">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Pruebas Completadas:</span>
+                                <span class="detail-value" id="modalUserTests">-</span>
+                            </div>
+                        </div>
+
+                        <div id="userDetailTabResults" class="tab-content">
+                            <div id="modalUserResults"></div>
+                        </div>
+
+                        <div id="userDetailTabActions" class="tab-content">
+                            <h4>Permisos de Administrador</h4>
+                            <div class="form-group">
+                                <label>Rol Actual:</label>
+                                <span id="modalUserRole" style="font-weight: bold;">Usuario Normal</span>
+                            </div>
+                            <button class="btn-action" id="toggleAdminBtn" onclick="toggleUserAdmin()">Hacer Administrador</button>
+
+                            <hr style="margin: 2rem 0;">
+
+                            <h4>Cambiar Contraseña del Usuario</h4>
+                            <div class="form-group">
+                                <label>Nueva Contraseña:</label>
+                                <input type="password" id="adminNewPassword" placeholder="••••••••">
+                            </div>
+                            <button class="btn-action" onclick="adminChangeUserPassword()">Cambiar Contraseña</button>
+
+                            <hr style="margin: 2rem 0;">
+
+                            <h4>Acciones Peligrosas</h4>
+                            <button class="btn-danger" onclick="confirmDeleteUser()">Eliminar Usuario</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MENTOR/COACH VIRTUAL -->
+<div class="screen" id="mentorCoachScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <span>👨‍🏫 Mi Mentor Virtual</span>
+            </div>
+            <div class="nav-user">
+                <button class="btn-icon" onclick="goToWelcome()" title="Volver al inicio">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                    </svg>
+                </button>
+                <span id="mentorUserName">Usuario</span>
+                <button class="btn-logout" onclick="logout()">Salir</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mentor-container">
+        <div class="mentor-header">
+            <div class="mentor-icon">👨‍🏫</div>
+            <h1>Tu Mentor Virtual</h1>
+            <p class="mentor-subtitle">Guía personalizada para mejorar tus habilidades laborales y destacar en tus evaluaciones</p>
+        </div>
+
+        <!-- Daily Tip -->
+        <div class="daily-tip-card">
+            <div class="daily-tip-header">
+                <div class="daily-tip-icon">💡</div>
+                <div>
+                    <div class="daily-tip-title">Consejo del Día</div>
+                </div>
+            </div>
+            <div class="daily-tip-content" id="dailyTipContent">
+                Cargando consejo del día...
+            </div>
+            <span class="daily-tip-category" id="dailyTipCategory">General</span>
+        </div>
+
+        <!-- Performance Analysis -->
+        <div class="performance-analysis">
+            <div class="performance-header">
+                <h2 class="performance-title">📊 Tu Rendimiento</h2>
+            </div>
+            <div class="performance-stats">
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="totalTestsTaken">0</div>
+                    <div class="performance-stat-label">Pruebas Realizadas</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="averageScore">0%</div>
+                    <div class="performance-stat-label">Promedio General</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="improvementRate">+0%</div>
+                    <div class="performance-stat-label">Mejora</div>
+                </div>
+                <div class="performance-stat">
+                    <div class="performance-stat-value" id="strongAreas">0</div>
+                    <div class="performance-stat-label">Áreas Fuertes</div>
+                </div>
+            </div>
+
+            <!-- Recommendations -->
+            <h3 style="margin-bottom: 20px; color: var(--dark);">🎯 Recomendaciones Personalizadas</h3>
+            <div class="recommendations-list" id="recommendationsList">
+                <!-- Recommendations will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Learning Path -->
+        <div class="learning-path">
+            <h2 class="learning-path-title">🚀 Tu Plan de Mejora</h2>
+            <div class="path-steps" id="learningPathSteps">
+                <!-- Learning path steps will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <!-- Mentor Sections -->
+        <div class="mentor-sections">
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">📝</div>
+                <h3 class="mentor-section-title">Preparación de Entrevistas</h3>
+                <p class="mentor-section-description">Consejos y estrategias para destacar en tus entrevistas laborales</p>
+                <button class="btn-primary" onclick="selectTest('interview')">Practicar Entrevista</button>
+            </div>
+
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">📄</div>
+                <h3 class="mentor-section-title">Mejora tu CV</h3>
+                <p class="mentor-section-description">Aprende a crear un currículum profesional que capte la atención</p>
+                <button class="btn-primary" onclick="showScreen('cvBuilderScreen')">Construir CV</button>
+            </div>
+
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">🎯</div>
+                <h3 class="mentor-section-title">Desarrollo Personal</h3>
+                <p class="mentor-section-description">Identifica tus fortalezas y trabaja en tus áreas de oportunidad</p>
+                <button class="btn-primary" onclick="showScreen('strengthsScreen')">Ver Fortalezas</button>
+            </div>
+
+            <div class="mentor-section-card">
+                <div class="mentor-section-icon">💼</div>
+                <h3 class="mentor-section-title">Etiqueta Profesional</h3>
+                <p class="mentor-section-description">Domina el código de vestimenta y comportamiento profesional</p>
+                <button class="btn-primary" onclick="selectTest('dressCode')">Aprender Etiqueta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Botón flotante para crear avatar -->
 <button class="floating-avatar-btn" onclick="showAvatarCreator()" title="Crear Avatar" id="floatingAvatarBtn">
     🎨
 </button>
 
+<script>
+// ===================================
+// LOOKBOOK PROFESIONAL - FUNCIONALIDAD
+// ===================================
+
+// Base de datos de outfits profesionales del Lookbook
+const lookbookOutfits = [
+    {
+        id: 1,
+        name: 'Ejecutivo Corporativo',
+        gender: 'male',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=500',
+        items: [
+            { type: 'Saco', detail: 'Azul marino de corte slim' },
+            { type: 'Camisa', detail: 'Blanca de algodón' },
+            { type: 'Pantalón', detail: 'De vestir azul marino' },
+            { type: 'Zapatos', detail: 'Oxford negros lustrados' },
+            { type: 'Corbata', detail: 'Azul marino con textura sutil' },
+            { type: 'Cinturón', detail: 'Negro de cuero' }
+        ],
+        description: 'Perfecto para entrevistas en bancos, firmas legales y consultoría. Proyecta autoridad y profesionalismo.',
+        level: 'Muy Formal',
+        price: '$$$'
+    },
+    {
+        id: 2,
+        name: 'Tech Professional',
+        gender: 'male',
+        tags: ['tech', 'casual'],
+        image: 'https://images.unsplash.com/photo-1556157382-97eda2d62296?w=500',
+        items: [
+            { type: 'Camisa', detail: 'Azul claro sin corbata' },
+            { type: 'Chinos', detail: 'Gris oscuro' },
+            { type: 'Zapatos', detail: 'Mocasines café' },
+            { type: 'Reloj', detail: 'Minimalista plateado' }
+        ],
+        description: 'Ideal para startups y empresas tech. Balance perfecto entre profesional y relajado.',
+        level: 'Business Casual',
+        price: '$$'
+    },
+    {
+        id: 3,
+        name: 'Creativo Moderno',
+        gender: 'male',
+        tags: ['creativo', 'casual'],
+        image: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Gris jaspeado' },
+            { type: 'Camiseta', detail: 'Negra de algodón premium' },
+            { type: 'Jeans', detail: 'Oscuros sin roturas' },
+            { type: 'Zapatos', detail: 'Boots chelsea negros' }
+        ],
+        description: 'Para agencias creativas, diseño, marketing. Muestra personalidad manteniendo profesionalismo.',
+        level: 'Smart Casual',
+        price: '$$'
+    },
+    {
+        id: 4,
+        name: 'Ejecutiva Poderosa',
+        gender: 'female',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Negro estructurado' },
+            { type: 'Blusa', detail: 'Blanca de seda' },
+            { type: 'Pantalón', detail: 'De vestir negro' },
+            { type: 'Tacones', detail: 'Negros clásicos (5-7cm)' },
+            { type: 'Collar', detail: 'Perlas discretas' }
+        ],
+        description: 'Para posiciones ejecutivas y corporativas. Transmite liderazgo y confianza.',
+        level: 'Muy Formal',
+        price: '$$$'
+    },
+    {
+        id: 5,
+        name: 'Profesional Elegante',
+        gender: 'female',
+        tags: ['corporativo', 'casual'],
+        image: 'https://images.unsplash.com/photo-1580894732444-8ecded7900cd?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Gris claro' },
+            { type: 'Blusa', detail: 'Crema' },
+            { type: 'Falda', detail: 'Lápiz gris (hasta rodilla)' },
+            { type: 'Zapatos', detail: 'Tacones nude medios' },
+            { type: 'Aretes', detail: 'Pequeños plateados' }
+        ],
+        description: 'Versátil para la mayoría de entrevistas profesionales. Femenina y formal.',
+        level: 'Formal',
+        price: '$$'
+    },
+    {
+        id: 6,
+        name: 'Business Moderno',
+        gender: 'female',
+        tags: ['tech', 'casual'],
+        image: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=500',
+        items: [
+            { type: 'Blusa', detail: 'Blanca estructurada' },
+            { type: 'Pantalón', detail: 'Gris de corte recto' },
+            { type: 'Flats', detail: 'Negros puntiagudos' },
+            { type: 'Reloj', detail: 'Minimalista dorado' }
+        ],
+        description: 'Para empresas modernas y tecnología. Cómodo pero profesional.',
+        level: 'Business Casual',
+        price: '$$'
+    },
+    {
+        id: 7,
+        name: 'Formal Tradicional',
+        gender: 'male',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=500',
+        items: [
+            { type: 'Traje', detail: 'Gris carbón de 3 piezas' },
+            { type: 'Camisa', detail: 'Azul claro' },
+            { type: 'Corbata', detail: 'Vino con patrón discreto' },
+            { type: 'Zapatos', detail: 'Oxford café oscuro' },
+            { type: 'Gemelos', detail: 'Plateados clásicos' }
+        ],
+        description: 'Para industrias conservadoras: finanzas, derecho, seguros.',
+        level: 'Máxima Formalidad',
+        price: '$$$$'
+    },
+    {
+        id: 8,
+        name: 'Sector Salud',
+        gender: 'female',
+        tags: ['salud', 'corporativo'],
+        image: 'https://images.unsplash.com/photo-1594824476967-48c8b964273f?w=500',
+        items: [
+            { type: 'Blazer', detail: 'Azul marino' },
+            { type: 'Blusa', detail: 'Blanca sin estampados' },
+            { type: 'Pantalón', detail: 'Negro recto' },
+            { type: 'Zapatos', detail: 'Flats o tacones bajos negros' }
+        ],
+        description: 'Para entrevistas en hospitales, clínicas, sector farmacéutico. Limpio y profesional.',
+        level: 'Formal',
+        price: '$$'
+    },
+    {
+        id: 9,
+        name: 'Industria Creativa',
+        gender: 'male',
+        tags: ['creativo'],
+        image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=500',
+        items: [
+            { type: 'Camisa', detail: 'Blanca Oxford sin corbata' },
+            { type: 'Pantalón', detail: 'Chinos beige' },
+            { type: 'Blazer', detail: 'Azul marino casual (opcional)' },
+            { type: 'Zapatos', detail: 'Desert boots marrones' }
+        ],
+        description: 'Para marketing, publicidad, diseño. Equilibrio entre creativo y profesional.',
+        level: 'Smart Casual',
+        price: '$$'
+    },
+    {
+        id: 10,
+        name: 'Versatil Profesional',
+        gender: 'female',
+        tags: ['creativo', 'casual'],
+        image: 'https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=500',
+        items: [
+            { type: 'Vestido', detail: 'Azul marino tipo sheath' },
+            { type: 'Cardigan', detail: 'Gris estructurado' },
+            { type: 'Zapatos', detail: 'Tacones medios negros' },
+            { type: 'Bolso', detail: 'Tote negro profesional' }
+        ],
+        description: 'Funciona para múltiples industrias. Simple, elegante y fácil de usar.',
+        level: 'Business Casual',
+        price: '$$'
+    },
+    {
+        id: 11,
+        name: 'Consultor Senior',
+        gender: 'male',
+        tags: ['corporativo', 'formal'],
+        image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500',
+        items: [
+            { type: 'Traje', detail: 'Azul marino' },
+            { type: 'Camisa', detail: 'Blanca de puño francés' },
+            { type: 'Corbata', detail: 'Azul rey' },
+            { type: 'Zapatos', detail: 'Oxford negros cap-toe' },
+            { type: 'Portafolio', detail: 'Cuero negro' }
+        ],
+        description: 'Para consultorías de alto nivel. Imagen impecable y confiable.',
+        level: 'Muy Formal',
+        price: '$$$'
+    },
+    {
+        id: 12,
+        name: 'Manager Moderna',
+        gender: 'female',
+        tags: ['corporativo', 'tech'],
+        image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=500',
+        items: [
+            { type: 'Saco', detail: 'Gris claro sin solapas' },
+            { type: 'Pantalón', detail: 'Negro de corte recto' },
+            { type: 'Blusa', detail: 'Blanca minimalista' },
+            { type: 'Zapatos', detail: 'Flats puntiagudos' },
+            { type: 'Reloj', detail: 'Smart watch elegante' }
+        ],
+        description: 'Para posiciones de gerencia en empresas tech o modernas. Look contemporáneo.',
+        level: 'Business Professional',
+        price: '$$'
+    }
+];
+
+// Sistema de favoritos
+let myCloset = [];
+
+//Iniciar lookbook
+function initLookbook() {
+    renderLookbookGrid();
+    updateClosetCount();
+}
+
+// Renderizar grid de outfits
+function renderLookbookGrid(filter = 'all', tag = 'all') {
+    const grid = document.getElementById('lookbookGrid');
+
+    let filteredOutfits = lookbookOutfits.filter(outfit => {
+        const genderMatch = filter === 'all' || outfit.gender === filter;
+        const tagMatch = tag === 'all' || outfit.tags.includes(tag);
+        return genderMatch && tagMatch;
+    });
+
+    grid.innerHTML = filteredOutfits.map(outfit => `
+        <div class="lookbook-card" onclick="showOutfitDetails(${outfit.id})">
+            <div class="card-image" style="background-image: url('${outfit.image}')">
+                <div class="card-overlay">
+                    <button class="btn-fav ${isInCloset(outfit.id) ? 'active' : ''}"
+                            onclick="event.stopPropagation(); toggleFavorite(${outfit.id})">
+                        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </button>
+                    <div class="card-tags">
+                        ${outfit.tags.map(tag => `<span class="card-tag">#${tag}</span>`).join('')}
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <h3>${outfit.name}</h3>
+                <p class="card-level">${outfit.level}</p>
+                <p class="card-desc">${outfit.description}</p>
+                <div class="card-footer">
+                    <span class="card-price">${outfit.price}</span>
+                    <span class="card-gender">${outfit.gender === 'male' ? 'Hombre' : 'Mujer'}</span>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Filtrar por género
+function filterByGender(gender) {
+    const currentTag = document.querySelector('.tag-btn.active')?.dataset.tag || 'all';
+
+    // Actualizar botones activos
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === gender);
+    });
+
+    renderLookbookGrid(gender, currentTag);
+}
+
+// Filtrar por tag
+function filterByTag(tag) {
+    const currentGender = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+
+    // Actualizar botones activos
+    document.querySelectorAll('.tag-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tag === tag);
+    });
+
+    renderLookbookGrid(currentGender, tag);
+}
+
+// Mostrar detalles del outfit
+function showOutfitDetails(outfitId) {
+    const outfit = lookbookOutfits.find(o => o.id === outfitId);
+    const modal = document.getElementById('outfitModal');
+    const modalBody = document.getElementById('modalBody');
+
+    modalBody.innerHTML = `
+        <div class="modal-outfit-details">
+            <div class="modal-image-section">
+                <img src="${outfit.image}" alt="${outfit.name}">
+                <button class="btn-fav-large ${isInCloset(outfit.id) ? 'active' : ''}"
+                        onclick="toggleFavorite(${outfit.id})">
+                    <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor">
+                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                    </svg>
+                    ${isInCloset(outfit.id) ? 'En Mi Closet' : 'Guardar en Mi Closet'}
+                </button>
+            </div>
+            <div class="modal-info-section">
+                <div class="modal-header-info">
+                    <h2>${outfit.name}</h2>
+                    <div class="modal-tags">
+                        ${outfit.tags.map(tag => `<span class="tag">#${tag}</span>`).join('')}
+                    </div>
+                </div>
+                <div class="modal-level-price">
+                    <span class="level-badge">${outfit.level}</span>
+                    <span class="price-badge">${outfit.price}</span>
+                </div>
+                <p class="modal-description">${outfit.description}</p>
+
+                <h3>Prendas que incluye:</h3>
+                <ul class="items-list">
+                    ${outfit.items.map(item => `
+                        <li>
+                            <strong>${item.type}:</strong> ${item.detail}
+                        </li>
+                    `).join('')}
+                </ul>
+
+                <div class="modal-tips">
+                    <h4>Consejos para este look:</h4>
+                    <ul>
+                        <li>Asegúrate de que todo esté limpio y planchado</li>
+                        <li>Los colores deben ser coordinados y profesionales</li>
+                        <li>El calzado debe estar impecable y lustrado</li>
+                        <li>Evita accesorios excesivos o muy llamativos</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+
+    modal.style.display = 'flex';
+}
+
+// Cerrar modal
+function closeOutfitModal() {
+    document.getElementById('outfitModal').style.display = 'none';
+}
+
+// Toggle favorito
+function toggleFavorite(outfitId) {
+    const index = myCloset.indexOf(outfitId);
+
+    if (index > -1) {
+        myCloset.splice(index, 1);
+    } else {
+        myCloset.push(outfitId);
+    }
+
+    localStorage.setItem('myCloset', JSON.stringify(myCloset));
+    updateClosetCount();
+
+    // Actualizar UI
+    const currentFilter = document.querySelector('.filter-btn.active')?.dataset.filter || 'all';
+    const currentTag = document.querySelector('.tag-btn.active')?.dataset.tag || 'all';
+    renderLookbookGrid(currentFilter, currentTag);
+
+    // Si el modal está abierto, actualizarlo
+    const modal = document.getElementById('outfitModal');
+    if (modal.style.display === 'flex') {
+        const outfit = lookbookOutfits.find(o => o.id === outfitId);
+        if (outfit) {
+            showOutfitDetails(outfitId);
+        }
+    }
+}
+
+// Verificar si está en closet
+function isInCloset(outfitId) {
+    return myCloset.includes(outfitId);
+}
+
+// Actualizar contador de closet
+function updateClosetCount() {
+    document.getElementById('closetCount').textContent = myCloset.length;
+}
+
+// Toggle panel de closet
+function toggleMyCloset() {
+    const panel = document.getElementById('myClosetPanel');
+    const isVisible = panel.style.display === 'block';
+
+    if (isVisible) {
+        panel.style.display = 'none';
+    } else {
+        panel.style.display = 'block';
+        renderMyCloset();
+    }
+}
+
+// Renderizar mi closet
+function renderMyCloset() {
+    const container = document.getElementById('closetItems');
+
+    if (myCloset.length === 0) {
+        container.innerHTML = '<p class="closet-empty">Aún no has guardado ningún outfit. Haz clic en el corazón de tus favoritos.</p>';
+        return;
+    }
+
+    const savedOutfits = lookbookOutfits.filter(o => myCloset.includes(o.id));
+
+    container.innerHTML = savedOutfits.map(outfit => `
+        <div class="closet-item" onclick="showOutfitDetails(${outfit.id})">
+            <img src="${outfit.image}" alt="${outfit.name}">
+            <div class="closet-item-info">
+                <h4>${outfit.name}</h4>
+                <p>${outfit.level}</p>
+            </div>
+            <button class="closet-remove" onclick="event.stopPropagation(); toggleFavorite(${outfit.id})">
+                ×
+            </button>
+        </div>
+    `).join('');
+}
+
+// Exportar a PDF (simulado)
+function exportMyCloset() {
+    if (myCloset.length === 0) {
+        alert('Primero guarda algunos outfits en tu closet');
+        return;
+    }
+
+    alert(`📄 Generando tu guía personalizada con ${myCloset.length} outfit${myCloset.length > 1 ? 's' : ''}...\n\n(Funcionalidad de PDF próximamente)`);
+}
+
+// Cargar closet desde localStorage
+function loadMyCloset() {
+    const saved = localStorage.getItem('myCloset');
+    if (saved) {
+        myCloset = JSON.parse(saved);
+    }
+}
+
+// Inicializar cuando cargue la página
+document.addEventListener('DOMContentLoaded', function() {
+    // Solo inicializar si estamos en la pantalla de dress code
+    if (document.getElementById('lookbookSection')) {
+        loadMyCloset();
+        initLookbook();
+    }
+});
+
+// FUNCIONES ANTIGUAS MANTENIDAS PARA COMPATIBILIDAD
+function startDressCodeActivity() {
+    // Ya no se usa, lookbook se muestra directo
+    initLookbook();
+}
+
+function selectGender(gender) {
+    filterByGender(gender);
+}
+
+function backToVideo() {
+    // Ya no hay video separado
+}
+
+function clearOutfit() {
+    // Funcionalidad removida en lookbook
+}
+
+function selectClothing() {
+    // Funcionalidad removida en lookbook
+}
+
+function renderAvatar() {
+    // Funcionalidad removida en lookbook
+}
+
+// Funciones antiguas de compatibilidad
+function updateFeedback() {
+    // Ya no se usa
+}
+
+function submitDressCode() {
+    // Ya no se usa
+}
+
+function closeDressCodeResults() {
+    document.getElementById('dressCodeResultsModal').style.display = 'none';
+}
+
+function tryAgainDressCode() {
+    closeDressCodeResults();
+}
+
+function finishDressCode() {
+    closeDressCodeResults();
+    if (typeof showScreen === 'function') {
+        showScreen('welcomeScreen');
+    } else if (typeof window.showScreen === 'function') {
+        window.showScreen('welcomeScreen');
+    }
+}
+
+</script>
+
+<script src="script-pro.js"></script>
 </body>
 </html>
