@@ -902,8 +902,12 @@ function skipOnboarding() {
 function finishOnboarding() {
     closeOnboarding();
     markOnboardingAsCompleted();
-    showScreen('welcomeScreen');
-    showToast('¡Perfecto! Ya puedes empezar a usar la plataforma', 'success');
+
+    // Llevar al usuario a la selección de PRE-TEST/POST-TEST
+    setTimeout(() => {
+        showScreen('testMenuScreen');
+        showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar tu evaluación', 'success');
+    }, 500);
 }
 
 function closeOnboarding() {
@@ -4500,8 +4504,17 @@ function saveAvatarPro() {
     // Si es un nuevo usuario, continuar con el flujo de onboarding
     if (currentUser.isNewUser) {
         setTimeout(() => {
-            showScreen('testMenuScreen');
-            showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar', 'info');
+            // Cerrar el creador de avatar
+            const avatarScreen = document.getElementById('avatarCreatorScreen');
+            if (avatarScreen) {
+                avatarScreen.classList.remove('active');
+            }
+
+            // Avanzar al siguiente paso del onboarding (Paso 2: PRE-TEST/POST-TEST)
+            currentOnboardingStep = 2; // Paso 2 es el índice 2 en el array
+            createOnboardingOverlay();
+            showOnboardingStep();
+            showToast('💡 Ahora conoce los tipos de evaluaciones disponibles', 'info');
         }, 1500);
     } else {
         // Usuario existente, volver a la pantalla anterior
