@@ -673,8 +673,7 @@ select:focus {
 
 .welcome-text {
     text-align: center;
-    margin-bottom: var(--space-3xl);
-    animation: slideInUp 0.6s ease-out;
+    margin-bottom: var(--space-2xl);
 }
 
 .welcome-text h1 {
@@ -708,14 +707,12 @@ select:focus {
     -webkit-backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.5);
     border-radius: var(--radius-xl);
-    padding: var(--space-3xl);
+    padding: var(--space-2xl);
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     box-shadow: var(--shadow-lg);
     position: relative;
     overflow: hidden;
-    animation: slideInUp 0.6s ease-out;
-    animation-fill-mode: both;
 }
 
 .type-card::before {
@@ -732,29 +729,24 @@ select:focus {
 
 .type-card:hover::before {
     opacity: 1;
-    animation: pulse 2s infinite;
 }
 
 .type-card:hover {
-    transform: translateY(-8px);
     box-shadow: var(--shadow-2xl);
     border-color: var(--accent);
-}
-
-.type-card:nth-child(2) {
-    animation-delay: 0.1s;
+    transform: scale(1.02);
 }
 
 .type-card-icon {
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     background: var(--gradient-blue);
     border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: var(--space-xl);
-    transition: var(--transition);
+    margin-bottom: var(--space-lg);
+    transition: all 0.3s ease;
     box-shadow: var(--shadow-md);
     position: relative;
 }
@@ -771,13 +763,13 @@ select:focus {
 }
 
 .type-card:hover .type-card-icon {
-    transform: scale(1.1) rotate(5deg);
+    transform: scale(1.05);
     box-shadow: var(--shadow-xl);
 }
 
 .type-card-icon svg {
-    width: 40px;
-    height: 40px;
+    width: 32px;
+    height: 32px;
     color: var(--white);
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
 }
@@ -791,7 +783,7 @@ select:focus {
 }
 
 .post-card:hover .type-card-icon {
-    transform: scale(1.1) rotate(-5deg);
+    transform: scale(1.05);
 }
 
 .type-card-content h3 {
@@ -915,12 +907,10 @@ select:focus {
     padding: var(--space-2xl);
     text-align: center;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.3s ease;
     box-shadow: var(--shadow-lg);
     position: relative;
     overflow: hidden;
-    animation: slideInUp 0.5s ease-out;
-    animation-fill-mode: both;
 }
 
 .test-card.modern::before {
@@ -942,19 +932,7 @@ select:focus {
 .test-card.modern:hover {
     border-color: var(--accent);
     box-shadow: var(--shadow-2xl);
-    transform: translateY(-8px) scale(1.02);
-}
-
-.test-card.modern:nth-child(2) {
-    animation-delay: 0.1s;
-}
-
-.test-card.modern:nth-child(3) {
-    animation-delay: 0.2s;
-}
-
-.test-card.modern:nth-child(4) {
-    animation-delay: 0.3s;
+    transform: scale(1.02);
 }
 
 .test-card-icon {
@@ -7773,7 +7751,6 @@ textarea.input-modern {
 .scenario-icon-large {
     font-size: 4rem;
     flex-shrink: 0;
-    animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
@@ -9759,7 +9736,6 @@ body.dark-theme .btn-nav.secondary:hover {
 .btn-icon {
     font-size: 3em;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
-    animation: bounce 2s infinite;
 }
 
 @keyframes bounce {
@@ -9968,7 +9944,6 @@ body.dark-theme .btn-nav.secondary:hover {
 .tutorial-icon {
     font-size: 4em;
     margin-bottom: 16px;
-    animation: bounce 2s infinite;
 }
 
 .tutorial-header h2 {
