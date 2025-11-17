@@ -2374,6 +2374,12 @@ function showResults(score, testName) {
     showScreen('resultsScreen');
     updateAttempts();
 
+    // Integración con sistema de gamificación
+    if (!isPracticeMode && typeof gamification !== 'undefined') {
+        const maxScore = 100;
+        gamification.onTestCompleted(score, maxScore, testName, elapsed);
+    }
+
     // Verificar si completó todos los exámenes para ofrecer diploma
     checkAndOfferCompletionDiploma();
 }
@@ -5036,6 +5042,11 @@ function saveAvatarPro() {
     // Actualizar foto de perfil en el perfil del usuario
     updateProfilePhoto();
 
+    // Integración con sistema de gamificación
+    if (typeof gamification !== 'undefined') {
+        gamification.unlockBadge('avatar_creator');
+    }
+
     showToast('¡Avatar guardado y sincronizado con tu perfil!', 'success');
 
     // Si es un nuevo usuario, marcar onboarding como completado y llevar a welcomeScreen
@@ -5361,6 +5372,11 @@ function showAudioAnalysis(analysis) {
     `;
 
     feedbackDiv.style.display = 'block';
+
+    // Integración con sistema de gamificación
+    if (typeof gamification !== 'undefined') {
+        gamification.onInterviewPracticed(analysis.score);
+    }
 }
 
 // Iniciar grabación de audio

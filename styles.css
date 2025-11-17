@@ -10896,3 +10896,105 @@ body.dark-theme .btn-secondary {
     color: var(--white) !important;
     border: 1px solid rgba(99, 102, 241, 0.4);
 }
+
+/* ========================================
+   GAMIFICATION SYSTEM STYLES
+======================================== */
+
+/* Welcome Container Layout con Sidebar */
+.welcome-container {
+    display: flex;
+    gap: 25px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Sidebar de Gamificación */
+.gamification-sidebar {
+    width: 320px;
+    flex-shrink: 0;
+}
+
+.welcome-content {
+    flex: 1;
+}
+
+/* User Level Badge (en navbar) */
+.user-level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    margin-right: 10px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+}
+
+.user-level-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.level-emoji {
+    font-size: 18px;
+}
+
+.level-number {
+    font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .welcome-container {
+        flex-direction: column;
+    }
+
+    .gamification-sidebar {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .welcome-container {
+        padding: 15px;
+    }
+
+    .gamification-sidebar {
+        margin-bottom: 20px;
+    }
+}
+
+/* Dark theme para gamificación */
+body.dark-theme #gamification-stats {
+    background: rgba(30, 35, 48, 0.95);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+body.dark-theme .level-display {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.8) 0%, rgba(118, 75, 162, 0.8) 100%);
+}
+
+body.dark-theme .streak-display {
+    background: linear-gradient(135deg, rgba(240, 147, 251, 0.8) 0%, rgba(245, 87, 108, 0.8) 100%);
+}
+
+body.dark-theme .stat-item {
+    background: rgba(30, 35, 48, 0.6);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+body.dark-theme .badge-item {
+    background: rgba(30, 35, 48, 0.6);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+body.dark-theme .stats-header h3,
+body.dark-theme .badges-preview h4 {
+    color: var(--gray-100);
+}

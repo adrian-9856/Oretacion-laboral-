@@ -563,17 +563,36 @@
                             <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                         </svg>
                     </button>
+                    <button class="btn-icon" onclick="if(typeof gamification !== 'undefined') gamification.showLeaderboard()" title="Clasificación">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="if(typeof industryPrep !== 'undefined') industryPrep.showIndustrySelector()" title="Mi Industria">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                    </button>
                     <button class="btn-icon" onclick="showCodeExamInput()" title="Examen por Código">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
                         </svg>
                     </button>
+                    <div class="user-level-badge" id="userLevelBadge">
+                        <span class="level-emoji">🌱</span>
+                        <span class="level-number">Nv.1</span>
+                    </div>
                     <span id="userName">Usuario</span>
                     <button class="btn-logout" onclick="logout()">Salir</button>
                 </div>
             </div>
         </nav>
         <div class="welcome-container">
+            <!-- Panel de Gamificación -->
+            <div class="gamification-sidebar">
+                <div id="gamification-stats"></div>
+            </div>
+
             <div class="welcome-content">
                 <div class="welcome-text">
                     <h1>Bienvenido al Sistema de Evaluación</h1>
@@ -2234,9 +2253,11 @@
     </svg>
 </button>
 
-<!-- Script externo de lookbook cargado al final -->
-<script src="lookbook-functions.js?v=4.2"></script>
-<script src="claude-ai-helper.js?v=4.2"></script>
-<script src="script-pro.js?v=4.2"></script>
+<!-- Scripts externos cargados al final -->
+<script src="lookbook-functions.js?v=4.3"></script>
+<script src="claude-ai-helper.js?v=4.3"></script>
+<script src="gamification-system.js?v=1.0"></script>
+<script src="industry-preparation.js?v=1.0"></script>
+<script src="script-pro.js?v=4.3"></script>
 </body>
 </html>
