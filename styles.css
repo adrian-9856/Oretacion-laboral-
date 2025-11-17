@@ -4271,6 +4271,47 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     box-shadow: var(--shadow-lg);
 }
 
+/* Botón flotante para reactivar tour/ayuda */
+.floating-help-tour-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: var(--white);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+    transition: var(--transition);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: helpPulse 2s infinite;
+}
+
+.floating-help-tour-btn svg {
+    width: 28px;
+    height: 28px;
+}
+
+.floating-help-tour-btn:hover {
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 12px 32px rgba(79, 70, 229, 0.5);
+    animation: none;
+}
+
+@keyframes helpPulse {
+    0%, 100% {
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+    }
+    50% {
+        box-shadow: 0 8px 32px rgba(79, 70, 229, 0.7);
+    }
+}
+
 /* ========================================
    SIMULADOR DE ENTREVISTA CON AUDIO
 ======================================== */
@@ -4703,6 +4744,18 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
         height: 50px;
         bottom: 90px;
         left: 20px;
+    }
+
+    .floating-help-tour-btn {
+        width: 50px;
+        height: 50px;
+        bottom: 20px;
+        right: 20px;
+    }
+
+    .floating-help-tour-btn svg {
+        width: 24px;
+        height: 24px;
     }
 
     .audio-controls {

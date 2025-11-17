@@ -694,7 +694,7 @@ function logout() {
 }
 
 // ========================================
-// SISTEMA DE ONBOARDING/TUTORIAL
+// SISTEMA DE ONBOARDING MEJORADO CON GAMIFICACIÓN
 // ========================================
 
 let currentOnboardingStep = 0;
@@ -703,39 +703,55 @@ const onboardingSteps = [
         title: '¡Bienvenido a Orientación Laboral!',
         message: 'Te guiaremos paso a paso para que aproveches al máximo la plataforma. Este tutorial te tomará solo 2 minutos.',
         icon: '👋',
-        action: null
+        action: null,
+        achievement: 'first_steps'
     },
     {
         title: 'Paso 1: Crea tu Avatar',
         message: 'Personaliza tu avatar para hacerlo único. Será tu imagen de perfil en la plataforma.',
         icon: '🎨',
-        action: 'avatar'
+        action: 'avatar',
+        achievement: 'avatar_created'
     },
     {
         title: 'Paso 2: Evalúate con PRE-TEST o POST-TEST',
         message: 'PRE-TEST: Evaluación inicial antes de capacitarte.\nPOST-TEST: Evaluación final después de aprender.',
         icon: '📝',
-        action: null
+        action: null,
+        achievement: 'tests_discovered'
     },
     {
         title: 'Paso 3: Explora las Herramientas',
         message: 'Accede a simuladores de entrevista, constructor de CV, análisis de personalidad y más.',
         icon: '🛠️',
-        action: null
+        action: null,
+        achievement: 'tools_explored'
     },
     {
         title: 'Paso 4: Consulta tu Progreso',
         message: 'Revisa tus resultados, estadísticas y desafíos completados en cualquier momento.',
         icon: '📊',
-        action: null
+        action: null,
+        achievement: 'progress_checked'
     },
     {
         title: '¡Todo Listo!',
         message: 'Ahora estás preparado para comenzar. ¡Mucha suerte en tu camino profesional!',
         icon: '🚀',
-        action: 'finish'
+        action: 'finish',
+        achievement: 'onboarding_complete'
     }
 ];
+
+// Sistema de Logros/Achievements
+const achievements = {
+    first_steps: { name: 'Primeros Pasos', emoji: '👣', unlocked: false },
+    avatar_created: { name: 'Avatar Creado', emoji: '🎨', unlocked: false },
+    tests_discovered: { name: 'Tests Descubiertos', emoji: '📝', unlocked: false },
+    tools_explored: { name: 'Herramientas Exploradas', emoji: '🛠️', unlocked: false },
+    progress_checked: { name: 'Progreso Revisado', emoji: '📊', unlocked: false },
+    onboarding_complete: { name: 'Onboarding Completado', emoji: '🏆', unlocked: false }
+};
 
 function showOnboarding() {
     currentOnboardingStep = 0;
@@ -748,7 +764,7 @@ function createOnboardingOverlay() {
     const existing = document.getElementById('onboardingOverlay');
     if (existing) existing.remove();
 
-    // Crear overlay
+    // Crear overlay con glassmorphism
     const overlay = document.createElement('div');
     overlay.id = 'onboardingOverlay';
     overlay.style.cssText = `
@@ -757,37 +773,88 @@ function createOnboardingOverlay() {
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.85);
+        background: rgba(0, 0, 0, 0.75);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
         z-index: 10000;
         display: flex;
         align-items: center;
         justify-content: center;
-        animation: fadeIn 0.3s ease;
+        animation: fadeIn 0.4s ease;
+        padding: 1rem;
     `;
 
-    // Crear modal de onboarding
+    // Crear modal de onboarding con glassmorphism mejorado
     const modal = document.createElement('div');
     modal.id = 'onboardingModal';
     modal.style.cssText = `
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-        border-radius: 20px;
-        padding: 2.5rem;
-        max-width: 500px;
-        width: 90%;
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.95) 0%, rgba(147, 51, 234, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 30px;
+        padding: 3rem 2.5rem;
+        max-width: 580px;
+        width: 100%;
         color: white;
         text-align: center;
-        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-        animation: slideUp 0.4s ease;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+        animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
     `;
 
-    modal.innerHTML = `
-        <div id="onboardingContent">
-            <!-- El contenido se actualizará dinámicamente -->
-        </div>
+    // Agregar efecto de brillo animado
+    const shine = document.createElement('div');
+    shine.style.cssText = `
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        animation: shine 3s infinite;
+        pointer-events: none;
     `;
+    modal.appendChild(shine);
 
+    const contentWrapper = document.createElement('div');
+    contentWrapper.id = 'onboardingContent';
+    contentWrapper.style.cssText = 'position: relative; z-index: 1;';
+
+    modal.appendChild(contentWrapper);
     overlay.appendChild(modal);
     document.body.appendChild(overlay);
+
+    // Agregar animaciones CSS si no existen
+    if (!document.getElementById('onboarding-animations')) {
+        const style = document.createElement('style');
+        style.id = 'onboarding-animations';
+        style.textContent = `
+            @keyframes slideUpBounce {
+                0% { transform: translateY(100px) scale(0.8); opacity: 0; }
+                60% { transform: translateY(-10px) scale(1.02); }
+                100% { transform: translateY(0) scale(1); opacity: 1; }
+            }
+            @keyframes shine {
+                0% { transform: translate(-100%, -100%) rotate(45deg); }
+                100% { transform: translate(100%, 100%) rotate(45deg); }
+            }
+            @keyframes confetti {
+                0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+                100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+            }
+            @keyframes pulse {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.1); }
+            }
+            @keyframes float {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+        `;
+        document.head.appendChild(style);
+    }
 }
 
 function showOnboardingStep() {
@@ -798,76 +865,158 @@ function showOnboardingStep() {
 
     const isFirstStep = currentOnboardingStep === 0;
     const isLastStep = currentOnboardingStep === onboardingSteps.length - 1;
+    const progress = ((currentOnboardingStep + 1) / onboardingSteps.length) * 100;
 
     content.innerHTML = `
-        <div style="font-size: 4rem; margin-bottom: 1rem;">${step.icon}</div>
-        <h2 style="margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700;">${step.title}</h2>
-        <p style="font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; white-space: pre-line;">${step.message}</p>
+        <!-- Barra de progreso mejorada -->
+        <div style="
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            position: relative;
+        ">
+            <div style="
+                width: ${progress}%;
+                height: 100%;
+                background: linear-gradient(90deg, #fff, #f0abfc);
+                border-radius: 10px;
+                transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            "></div>
+        </div>
 
-        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem;">
+        <!-- Contador de pasos -->
+        <div style="
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0.9;
+            margin-bottom: 1rem;
+            letter-spacing: 1px;
+        ">
+            PASO ${currentOnboardingStep + 1} DE ${onboardingSteps.length}
+        </div>
+
+        <!-- Icono animado -->
+        <div style="
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            animation: float 2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+        ">${step.icon}</div>
+
+        <!-- Título con efecto -->
+        <h2 style="
+            margin-bottom: 1rem;
+            font-size: 2rem;
+            font-weight: 800;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -0.5px;
+        ">${step.title}</h2>
+
+        <!-- Mensaje -->
+        <p style="
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            white-space: pre-line;
+            opacity: 0.95;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+        ">${step.message}</p>
+
+        <!-- Botones de navegación -->
+        <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem; flex-wrap: wrap;">
             ${!isFirstStep ? `
                 <button onclick="previousOnboardingStep()" style="
-                    background: rgba(255, 255, 255, 0.2);
-                    border: 2px solid white;
+                    background: rgba(255, 255, 255, 0.15);
+                    backdrop-filter: blur(10px);
+                    border: 2px solid rgba(255, 255, 255, 0.3);
                     color: white;
-                    padding: 0.8rem 1.5rem;
-                    border-radius: 10px;
+                    padding: 1rem 1.8rem;
+                    border-radius: 15px;
                     cursor: pointer;
-                    font-weight: 600;
+                    font-weight: 700;
                     font-size: 1rem;
-                    transition: all 0.3s;
-                " onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                " onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 25px rgba(0, 0, 0, 0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)'">
                     ← Anterior
                 </button>
             ` : ''}
 
             <button onclick="${isLastStep ? 'finishOnboarding()' : 'nextOnboardingStep()'}" style="
-                background: white;
+                background: linear-gradient(135deg, #fff, #f0abfc);
                 border: none;
-                color: var(--primary);
-                padding: 0.8rem 2rem;
-                border-radius: 10px;
+                color: #7c3aed;
+                padding: 1rem 2.5rem;
+                border-radius: 15px;
                 cursor: pointer;
-                font-weight: 700;
-                font-size: 1rem;
-                transition: all 0.3s;
-                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0, 0, 0, 0.2)'">
+                font-weight: 800;
+                font-size: 1.1rem;
+                transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+                box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-3px) scale(1.05)'; this.style.boxShadow='0 10px 35px rgba(0, 0, 0, 0.4)'" onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 6px 25px rgba(0, 0, 0, 0.3)'">
                 ${isLastStep ? '¡Comenzar! 🎉' : 'Siguiente →'}
             </button>
         </div>
 
-        <div style="margin-top: 2rem; display: flex; gap: 0.5rem; justify-content: center;">
-            ${onboardingSteps.map((_, index) => `
-                <div style="
-                    width: ${index === currentOnboardingStep ? '30px' : '10px'};
-                    height: 10px;
-                    background: ${index === currentOnboardingStep ? 'white' : 'rgba(255, 255, 255, 0.3)'};
-                    border-radius: 5px;
-                    transition: all 0.3s;
-                "></div>
-            `).join('')}
+        <!-- Indicadores de paso mejorados -->
+        <div style="margin-top: 2.5rem; display: flex; gap: 0.6rem; justify-content: center; align-items: center;">
+            ${onboardingSteps.map((s, index) => {
+                const isActive = index === currentOnboardingStep;
+                const isPast = index < currentOnboardingStep;
+                return `
+                    <div style="
+                        width: ${isActive ? '40px' : '12px'};
+                        height: 12px;
+                        background: ${isPast ? '#34d399' : (isActive ? 'white' : 'rgba(255, 255, 255, 0.25)')};
+                        border-radius: 6px;
+                        transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        box-shadow: ${isActive ? '0 0 15px rgba(255, 255, 255, 0.6)' : 'none'};
+                        position: relative;
+                    ">
+                        ${isPast ? '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 8px;">✓</div>' : ''}
+                    </div>
+                `;
+            }).join('')}
         </div>
 
+        <!-- Botón de saltar (solo si no es último paso) -->
         ${!isLastStep ? `
             <button onclick="skipOnboarding()" style="
                 background: none;
                 border: none;
-                color: rgba(255, 255, 255, 0.7);
-                padding: 0.5rem;
+                color: rgba(255, 255, 255, 0.6);
+                padding: 0.8rem;
                 cursor: pointer;
-                font-size: 0.9rem;
-                margin-top: 1rem;
+                font-size: 0.95rem;
+                margin-top: 1.5rem;
                 text-decoration: underline;
-            " onmouseover="this.style.color='white'" onmouseout="this.style.color='rgba(255, 255, 255, 0.7)'">
+                transition: all 0.3s;
+                font-weight: 500;
+            " onmouseover="this.style.color='white'; this.style.textDecoration='none'" onmouseout="this.style.color='rgba(255, 255, 255, 0.6)'; this.style.textDecoration='underline'">
                 Saltar tutorial
             </button>
         ` : ''}
     `;
+
+    // Agregar animación de entrada al contenido
+    content.style.animation = 'fadeIn 0.5s ease';
 }
 
 function nextOnboardingStep() {
     const step = onboardingSteps[currentOnboardingStep];
+
+    // Desbloquear logro del paso actual
+    if (step.achievement) {
+        unlockAchievement(step.achievement);
+    }
 
     // Ejecutar acción del paso si la hay
     if (step.action === 'avatar') {
@@ -896,20 +1045,27 @@ function skipOnboarding() {
     closeOnboarding();
     markOnboardingAsCompleted();
     showScreen('welcomeScreen');
-    showToast('Puedes ver el tutorial en cualquier momento desde el menú', 'info');
+    showWelcomeDashboard();
 }
 
 function finishOnboarding() {
     console.log('🔍 DEBUG: finishOnboarding() llamado');
+
+    // Desbloquear logro final
+    unlockAchievement('onboarding_complete');
+
+    // Mostrar confeti de celebración
+    showConfettiCelebration();
+
     closeOnboarding();
     markOnboardingAsCompleted();
 
-    // Llevar al usuario a la selección de PRE-TEST/POST-TEST
+    // Mostrar dashboard de bienvenida con checklist
     setTimeout(() => {
         console.log('🔍 DEBUG: Redirigiendo a welcomeScreen desde finishOnboarding');
         showScreen('welcomeScreen');
-        showToast('💡 Ahora elige PRE-TEST o POST-TEST para comenzar tu evaluación', 'success');
-    }, 500);
+        showWelcomeDashboard();
+    }, 800);
 }
 
 function closeOnboarding() {
@@ -927,9 +1083,11 @@ function markOnboardingAsCompleted() {
         if (userIndex !== -1) {
             users[userIndex].onboardingCompleted = true;
             users[userIndex].isNewUser = false;
+            users[userIndex].onboardingCompletedAt = new Date().toISOString();
             localStorage.setItem('users', JSON.stringify(users));
             currentUser.onboardingCompleted = true;
             currentUser.isNewUser = false;
+            currentUser.onboardingCompletedAt = new Date().toISOString();
             localStorage.setItem('currentUser', JSON.stringify(currentUser));
         }
     }
@@ -943,12 +1101,389 @@ function showAvatarCreatorForNewUser() {
     }, 500);
 }
 
+// ========================================
+// SISTEMA DE GAMIFICACIÓN Y LOGROS
+// ========================================
+
+function unlockAchievement(achievementId) {
+    if (achievements[achievementId] && !achievements[achievementId].unlocked) {
+        achievements[achievementId].unlocked = true;
+
+        // Guardar en localStorage
+        const userAchievements = JSON.parse(localStorage.getItem('userAchievements') || '{}');
+        userAchievements[achievementId] = {
+            unlocked: true,
+            unlockedAt: new Date().toISOString()
+        };
+        localStorage.setItem('userAchievements', JSON.stringify(userAchievements));
+
+        // Mostrar notificación de logro desbloqueado
+        showAchievementUnlocked(achievements[achievementId]);
+    }
+}
+
+function showAchievementUnlocked(achievement) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: linear-gradient(135deg, #10b981, #059669);
+        color: white;
+        padding: 1.2rem 1.5rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
+        z-index: 10001;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        animation: slideInRight 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        backdrop-filter: blur(10px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        min-width: 300px;
+    `;
+
+    notification.innerHTML = `
+        <div style="font-size: 2.5rem; animation: pulse 1s infinite;">${achievement.emoji}</div>
+        <div style="flex: 1;">
+            <div style="font-size: 0.8rem; opacity: 0.9; font-weight: 600; letter-spacing: 1px;">LOGRO DESBLOQUEADO</div>
+            <div style="font-size: 1.1rem; font-weight: 700; margin-top: 0.2rem;">${achievement.name}</div>
+        </div>
+        <div style="font-size: 1.5rem;">🏆</div>
+    `;
+
+    document.body.appendChild(notification);
+
+    // Agregar animación CSS si no existe
+    if (!document.getElementById('achievement-animations')) {
+        const style = document.createElement('style');
+        style.id = 'achievement-animations';
+        style.textContent = `
+            @keyframes slideInRight {
+                0% { transform: translateX(400px); opacity: 0; }
+                100% { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOutRight {
+                0% { transform: translateX(0); opacity: 1; }
+                100% { transform: translateX(400px); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // Remover después de 4 segundos
+    setTimeout(() => {
+        notification.style.animation = 'slideOutRight 0.5s ease';
+        setTimeout(() => notification.remove(), 500);
+    }, 4000);
+}
+
+function showConfettiCelebration() {
+    const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+    const confettiCount = 50;
+
+    for (let i = 0; i < confettiCount; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                top: -20px;
+                left: ${Math.random() * 100}%;
+                width: 10px;
+                height: 10px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                animation: confetti ${2 + Math.random() * 2}s ease-out forwards;
+                z-index: 10002;
+                border-radius: 50%;
+            `;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 4000);
+        }, i * 30);
+    }
+}
+
+// ========================================
+// DASHBOARD DE BIENVENIDA CON CHECKLIST
+// ========================================
+
+function showWelcomeDashboard() {
+    // Verificar si ya se mostró en esta sesión
+    if (sessionStorage.getItem('welcomeDashboardShown')) {
+        return;
+    }
+    sessionStorage.setItem('welcomeDashboardShown', 'true');
+
+    const dashboard = document.createElement('div');
+    dashboard.id = 'welcomeDashboard';
+    dashboard.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(249, 250, 251, 0.95));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 25px;
+        padding: 2.5rem;
+        max-width: 600px;
+        width: 90%;
+        z-index: 10000;
+        box-shadow: 0 25px 80px rgba(0, 0, 0, 0.2);
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        animation: slideUpBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        max-height: 80vh;
+        overflow-y: auto;
+    `;
+
+    const checklist = [
+        { id: 'avatar', icon: '🎨', title: 'Completa tu perfil', desc: 'Personaliza tu avatar y datos', done: currentUser?.avatar ? true : false },
+        { id: 'test', icon: '📝', title: 'Haz tu primera evaluación', desc: 'PRE-TEST o POST-TEST', done: false },
+        { id: 'mentor', icon: '🤖', title: 'Habla con tu Mentor IA', desc: 'Recibe consejos personalizados', done: false },
+        { id: 'progress', icon: '📊', title: 'Revisa tu progreso', desc: 'Ve tus estadísticas y logros', done: false }
+    ];
+
+    dashboard.innerHTML = `
+        <button onclick="closeWelcomeDashboard()" style="
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        " onmouseover="this.style.background='rgba(0,0,0,0.05)'; this.style.color='#374151'" onmouseout="this.style.background='none'; this.style.color='#9ca3af'">
+            ×
+        </button>
+
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <div style="font-size: 3.5rem; margin-bottom: 1rem;">🎉</div>
+            <h2 style="font-size: 2rem; font-weight: 800; color: #1f2937; margin-bottom: 0.5rem;">
+                ¡Bienvenido, ${currentUser?.name || 'Usuario'}!
+            </h2>
+            <p style="color: #6b7280; font-size: 1.1rem;">
+                Completa estos pasos para comenzar tu viaje profesional
+            </p>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            ${checklist.map(item => `
+                <div style="
+                    background: ${item.done ? 'linear-gradient(135deg, #d1fae5, #a7f3d0)' : 'white'};
+                    border: 2px solid ${item.done ? '#10b981' : '#e5e7eb'};
+                    border-radius: 15px;
+                    padding: 1.2rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 1rem;
+                    transition: all 0.3s;
+                    cursor: pointer;
+                " onmouseover="this.style.transform='translateX(5px)'; this.style.boxShadow='0 5px 20px rgba(0,0,0,0.1)'" onmouseout="this.style.transform='translateX(0)'; this.style.boxShadow='none'">
+                    <div style="
+                        font-size: 2.5rem;
+                        width: 60px;
+                        height: 60px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: ${item.done ? 'white' : 'rgba(79, 70, 229, 0.1)'};
+                        border-radius: 12px;
+                    ">
+                        ${item.done ? '✅' : item.icon}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="font-size: 1.1rem; font-weight: 700; color: #1f2937; margin-bottom: 0.2rem;">
+                            ${item.title}
+                        </h3>
+                        <p style="font-size: 0.9rem; color: #6b7280; margin: 0;">
+                            ${item.desc}
+                        </p>
+                    </div>
+                    ${item.done ? '<div style="color: #10b981; font-size: 1.5rem;">✓</div>' : ''}
+                </div>
+            `).join('')}
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <button onclick="closeWelcomeDashboard()" style="
+                background: linear-gradient(135deg, #4f46e5, #7c3aed);
+                color: white;
+                border: none;
+                padding: 1rem 2.5rem;
+                border-radius: 15px;
+                font-size: 1.1rem;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.3s;
+                box-shadow: 0 5px 20px rgba(79, 70, 229, 0.3);
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 30px rgba(79, 70, 229, 0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 5px 20px rgba(79, 70, 229, 0.3)'">
+                ¡Empecemos! 🚀
+            </button>
+        </div>
+    `;
+
+    // Agregar overlay oscuro detrás
+    const overlay = document.createElement('div');
+    overlay.id = 'welcomeDashboardOverlay';
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 9999;
+        animation: fadeIn 0.3s ease;
+    `;
+    overlay.onclick = closeWelcomeDashboard;
+
+    document.body.appendChild(overlay);
+    document.body.appendChild(dashboard);
+}
+
+function closeWelcomeDashboard() {
+    const dashboard = document.getElementById('welcomeDashboard');
+    const overlay = document.getElementById('welcomeDashboardOverlay');
+    if (dashboard) dashboard.remove();
+    if (overlay) overlay.remove();
+}
+
+// ========================================
+// FUNCIÓN PARA REACTIVAR EL TOUR
+// ========================================
+
+function reactivateTour() {
+    // Mostrar un menú de opciones de ayuda
+    const helpMenu = document.createElement('div');
+    helpMenu.id = 'helpMenu';
+    helpMenu.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        padding: 1rem;
+        z-index: 10000;
+        min-width: 250px;
+        animation: slideUpBounce 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+
+    helpMenu.innerHTML = `
+        <div style="padding: 0.5rem; border-bottom: 2px solid #f3f4f6; margin-bottom: 0.5rem;">
+            <h3 style="margin: 0; font-size: 1.1rem; color: #1f2937; font-weight: 700;">Centro de Ayuda</h3>
+        </div>
+        <button onclick="restartOnboarding(); closeHelpMenu();" style="
+            width: 100%;
+            padding: 0.8rem;
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        " onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+            <span style="font-size: 1.5rem;">🔄</span>
+            <span>Reiniciar Tour Guiado</span>
+        </button>
+        <button onclick="showWelcomeDashboard(); closeHelpMenu();" style="
+            width: 100%;
+            padding: 0.8rem;
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        " onmouseover="this.style.transform='translateX(5px)'; this.style.background='#f9fafb'" onmouseout="this.style.transform='translateX(0)'; this.style.background='white'">
+            <span style="font-size: 1.5rem;">📋</span>
+            <span>Ver Checklist de Inicio</span>
+        </button>
+        <button onclick="openMentorVirtual(); closeHelpMenu();" style="
+            width: 100%;
+            padding: 0.8rem;
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        " onmouseover="this.style.transform='translateX(5px)'; this.style.background='#f9fafb'" onmouseout="this.style.transform='translateX(0)'; this.style.background='white'">
+            <span style="font-size: 1.5rem;">🤖</span>
+            <span>Hablar con Mentor IA</span>
+        </button>
+    `;
+
+    // Cerrar el menú si se hace clic fuera de él
+    setTimeout(() => {
+        document.addEventListener('click', function closeOnClickOutside(e) {
+            if (!helpMenu.contains(e.target) && !e.target.closest('.floating-help-tour-btn')) {
+                closeHelpMenu();
+                document.removeEventListener('click', closeOnClickOutside);
+            }
+        });
+    }, 100);
+
+    document.body.appendChild(helpMenu);
+}
+
+function closeHelpMenu() {
+    const menu = document.getElementById('helpMenu');
+    if (menu) menu.remove();
+}
+
+function restartOnboarding() {
+    // Reiniciar el tour desde el principio
+    currentOnboardingStep = 0;
+    showOnboarding();
+}
+
+function openMentorVirtual() {
+    // Abrir el mentor virtual si existe la función
+    if (typeof toggleAssistant === 'function') {
+        toggleAssistant();
+    } else {
+        showToast('💡 Encuentra el Mentor Virtual en la barra superior (icono 🎓)', 'info');
+    }
+}
+
 // Exportar funciones de onboarding
 window.showOnboarding = showOnboarding;
 window.nextOnboardingStep = nextOnboardingStep;
 window.previousOnboardingStep = previousOnboardingStep;
 window.skipOnboarding = skipOnboarding;
 window.finishOnboarding = finishOnboarding;
+window.closeWelcomeDashboard = closeWelcomeDashboard;
+window.showWelcomeDashboard = showWelcomeDashboard;
+window.reactivateTour = reactivateTour;
+window.closeHelpMenu = closeHelpMenu;
+window.restartOnboarding = restartOnboarding;
+window.openMentorVirtual = openMentorVirtual;
 
 // ========================================
 // GOOGLE SHEETS
@@ -8737,98 +9272,3 @@ window.showMentorCoach = showMentorCoach;
 // ========================================
 // TUTORIAL / ONBOARDING PARA USUARIOS NUEVOS
 // ========================================
-
-// Mostrar tutorial al cargar la pantalla de bienvenida (solo la primera vez)
-function checkAndShowTutorial() {
-    const dontShow = localStorage.getItem('dontShowTutorial');
-    const tutorialShown = sessionStorage.getItem('tutorialShownThisSession');
-    
-    // Solo mostrar si no está marcado "no mostrar" y no se ha mostrado en esta sesión
-    if (!dontShow && !tutorialShown) {
-        setTimeout(() => {
-            showTutorial();
-            sessionStorage.setItem('tutorialShownThisSession', 'true');
-        }, 800);
-    }
-}
-
-// Mostrar el modal de tutorial
-function showTutorial() {
-    const modal = document.getElementById('tutorialModal');
-    if (modal) {
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden'; // Prevenir scroll del body
-    }
-}
-
-// Cerrar el modal de tutorial
-function closeTutorial() {
-    console.log('🔍 DEBUG: closeTutorial() llamado');
-    const modal = document.getElementById('tutorialModal');
-    if (modal) {
-        modal.classList.remove('show');
-        document.body.style.overflow = ''; // Restaurar scroll del body
-    }
-
-    // Asegurar que estamos en welcomeScreen después de cerrar el tutorial
-    const currentScreen = document.querySelector('.screen.active');
-    if (currentScreen && currentScreen.id !== 'welcomeScreen') {
-        console.log('🔍 DEBUG: No estamos en welcomeScreen, redirigiendo...');
-        showScreen('welcomeScreen');
-    }
-    console.log('🔍 DEBUG: Tutorial cerrado, pantalla actual:', currentScreen?.id);
-}
-
-// Guardar preferencia de no mostrar tutorial
-function setDontShowTutorial(checked) {
-    if (checked) {
-        localStorage.setItem('dontShowTutorial', 'true');
-    } else {
-        localStorage.removeItem('dontShowTutorial');
-    }
-}
-
-// Cerrar tutorial al hacer clic fuera del contenido
-document.addEventListener('click', function(e) {
-    const modal = document.getElementById('tutorialModal');
-    if (modal && e.target === modal) {
-        closeTutorial();
-    }
-});
-
-// Cerrar tutorial con tecla Escape
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeTutorial();
-    }
-});
-
-// Hook en showScreen para mostrar tutorial cuando se muestra welcomeScreen
-const originalShowScreen = window.showScreen;
-if (typeof originalShowScreen === 'function') {
-    window.showScreen = function(screenId) {
-        originalShowScreen(screenId);
-        
-        // Si se está mostrando la pantalla de bienvenida, verificar si mostrar tutorial
-        if (screenId === 'welcomeScreen') {
-            checkAndShowTutorial();
-        }
-    };
-}
-
-// Exportar funciones para uso global
-window.showTutorial = showTutorial;
-window.closeTutorial = closeTutorial;
-window.setDontShowTutorial = setDontShowTutorial;
-window.checkAndShowTutorial = checkAndShowTutorial;
-
-// Verificar al cargar la página
-window.addEventListener('load', function() {
-    // Verificar si estamos en la pantalla de bienvenida
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    if (welcomeScreen && welcomeScreen.classList.contains('active')) {
-        checkAndShowTutorial();
-    }
-});
-
-console.log('✅ Sistema de tutorial inicializado correctamente');
