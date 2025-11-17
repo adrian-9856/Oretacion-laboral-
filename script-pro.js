@@ -689,6 +689,13 @@ document.getElementById('registerForm')?.addEventListener('submit', async functi
 function logout() {
     localStorage.removeItem('currentUser');
     currentUser = null;
+
+    // Ocultar botones flotantes
+    const floatingAvatarBtn = document.getElementById('floatingAvatarBtn');
+    const floatingHelpBtn = document.getElementById('floatingHelpTourBtn');
+    if (floatingAvatarBtn) floatingAvatarBtn.classList.remove('visible');
+    if (floatingHelpBtn) floatingHelpBtn.classList.remove('visible');
+
     showScreen('loginScreen');
     showToast('Sesión cerrada', 'info');
 }
@@ -701,42 +708,22 @@ let currentOnboardingStep = 0;
 const onboardingSteps = [
     {
         title: '¡Bienvenido a Orientación Laboral!',
-        message: 'Te guiaremos paso a paso para que aproveches al máximo la plataforma. Este tutorial te tomará solo 2 minutos.',
+        message: 'Tu plataforma de evaluación y preparación laboral. Realiza tests, crea tu CV y prepárate para entrevistas.',
         icon: '👋',
         action: null,
         achievement: 'first_steps'
     },
     {
-        title: 'Paso 1: Crea tu Avatar',
-        message: 'Personaliza tu avatar para hacerlo único. Será tu imagen de perfil en la plataforma.',
+        title: 'Personaliza tu Avatar',
+        message: 'Crea tu avatar personalizado (puedes omitir este paso si lo prefieres).',
         icon: '🎨',
         action: 'avatar',
-        achievement: 'avatar_created'
+        achievement: 'avatar_created',
+        canSkip: true
     },
     {
-        title: 'Paso 2: Evalúate con PRE-TEST o POST-TEST',
-        message: 'PRE-TEST: Evaluación inicial antes de capacitarte.\nPOST-TEST: Evaluación final después de aprender.',
-        icon: '📝',
-        action: null,
-        achievement: 'tests_discovered'
-    },
-    {
-        title: 'Paso 3: Explora las Herramientas',
-        message: 'Accede a simuladores de entrevista, constructor de CV, análisis de personalidad y más.',
-        icon: '🛠️',
-        action: null,
-        achievement: 'tools_explored'
-    },
-    {
-        title: 'Paso 4: Consulta tu Progreso',
-        message: 'Revisa tus resultados, estadísticas y desafíos completados en cualquier momento.',
-        icon: '📊',
-        action: null,
-        achievement: 'progress_checked'
-    },
-    {
-        title: '¡Todo Listo!',
-        message: 'Ahora estás preparado para comenzar. ¡Mucha suerte en tu camino profesional!',
+        title: '¡Listo para Comenzar!',
+        message: 'Ya puedes realizar evaluaciones, crear tu CV, practicar entrevistas y mucho más.',
         icon: '🚀',
         action: 'finish',
         achievement: 'onboarding_complete'
@@ -5506,6 +5493,30 @@ function showScreen(screenId) {
     if (screen) {
         screen.classList.add('active');
         window.scrollTo(0, 0);
+    }
+
+    // Controlar visibilidad de botones flotantes
+    const floatingAvatarBtn = document.getElementById('floatingAvatarBtn');
+    const floatingHelpBtn = document.getElementById('floatingHelpTourBtn');
+
+    // Pantallas donde NO deben aparecer los botones flotantes
+    const hiddenScreens = ['loginScreen', 'adminLoginScreen', 'adminDashboard', 'registerScreen'];
+    const shouldHideButtons = hiddenScreens.includes(screenId) || !currentUser;
+
+    if (floatingAvatarBtn) {
+        if (shouldHideButtons) {
+            floatingAvatarBtn.classList.remove('visible');
+        } else {
+            floatingAvatarBtn.classList.add('visible');
+        }
+    }
+
+    if (floatingHelpBtn) {
+        if (shouldHideButtons) {
+            floatingHelpBtn.classList.remove('visible');
+        } else {
+            floatingHelpBtn.classList.add('visible');
+        }
     }
 
     // Cargar avatar PRO si el usuario está logueado

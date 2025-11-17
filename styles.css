@@ -4230,6 +4230,11 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     box-shadow: 0 8px 24px rgba(240, 147, 251, 0.4);
     transition: var(--transition);
     z-index: 999;
+    display: none; /* Oculto por defecto */
+}
+
+.floating-avatar-btn.visible {
+    display: block;
 }
 
 .floating-avatar-btn:hover {
@@ -4252,10 +4257,14 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
     transition: var(--transition);
     z-index: 999;
-    display: flex;
+    display: none; /* Oculto por defecto */
     align-items: center;
     justify-content: center;
     animation: helpPulse 2s infinite;
+}
+
+.floating-help-tour-btn.visible {
+    display: flex;
 }
 
 .floating-help-tour-btn svg {
