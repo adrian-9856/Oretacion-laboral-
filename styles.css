@@ -57,10 +57,10 @@
     --backdrop-blur: blur(10px);
     --backdrop-blur-strong: blur(20px);
 
-    /* Gradients */
-    --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Gradients - Profesionales */
+    --gradient-primary: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
     --gradient-blue: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
-    --gradient-purple: linear-gradient(135deg, #6366F1 0%, #8B5CF6 100%);
+    --gradient-purple: linear-gradient(135deg, #475569 0%, #64748B 100%);
     --gradient-success: linear-gradient(135deg, #10B981 0%, #059669 100%);
     --gradient-overlay: linear-gradient(135deg, rgba(30, 58, 138, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
 
@@ -87,7 +87,7 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
     background-attachment: fixed;
     color: var(--dark);
     min-height: 100vh;
@@ -5121,6 +5121,9 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
 .profile-photo-container {
     position: relative;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .profile-photo {
@@ -5128,7 +5131,14 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     height: 150px;
     border-radius: 50%;
     object-fit: cover;
-    border: 4px solid var(--primary);
+    border: 5px solid white;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.profile-photo:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
 }
 
 .btn-change-photo {
@@ -5136,19 +5146,22 @@ body.dark-theme ::-webkit-scrollbar-thumb:hover {
     align-items: center;
     gap: 0.5rem;
     margin-top: 1rem;
-    padding: 0.5rem 1rem;
-    background: var(--primary);
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
     color: white;
     border: none;
-    border-radius: var(--radius-sm);
+    border-radius: 8px;
     cursor: pointer;
     font-size: 0.9rem;
-    transition: var(--transition);
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
 }
 
 .btn-change-photo:hover {
-    background: var(--secondary);
+    background: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
     transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(30, 58, 138, 0.4);
 }
 
 .btn-change-photo svg {
@@ -10887,12 +10900,47 @@ body.dark-theme .btn-secondary {
 
 /* Sidebar de Gamificación */
 .gamification-sidebar {
+    display: none; /* Oculto - se muestra solo en pantalla de progreso */
     width: 320px;
     flex-shrink: 0;
 }
 
 .welcome-content {
     flex: 1;
+}
+
+/* Botón Ver Mi Progreso */
+.progress-button-container {
+    margin: 2rem 0;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-view-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, #1E3A8A 0%, #3B82F6 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(30, 58, 138, 0.3);
+}
+
+.btn-view-progress:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(30, 58, 138, 0.4);
+    background: linear-gradient(135deg, #2563EB 0%, #60A5FA 100%);
+}
+
+.btn-view-progress svg {
+    width: 24px;
+    height: 24px;
 }
 
 /* User Level Badge (en navbar) */
@@ -10902,18 +10950,18 @@ body.dark-theme .btn-secondary {
     gap: 6px;
     padding: 6px 12px;
     border-radius: 20px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #475569 0%, #64748B 100%);
     color: white;
     font-weight: 600;
     font-size: 14px;
     margin-right: 10px;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 12px rgba(71, 85, 105, 0.3);
     transition: all 0.3s ease;
 }
 
 .user-level-badge:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 6px 16px rgba(71, 85, 105, 0.4);
 }
 
 .level-emoji {

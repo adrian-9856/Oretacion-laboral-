@@ -596,8 +596,19 @@
             <div class="welcome-content">
                 <div class="welcome-text">
                     <h1>Bienvenido al Sistema de Evaluación</h1>
-                    <p>Selecciona el tipo de evaluación que deseas realizar</p>
+                    <p>Selecciona una opción para comenzar</p>
                 </div>
+
+                <!-- Botón Ver Mi Progreso -->
+                <div class="progress-button-container">
+                    <button class="btn-view-progress" onclick="showProgress()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                        <span>Ver Mi Progreso</span>
+                    </button>
+                </div>
+
                 <div class="test-type-cards">
                     <div class="type-card pre-card" onclick="selectTest('pre')">
                         <div class="type-card-icon">

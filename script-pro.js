@@ -5628,13 +5628,10 @@ let userProfilePhoto = null;
 let cvPhoto = null;
 
 // Cargar foto de perfil
-function uploadProfilePhoto() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-
-    input.onchange = (e) => {
-        const file = e.target.files[0];
+function uploadProfilePhoto(event) {
+    // Si se llama desde un input existente
+    if (event && event.target && event.target.files) {
+        const file = event.target.files[0];
         if (!file) return;
 
         if (file.size > 5 * 1024 * 1024) {
@@ -5643,16 +5640,34 @@ function uploadProfilePhoto() {
         }
 
         const reader = new FileReader();
-        reader.onload = (event) => {
-            userProfilePhoto = event.target.result;
-            localStorage.setItem(`profile_photo_${currentUser.email}`, userProfilePhoto);
+        reader.onload = (e) => {
+            const photoData = e.target.result;
+            // Guardar con ambas claves para compatibilidad
+            localStorage.setItem(`profile_photo_${currentUser.email}`, photoData);
+            localStorage.setItem(`profilePhoto_${currentUser.email}`, photoData);
+
+            // Actualizar la imagen en la pantalla de perfil
+            const profilePhotoElement = document.getElementById('userProfilePhoto');
+            if (profilePhotoElement) {
+                profilePhotoElement.src = photoData;
+            }
+
             updateProfilePhotoDisplay();
-            showToast('✅ Foto de perfil actualizada', 'success');
+            showToast('✅ Foto de perfil actualizada correctamente', 'success');
         };
         reader.readAsDataURL(file);
-    };
+    } else {
+        // Si se llama sin evento, crear un input
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
 
-    input.click();
+        input.onchange = (e) => {
+            uploadProfilePhoto(e);
+        };
+
+        input.click();
+    }
 }
 
 // Actualizar display de foto de perfil
