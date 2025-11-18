@@ -5069,6 +5069,9 @@ function updateUserAvatarPro() {
 
     const avatarContainer = document.createElement('div');
     avatarContainer.className = 'user-mini-avatar';
+    avatarContainer.style.cursor = 'pointer';
+    avatarContainer.title = 'Ver mi perfil';
+    avatarContainer.onclick = showUserProfile;
     avatarContainer.innerHTML = `
         <img src="${avatarURL}" alt="Avatar" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover;">
     `;
@@ -5079,7 +5082,9 @@ function updateUserAvatarPro() {
         if (existingAvatar) {
             existingAvatar.remove();
         }
-        navUser.insertBefore(avatarContainer.cloneNode(true), navUser.firstChild);
+        const newAvatar = avatarContainer.cloneNode(true);
+        newAvatar.onclick = showUserProfile;
+        navUser.insertBefore(newAvatar, navUser.firstChild);
     });
 }
 
