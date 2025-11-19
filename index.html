@@ -126,6 +126,17 @@
         <div class="container">
             <div class="dashboard-header">
                 <h1>Dashboard de Administración</h1>
+                <div class="dashboard-tabs">
+                    <button class="dashboard-tab active" onclick="showAdminTab('results')">
+                        📊 Resultados
+                    </button>
+                    <button class="dashboard-tab" onclick="showAdminTab('users')">
+                        👥 Usuarios
+                    </button>
+                    <button class="dashboard-tab" onclick="showAdminTab('codes')">
+                        🔑 Códigos de Examen
+                    </button>
+                </div>
                 <div class="dashboard-actions">
                     <button class="btn-action" onclick="exportToExcel()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -187,36 +198,368 @@
                     </div>
                 </div>
             </div>
-            <div class="filters-section">
-                <input type="text" id="searchUser" placeholder="Buscar por nombre o email..." class="search-input">
-                <select id="filterTest" class="filter-select">
-                    <option value="">Todas las pruebas</option>
-                    <option value="Cuestionario">Cuestionario</option>
-                    <option value="Detectar Errores">Detectar Errores</option>
-                    <option value="Construir CV">Construir CV</option>
-                </select>
-                <select id="filterType" class="filter-select">
-                    <option value="">PRE y POST</option>
-                    <option value="pre">Solo PRE-TEST</option>
-                    <option value="post">Solo POST-TEST</option>
-                </select>
+
+            <!-- Sección de Gráficas -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <h3>📊 Puntuaciones por Test</h3>
+                    <div class="bar-chart" id="scoresChart">
+                        <div class="bar-chart-empty">
+                            <p>No hay datos disponibles</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3>👥 Tests por Usuario</h3>
+                    <div class="pie-chart-container" id="testsPerUserChart">
+                        <div class="pie-chart-empty">
+                            <p>No hay datos disponibles</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="table-container">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Email</th>
-                            <th>Prueba</th>
-                            <th>Tipo</th>
-                            <th>Puntuación</th>
-                            <th>Tiempo</th>
-                            <th>Fecha</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="resultsTableBody"></tbody>
-                </table>
+
+            <!-- Tab Resultados -->
+            <div class="admin-tab-content active" id="resultsTabContent">
+                <div class="filters-section">
+                    <input type="text" id="searchUser" placeholder="Buscar por nombre o email..." class="search-input">
+                    <select id="filterTest" class="filter-select">
+                        <option value="">Todas las pruebas</option>
+                        <option value="Cuestionario">Cuestionario</option>
+                        <option value="Detectar Errores">Detectar Errores</option>
+                        <option value="Construir CV">Construir CV</option>
+                    </select>
+                    <select id="filterType" class="filter-select">
+                        <option value="">PRE y POST</option>
+                        <option value="pre">Solo PRE-TEST</option>
+                        <option value="post">Solo POST-TEST</option>
+                    </select>
+                </div>
+                <div class="table-container">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Prueba</th>
+                                <th>Tipo</th>
+                                <th>Puntuación</th>
+                                <th>Tiempo</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab Usuarios -->
+            <div class="admin-tab-content" id="usersTabContent">
+                <div class="users-management-section">
+                    <div class="users-header">
+                        <h2>👥 Gestión de Usuarios</h2>
+                        <div class="users-stats-mini">
+                            <div class="stat-mini">
+                                <span class="stat-mini-value" id="totalUsersCount">0</span>
+                                <span class="stat-mini-label">Total Usuarios</span>
+                            </div>
+                            <div class="stat-mini">
+                                <span class="stat-mini-value" id="newUsersToday">0</span>
+                                <span class="stat-mini-label">Nuevos Hoy</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="users-filters">
+                        <input type="text" id="searchUserManagement" placeholder="🔍 Buscar por nombre o email..." class="search-input" onkeyup="filterUsers()">
+                        <select id="filterOnboarding" class="filter-select" onchange="filterUsers()">
+                            <option value="">Todos los usuarios</option>
+                            <option value="completed">Onboarding completado</option>
+                            <option value="pending">Onboarding pendiente</option>
+                        </select>
+                    </div>
+
+                    <div class="users-table-container">
+                        <table class="results-table users-table">
+                            <thead>
+                                <tr>
+                                    <th>Avatar</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Edad</th>
+                                    <th>Registro</th>
+                                    <th>Onboarding</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Códigos de Examen -->
+            <div class="admin-tab-content" id="codesTabContent">
+                <div class="codes-section">
+                    <div class="create-code-card">
+                        <h2>🔑 Crear Nuevo Código de Examen</h2>
+                        <div class="code-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nombre del Código:</label>
+                                    <input type="text" id="codeName" placeholder="Ej: Evaluación Grupo A" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Código (generado automáticamente):</label>
+                                    <div class="code-display-group">
+                                        <input type="text" id="generatedCode" readonly class="form-input code-display">
+                                        <button class="btn-icon-action" onclick="generateNewCode()" title="Generar nuevo código">
+                                            🔄
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Tipo de Examen:</label>
+                                    <select id="codeTestType" class="form-select">
+                                        <option value="pre">PRE-TEST</option>
+                                        <option value="post">POST-TEST</option>
+                                        <option value="both">PRE y POST</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Pruebas Disponibles:</label>
+                                    <div class="tests-checkboxes-grid">
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="quiz" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">📝</span>
+                                                Cuestionario
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="formal" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">💼</span>
+                                                Formal vs Informal
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="builder" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">📄</span>
+                                                Construir CV
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="interview" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">💬</span>
+                                                Simulador de Entrevista
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="wordsearch" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">🔍</span>
+                                                Sopa de Letras
+                                            </span>
+                                        </label>
+                                        <label class="test-checkbox-item">
+                                            <input type="checkbox" name="testsAvailable" value="strengths" checked>
+                                            <span class="checkbox-custom"></span>
+                                            <span class="checkbox-label">
+                                                <span class="checkbox-icon">🎯</span>
+                                                Fortalezas y Debilidades
+                                            </span>
+                                        </label>
+                                    </div>
+                                    <small>Selecciona los tests que estarán disponibles con este código</small>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Fecha de Expiración:</label>
+                                    <input type="datetime-local" id="codeExpiration" class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label>Usos Máximos (0 = ilimitado):</label>
+                                    <input type="number" id="codeMaxUses" value="0" min="0" class="form-input">
+                                </div>
+                            </div>
+                            <button class="btn-create-code" onclick="createExamCode()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Crear Código
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="codes-list-section">
+                        <h2>📋 Códigos Creados</h2>
+                        <div class="table-container">
+                            <table class="results-table">
+                                <thead>
+                                    <tr>
+                                        <th>Código</th>
+                                        <th>Nombre</th>
+                                        <th>Tipo</th>
+                                        <th>Usos</th>
+                                        <th>Expira</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="codesTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JUEGO FORTALEZAS Y DEBILIDADES -->
+    <div class="screen" id="strengthsWeaknessesScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>🎯 Fortalezas y Debilidades</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="strengthsTestTypeBadge"></span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="characterGameTimer">05:00</span>
+                    </span>
+                    <button class="btn-logout" onclick="goToMenu()">← Volver</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container">
+            <div class="test-instructions">
+                <h2>Identifica tus Características Personales</h2>
+                <p>Arrastra las características a las categorías correspondientes. Este ejercicio te ayudará a conocerte mejor profesionalmente.</p>
+            </div>
+
+                <div class="game-header-stats">
+                    <div class="stat-item">
+                        <span class="stat-label">✅ Fortalezas:</span>
+                        <span class="stat-value" id="strengthsCount">0 / 5</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">🎯 Áreas de mejora:</span>
+                        <span class="stat-value" id="weaknessesCount">0 / 3</span>
+                    </div>
+                </div>
+
+                    <div class="characteristics-game-layout">
+                        <!-- Panel de características para arrastrar -->
+                        <div class="characteristics-panel">
+                            <h4>📋 Arrastra las características que te describen</h4>
+                            <div class="char-cards-container" id="characterCardsContainer"></div>
+                        </div>
+
+                        <!-- Zonas de drop -->
+                        <div class="drop-zones-container">
+                            <div class="drop-zone-box strength-zone" id="strengthDropZone" ondrop="dropCharacteristic(event)" ondragover="allowDrop(event)">
+                                <h4>💪 Mis Fortalezas</h4>
+                                <p class="zone-hint">Arrastra hasta 5 fortalezas</p>
+                                <div class="dropped-characteristics" id="strengthsDropped"></div>
+                            </div>
+
+                            <div class="drop-zone-box weakness-zone" id="weaknessDropZone" ondrop="dropCharacteristic(event)" ondragover="allowDrop(event)">
+                                <h4>🎯 Áreas de Mejora</h4>
+                                <p class="zone-hint">Arrastra hasta 3 áreas</p>
+                                <div class="dropped-characteristics" id="weaknessesDropped"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="selected-summary" id="selectedSummary" style="display: none;">
+                        <h4>📝 Resumen de tu perfil:</h4>
+                        <div class="summary-content">
+                            <div class="summary-section">
+                                <strong>Fortalezas:</strong>
+                                <ul id="summaryStrengths"></ul>
+                            </div>
+                            <div class="summary-section">
+                                <strong>Áreas de mejora:</strong>
+                                <ul id="summaryWeaknesses"></ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="test-actions" style="display: flex; justify-content: center; gap: 16px; margin-top: 32px;">
+                        <button class="btn-secondary" onclick="goToMenu()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                            </svg>
+                            Volver
+                        </button>
+                        <button class="btn-primary" id="finishStrengthsBtn" onclick="finishStrengthsTest()" disabled>
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M5 13l4 4L19 7"/>
+                            </svg>
+                            Finalizar Test
+                        </button>
+                    </div>
+        </div>
+    </div>
+
+    <!-- INGRESAR CÓDIGO -->
+    <div class="screen" id="codeEntryScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    </svg>
+                    <span>Ingreso de Código</span>
+                </div>
+                <div class="nav-user">
+                    <span id="userName2">Usuario</span>
+                    <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
+                </div>
+            </div>
+        </nav>
+        <div class="welcome-container">
+            <div class="welcome-content">
+                <div class="code-entry-card">
+                    <div class="code-entry-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                        </svg>
+                    </div>
+                    <h2>¿Tienes un código de examen?</h2>
+                    <p>Ingresa el código que te proporcionó tu instructor</p>
+                    <div class="code-entry-form">
+                        <input type="text" id="examCodeInput" placeholder="Ej: EXAM-2024-ABC123" class="code-input" maxlength="20">
+                        <button class="btn-validate-code" onclick="validateExamCode()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Validar Código
+                        </button>
+                    </div>
+                    <div class="code-skip-section">
+                        <p>o</p>
+                        <button class="btn-skip-code" onclick="skipCodeEntry()">
+                            Continuar sin código
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -239,7 +582,12 @@
                     </button>
                     <button class="btn-icon" onclick="showProgress()" title="Mi progreso">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                            <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 4 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                        </svg>
+                    </button>
+                    <button class="btn-icon" onclick="showCodeEntry()" title="Ingresar código">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                         </svg>
                     </button>
                     <span id="userName">Usuario</span>
@@ -299,7 +647,7 @@
     <div class="screen" id="progressScreen">
         <nav class="navbar">
             <div class="nav-content">
-                <div class="nav-brand"><span>Mi Progreso</span></div>
+                <div class="nav-brand"><span>🎯 Mi Perfil Completo</span></div>
                 <div class="nav-user">
                     <span id="userName3">Usuario</span>
                     <button class="btn-logout" onclick="goToWelcome()">← Volver</button>
@@ -307,43 +655,102 @@
             </div>
         </nav>
         <div class="container">
-            <div class="progress-dashboard">
-                <h2>Tu Historial de Evaluaciones</h2>
-                <div class="progress-stats">
-                    <div class="progress-card">
-                        <h3>Pruebas Completadas</h3>
-                        <p class="big-number" id="userTestsCompleted">0</p>
-                    </div>
-                    <div class="progress-card">
-                        <h3>Promedio General</h3>
-                        <p class="big-number" id="userAvgScore">0%</p>
-                    </div>
-                    <div class="progress-card">
-                        <h3>Mejor Puntuación</h3>
-                        <p class="big-number" id="userBestScore">0%</p>
+            <div class="profile-complete-layout">
+                <!-- Perfil Principal con Avatar -->
+                <div class="profile-header-card">
+                    <div class="profile-avatar-section">
+                        <div class="profile-avatar-container" id="profileAvatarContainer">
+                            <div class="profile-avatar-placeholder">👤</div>
+                        </div>
+                        <div class="profile-basic-info">
+                            <h1 class="profile-name" id="profileUserName">Usuario</h1>
+                            <p class="profile-email" id="profileUserEmail">email@ejemplo.com</p>
+                            <div class="profile-badges">
+                                <span class="profile-badge" id="profileOnboardingBadge">
+                                    ✅ Perfil Completado
+                                </span>
+                                <span class="profile-badge tests">
+                                    🎯 <span id="profileTotalTests">0</span> Exámenes
+                                </span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="history-table">
-                    <h3>Historial Detallado</h3>
-                    <table class="results-table">
-                        <thead>
-                            <tr>
-                                <th>Prueba</th>
-                                <th>Tipo</th>
-                                <th>Puntuación</th>
-                                <th>Tiempo</th>
-                                <th>Fecha</th>
-                                <th>Certificado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="userHistoryTable"></tbody>
-                    </table>
+
+                <!-- Grid de Características del Usuario -->
+                <div class="profile-characteristics-section">
+                    <div class="profile-section-card">
+                        <h3>💪 Mis Fortalezas</h3>
+                        <div class="characteristics-tags" id="profileStrengthsTags">
+                            <p class="empty-state">No se han seleccionado fortalezas</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-section-card">
+                        <h3>🎯 Áreas de Mejora</h3>
+                        <div class="characteristics-tags" id="profileWeaknessesTags">
+                            <p class="empty-state">No se han seleccionado áreas de mejora</p>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Estadísticas de Evaluaciones -->
+                <div class="profile-stats-section">
+                    <h2>📊 Estadísticas de Evaluaciones</h2>
+                    <div class="progress-stats">
+                        <div class="progress-card">
+                            <div class="stat-icon">📝</div>
+                            <h3>Pruebas Completadas</h3>
+                            <p class="big-number" id="userTestsCompleted">0</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="stat-icon">📈</div>
+                            <h3>Promedio General</h3>
+                            <p class="big-number" id="userAvgScore">0%</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="stat-icon">🏆</div>
+                            <h3>Mejor Puntuación</h3>
+                            <p class="big-number" id="userBestScore">0%</p>
+                        </div>
+                        <div class="progress-card">
+                            <div class="stat-icon">⏱️</div>
+                            <h3>Tiempo Total</h3>
+                            <p class="big-number" id="userTotalTime">0 min</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Historial Detallado -->
+                <div class="profile-history-section">
+                    <h2>📚 Historial Detallado</h2>
+                    <div class="history-table">
+                        <table class="results-table">
+                            <thead>
+                                <tr>
+                                    <th>Prueba</th>
+                                    <th>Tipo</th>
+                                    <th>Puntuación</th>
+                                    <th>Tiempo</th>
+                                    <th>Fecha</th>
+                                    <th>Certificado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userHistoryTable"></tbody>
+                        </table>
+                        <div class="empty-history" id="emptyHistory" style="display: none;">
+                            <p>📭 Aún no has completado ninguna evaluación</p>
+                            <p class="empty-hint">¡Empieza ahora y construye tu historial!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botón Volver -->
                 <button class="btn-back" onclick="goToWelcome()">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
                     </svg>
-                    Volver
+                    Volver al Inicio
                 </button>
             </div>
         </div>
@@ -374,14 +781,14 @@
                     <p>Preguntas sobre competencias laborales</p>
                     <button class="test-start-btn">Iniciar →</button>
                 </div>
-                <div class="test-card modern" onclick="startTest('errors')">
-                    <div class="test-card-icon errors">
+                <div class="test-card modern" onclick="startTest('formal')">
+                    <div class="test-card-icon" style="background: linear-gradient(135deg, #00b894, #00cec9);">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            <path d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"/>
                         </svg>
                     </div>
-                    <h3>Detectar Errores</h3>
-                    <p>Encuentra errores en un CV</p>
+                    <h3>💼 Formal vs Informal</h3>
+                    <p>Clasifica frases según su nivel de formalidad</p>
                     <button class="test-start-btn">Iniciar →</button>
                 </div>
                 <div class="test-card modern" onclick="startTest('builder')">
@@ -402,6 +809,26 @@
     </div>
     <h3>Simulador de Entrevista</h3>
     <p>Practica respuestas a preguntas comunes</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+                <div class="test-card modern" onclick="startTest('wordsearch')" id="wordSearchCard" style="display: none;">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/>
+        </svg>
+    </div>
+    <h3>🔍 Sopa de Letras</h3>
+    <p>Encuentra palabras sobre términos laborales</p>
+    <button class="test-start-btn">Iniciar →</button>
+</div>
+                <div class="test-card modern" onclick="startTest('strengths')">
+    <div class="test-card-icon" style="background: linear-gradient(135deg, #f093fb, #f5576c);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+    </div>
+    <h3>🎯 Fortalezas y Debilidades</h3>
+    <p>Identifica tus características personales</p>
     <button class="test-start-btn">Iniciar →</button>
 </div>
             </div>
@@ -445,11 +872,11 @@
         </div>
     </div>
 
-    <!-- DETECTAR ERRORES -->
-    <div class="screen" id="errorDetectionScreen">
+    <!-- FORMAL VS INFORMAL -->
+    <div class="screen" id="formalInformalScreen">
         <nav class="navbar">
             <div class="nav-content">
-                <div class="nav-brand"><span>Detectar Errores en CV</span></div>
+                <div class="nav-brand"><span>💼 Formal vs Informal</span></div>
                 <div class="nav-user">
                     <span class="test-badge" id="testTypeBadge3"></span>
                     <span class="timer-badge">
@@ -457,19 +884,79 @@
                             <circle cx="12" cy="12" r="10"/>
                             <polyline points="12 6 12 12 16 14"/>
                         </svg>
-                        <span id="errorTimer">10:00</span>
+                        <span id="formalTimer">8:00</span>
                     </span>
                 </div>
             </div>
         </nav>
         <div class="container">
-            <div class="error-detection-layout">
-                <div class="error-instructions">
+            <div class="formal-game-layout">
+                <div class="formal-instructions">
                     <h3>📋 Instrucciones</h3>
-                    <p>Haz clic en las palabras o frases que contengan errores ortográficos, gramaticales o de formato.</p>
-                    <p><strong>Encuentra 10 errores</strong> en el CV</p>
+                    <p>Arrastra cada frase a la categoría correcta:</p>
+                    <ul>
+                        <li>💼 <strong>Formal:</strong> Para entrevistas y ambientes profesionales</li>
+                        <li>💬 <strong>Informal:</strong> Para conversaciones casuales</li>
+                    </ul>
+                    <div class="score-display">
+                        <span>Puntuación: <strong id="formalScore">0</strong> / <strong id="formalTotal">0</strong></span>
+                    </div>
                 </div>
-                <div id="cvErrorContainer"></div>
+
+                <div class="phrases-container">
+                    <h3>Frases para clasificar:</h3>
+                    <div class="phrases-list" id="phrasesList"></div>
+                </div>
+
+                <div class="categories-container">
+                    <div class="category-box formal-box" id="formalBox" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="category-icon">💼</div>
+                        <h3>Formal</h3>
+                        <p>Para entrevistas y trabajo</p>
+                        <div class="dropped-phrases" id="formalDropped"></div>
+                    </div>
+
+                    <div class="category-box informal-box" id="informalBox" ondrop="drop(event)" ondragover="allowDrop(event)">
+                        <div class="category-icon">💬</div>
+                        <h3>Informal</h3>
+                        <p>Para conversaciones casuales</p>
+                        <div class="dropped-phrases" id="informalDropped"></div>
+                    </div>
+                </div>
+
+                <div class="formal-actions">
+                    <button class="btn-action secondary" onclick="confirmExit()">Cancelar</button>
+                    <button class="btn-action primary" onclick="finishFormalGame()" id="finishFormalBtn" disabled>Finalizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETECTAR ERRORES EN MI CV -->
+    <div class="screen" id="myErrorDetectionScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>🔍 Revisa tu CV</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge7"></span>
+                    <button class="btn-logout" onclick="skipCVReview()">Saltar →</button>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="my-cv-review-layout">
+                <div class="review-instructions">
+                    <h3>🎯 Tu Turno de Revisar</h3>
+                    <p>Hemos agregado algunos errores intencionales a tu CV. ¿Puedes encontrarlos?</p>
+                    <div class="errors-stats">
+                        <span>Errores encontrados: <strong id="myErrorsFound">0</strong> / <strong id="myErrorsTotal">0</strong></span>
+                    </div>
+                </div>
+                <div class="my-cv-container" id="myCVContainer"></div>
+                <div class="review-actions">
+                    <button class="btn-action secondary" onclick="skipCVReview()">Omitir</button>
+                    <button class="btn-action primary" onclick="finishCVReview()">Finalizar Revisión</button>
+                </div>
             </div>
         </div>
     </div>
@@ -487,6 +974,61 @@
         </nav>
         <div class="container-narrow">
             <div id="cvBuilderContainer"></div>
+        </div>
+    </div>
+
+    <!-- SOPA DE LETRAS -->
+    <div class="screen" id="wordSearchScreen">
+        <nav class="navbar">
+            <div class="nav-content">
+                <div class="nav-brand"><span>🔍 Sopa de Letras</span></div>
+                <div class="nav-user">
+                    <span class="test-badge" id="testTypeBadge6">PRE-TEST</span>
+                    <span class="timer-badge">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <span id="wordSearchTimer">10:00</span>
+                    </span>
+                </div>
+            </div>
+        </nav>
+        <div class="container">
+            <div class="wordsearch-layout">
+                <div class="wordsearch-sidebar">
+                    <div class="wordsearch-info-card">
+                        <h3>📋 Instrucciones</h3>
+                        <p>Encuentra todas las palabras relacionadas con el mundo laboral en la sopa de letras.</p>
+                        <ul>
+                            <li>✅ Selecciona las letras arrastrando el mouse</li>
+                            <li>✅ Las palabras pueden estar en horizontal, vertical o diagonal</li>
+                            <li>✅ Las palabras encontradas se marcarán en color</li>
+                        </ul>
+                    </div>
+                    <div class="wordsearch-words-list">
+                        <h3>🎯 Palabras a encontrar</h3>
+                        <div id="wordsList"></div>
+                    </div>
+                    <div class="wordsearch-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Palabras encontradas:</span>
+                            <span class="stat-value"><strong id="wordsFound">0</strong> / <strong id="totalWords">0</strong></span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Puntuación:</span>
+                            <span class="stat-value"><strong id="wordSearchScore">0</strong> puntos</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="wordsearch-main">
+                    <div class="wordsearch-grid" id="wordSearchGrid"></div>
+                    <div class="wordsearch-actions">
+                        <button class="btn-action secondary" onclick="confirmExit()">Cancelar</button>
+                        <button class="btn-action primary" onclick="finishWordSearch()">Finalizar</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -566,6 +1108,34 @@
 
     <!-- TOAST -->
     <div class="toast" id="toast"></div>
+
+    <!-- MODAL CAMBIAR CONTRASEÑA -->
+    <div class="modal" id="changePasswordModal" style="display: none;">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>🔐 Cambiar Contraseña</h3>
+                <button class="modal-close" onclick="closeChangePasswordModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-info-display">
+                    <p><strong>Usuario:</strong> <span id="modalUserName"></span></p>
+                    <p><strong>Email:</strong> <span id="modalUserEmail"></span></p>
+                </div>
+                <div class="form-group">
+                    <label>Nueva Contraseña:</label>
+                    <input type="password" id="newPasswordInput" placeholder="Ingresa la nueva contraseña" class="form-input" minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Contraseña:</label>
+                    <input type="password" id="confirmPasswordInput" placeholder="Confirma la nueva contraseña" class="form-input" minlength="6">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal cancel" onclick="closeChangePasswordModal()">Cancelar</button>
+                <button class="btn-modal confirm" onclick="confirmChangePassword()">Cambiar Contraseña</button>
+            </div>
+        </div>
+    </div>
 
     <script src="script-pro.js"></script>
     <!-- SIMULADOR DE ENTREVISTA -->
@@ -914,12 +1484,73 @@
                         </svg>
                         Descargar PNG
                     </button>
+                    <button class="btn-remove-photo" onclick="removeProfilePhoto()" title="Eliminar foto/avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                        Eliminar Foto
+                    </button>
                 </div>
             </div>
 
             <!-- Panel de Personalización -->
             <div class="avatar-customization-pro-section">
                 <h2>⚙️ Personalizar Avatar</h2>
+
+                <!-- Opción de Cámara -->
+                <div class="customization-group-pro">
+                    <h3>📸 Opción 1: Tomar Foto con Cámara</h3>
+                    <div class="camera-section">
+                        <video id="cameraVideo" autoplay playsinline style="display: none;" width="256" height="256"></video>
+                        <canvas id="cameraCanvas" style="display: none;" width="256" height="256"></canvas>
+                        <div class="camera-controls">
+                            <button class="btn-camera" id="startCameraBtn" onclick="startCamera()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/>
+                                    <circle cx="12" cy="13" r="4"/>
+                                </svg>
+                                Activar Cámara
+                            </button>
+                            <button class="btn-camera" id="capturePhotoBtn" onclick="capturePhoto()" style="display: none;">
+                                📷 Capturar Foto
+                            </button>
+                            <button class="btn-camera secondary" id="stopCameraBtn" onclick="stopCamera()" style="display: none;">
+                                ❌ Cerrar Cámara
+                            </button>
+                        </div>
+                        <p class="camera-note">Toma una foto en tiempo real con tu cámara web o móvil</p>
+                    </div>
+                </div>
+
+                <div class="divider-section">
+                    <span>O</span>
+                </div>
+
+                <!-- Opción de Subir Foto -->
+                <div class="customization-group-pro">
+                    <h3>🖼️ Opción 2: Subir Foto desde tu Dispositivo</h3>
+                    <div class="upload-section">
+                        <input type="file" id="photoUploadInput" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                        <button class="btn-upload" onclick="document.getElementById('photoUploadInput').click()">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            Seleccionar Foto
+                        </button>
+                        <p class="upload-note">Sube una foto que ya tengas en tu galería o archivos</p>
+                    </div>
+                </div>
+
+                <div class="divider-section">
+                    <span>O</span>
+                </div>
+
+                <!-- Selector de Estilo -->
+                <div class="customization-group-pro">
+                    <h3>🎭 Opción 3: Generar Avatar Animado</h3>
+                </div>
 
                 <!-- Selector de Estilo -->
                 <div class="customization-group-pro">
