@@ -104,20 +104,20 @@
   included_files = ["netlify/functions/**"]
 
 # Configuración específica para cada función
-[[functions."analyze-interview"]]
+[functions."analyze-interview"]
   # Timeout de 30 segundos (Claude AI puede tardar)
   timeout = 30
 
-[[functions."generate-questions"]]
+[functions."generate-questions"]
   timeout = 30
 
-[[functions."mentor-coach"]]
+[functions."mentor-coach"]
   timeout = 30
 
-[[functions."analyze-cv"]]
+[functions."analyze-cv"]
   timeout = 30
 
-[[functions."save-to-sheets"]]
+[functions."save-to-sheets"]
   timeout = 15
 
 # ============================================
@@ -154,3 +154,7 @@
 # ============================================
 # CONFIGURACIÓN ADICIONAL
 # ============================================
+
+# Plugin Configuration
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
