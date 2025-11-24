@@ -1,0 +1,808 @@
+/**
+ * ========================================
+ * ESTILOS PARA NUEVOS JUEGOS - RUTA 2
+ * ========================================
+ */
+
+/* ========================================
+   BADGES Y CARDS DE MENU
+   ======================================== */
+
+.game-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: 20px;
+    margin: 0.5rem 0;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.05);
+        opacity: 0.9;
+    }
+}
+
+.coming-soon-badge {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.new-game-card {
+    position: relative;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.new-game-card:hover {
+    transform: translateY(-5px);
+    border-color: #667eea;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+}
+
+.new-game-card.coming-soon {
+    opacity: 0.7;
+    filter: grayscale(30%);
+}
+
+.section-title-new {
+    font-size: 2rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+/* ========================================
+   GAME INTRO SCREEN
+   ======================================== */
+
+.game-intro {
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.game-intro-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.game-intro-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.game-intro-subtitle {
+    font-size: 1.2rem;
+    color: #666;
+    margin-top: 0.5rem;
+}
+
+.game-intro-info {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.game-intro-info h3 {
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.game-intro-info ul {
+    list-style: none;
+    padding: 0;
+}
+
+.game-intro-info ul li {
+    padding: 0.75rem 0;
+    font-size: 1.1rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.game-intro-info ul li:last-child {
+    border-bottom: none;
+}
+
+.game-intro-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    justify-content: center;
+}
+
+/* ========================================
+   SPEED INTERVIEW - ENTREVISTA RÁPIDA
+   ======================================== */
+
+.speed-interview-container {
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+.speed-progress {
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.speed-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transition: width 0.3s ease;
+}
+
+.speed-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.speed-counter {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.speed-timer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #10b981;
+    color: white;
+    border-radius: 30px;
+    font-size: 1.3rem;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.speed-timer svg {
+    width: 24px;
+    height: 24px;
+}
+
+.speed-timer.time-warning {
+    background: #f59e0b;
+    animation: shake 0.5s ease-in-out infinite;
+}
+
+.speed-timer.time-danger {
+    background: #ef4444;
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+.speed-question-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.question-type-badge {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.question-type-badge.technical {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.question-type-badge.behavioral {
+    background: #fce7f3;
+    color: #be185d;
+}
+
+.question-type-badge.situational {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.speed-question {
+    font-size: 1.5rem;
+    color: #1f2937;
+    margin: 1rem 0;
+    line-height: 1.6;
+}
+
+.speed-tips {
+    background: #fef3c7;
+    padding: 1rem;
+    border-radius: 10px;
+    border-left: 4px solid #f59e0b;
+    margin-top: 1.5rem;
+}
+
+.speed-answer-section {
+    margin-bottom: 2rem;
+}
+
+.speed-answer-section textarea {
+    width: 100%;
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.3s ease;
+}
+
+.speed-answer-section textarea:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.speed-answer-counter {
+    text-align: right;
+    margin-top: 0.5rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.speed-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+}
+
+/* Speed Feedback */
+.speed-feedback {
+    background: white;
+    padding: 3rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 3px solid;
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.speed-feedback-score {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.score-emoji {
+    font-size: 4rem;
+    animation: bounceIn 0.6s ease-out;
+}
+
+@keyframes bounceIn {
+    0% {
+        transform: scale(0);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.score-value {
+    font-size: 3rem;
+    font-weight: 800;
+}
+
+.speed-feedback-details {
+    margin: 1.5rem 0;
+    text-align: left;
+}
+
+.speed-continue {
+    color: #6b7280;
+    font-style: italic;
+    margin-top: 1rem;
+}
+
+/* Speed Results */
+.speed-results {
+    max-width: 1000px;
+    margin: 2rem auto;
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.results-emoji {
+    font-size: 5rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.results-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.stat-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+    color: #6b7280;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.results-breakdown {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+}
+
+.question-result {
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+}
+
+.question-result:last-child {
+    margin-bottom: 0;
+}
+
+.question-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.question-num {
+    font-weight: 600;
+    color: #4b5563;
+}
+
+.question-score {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 700;
+}
+
+.question-score.good {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.question-score.needs-improvement {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.question-text {
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.answer-preview {
+    color: #6b7280;
+    font-style: italic;
+    font-size: 0.9rem;
+}
+
+.skipped-label {
+    color: #f59e0b;
+    font-weight: 600;
+}
+
+.results-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+/* ========================================
+   RED FLAGS DETECTOR
+   ======================================== */
+
+.red-flags-container {
+    max-width: 900px;
+    margin: 2rem auto;
+}
+
+.red-flags-progress {
+    background: #e0e0e0;
+    height: 8px;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.progress-text {
+    position: absolute;
+    top: -30px;
+    right: 0;
+    font-size: 0.9rem;
+    color: #6b7280;
+    font-weight: 600;
+}
+
+.job-offer-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+}
+
+.job-header h2 {
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.company-name {
+    color: #667eea;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.job-description,
+.job-requirements {
+    margin-top: 1.5rem;
+}
+
+.job-description h3,
+.job-requirements h3 {
+    color: #4b5563;
+    margin-bottom: 0.75rem;
+}
+
+.job-requirements ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.job-requirements ul li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.job-requirements ul li:before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: #10b981;
+    font-weight: bold;
+}
+
+.detection-question {
+    background: #fef3c7;
+    padding: 2rem;
+    border-radius: 10px;
+    border-left: 4px solid #f59e0b;
+    margin-bottom: 2rem;
+}
+
+.detection-question h3 {
+    color: #92400e;
+    margin-bottom: 0.75rem;
+}
+
+.detection-question .hint {
+    color: #78350f;
+    font-size: 0.95rem;
+}
+
+.detection-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.detection-btn {
+    padding: 2rem;
+    border: 3px solid;
+    border-radius: 15px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.detection-btn.legitimate {
+    border-color: #10b981;
+    color: #065f46;
+}
+
+.detection-btn.legitimate:hover {
+    background: #d1fae5;
+    transform: scale(1.05);
+}
+
+.detection-btn.scam {
+    border-color: #ef4444;
+    color: #991b1b;
+}
+
+.detection-btn.scam:hover {
+    background: #fee2e2;
+    transform: scale(1.05);
+}
+
+.btn-hint {
+    font-size: 0.85rem;
+    font-weight: 400;
+    opacity: 0.7;
+}
+
+.score-display {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.score-item {
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.score-item.correct {
+    color: #10b981;
+}
+
+.score-item.wrong {
+    color: #ef4444;
+}
+
+/* Red Flags Feedback */
+.red-flags-feedback {
+    background: white;
+    padding: 3rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 2rem auto;
+}
+
+.red-flags-feedback.correct {
+    border: 3px solid #10b981;
+}
+
+.red-flags-feedback.incorrect {
+    border: 3px solid #ef4444;
+}
+
+.feedback-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.feedback-icon {
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+.feedback-result {
+    background: #f9fafb;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.feedback-explanation {
+    margin-bottom: 1.5rem;
+}
+
+.feedback-explanation h3 {
+    color: #667eea;
+    margin-bottom: 0.75rem;
+}
+
+.feedback-red-flags,
+.feedback-legitimate {
+    background: #fef3c7;
+    padding: 1.5rem;
+    border-radius: 10px;
+    border-left: 4px solid #f59e0b;
+    margin-bottom: 2rem;
+}
+
+.feedback-red-flags h3,
+.feedback-legitimate h3 {
+    color: #92400e;
+    margin-bottom: 1rem;
+}
+
+.feedback-red-flags ul,
+.feedback-legitimate ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.feedback-red-flags ul li,
+.feedback-legitimate ul li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.feedback-red-flags ul li:before {
+    content: "🚩";
+    position: absolute;
+    left: 0;
+}
+
+.feedback-legitimate ul li:before {
+    content: "✅";
+    position: absolute;
+    left: 0;
+}
+
+/* Red Flags Results */
+.red-flags-results {
+    max-width: 1000px;
+    margin: 2rem auto;
+}
+
+.safety-tips {
+    background: white;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.safety-tips h3 {
+    color: #667eea;
+    margin-bottom: 1rem;
+}
+
+.safety-tips ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.safety-tips ul li {
+    padding: 0.75rem 0;
+    font-size: 1.05rem;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.safety-tips ul li:last-child {
+    border-bottom: none;
+}
+
+/* ========================================
+   LOADING STATE
+   ======================================== */
+
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #667eea;
+    border-radius: 50%;
+    margin: 0 auto 2rem;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+
+@media (max-width: 768px) {
+    .game-intro-actions {
+        flex-direction: column;
+    }
+
+    .speed-header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .speed-question {
+        font-size: 1.2rem;
+    }
+
+    .results-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .detection-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    .score-display {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+}

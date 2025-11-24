@@ -11,6 +11,7 @@
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100'/><text x='50' y='60' text-anchor='middle' font-size='50' fill='white' font-family='Arial'>EP</text></svg>">
     <link rel="stylesheet" href="styles.css?v=4.2">
+    <link rel="stylesheet" href="games-new.css?v=1.0">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -2233,6 +2234,128 @@
                 <button class="btn-primary" onclick="selectTest('dressCode')">Aprender Etiqueta</button>
             </div>
         </div>
+
+        <!-- 🆕 NUEVOS JUEGOS INTERACTIVOS -->
+        <h2 class="section-title-new" style="margin-top: 3rem;">🎮 Juegos Interactivos</h2>
+        <div class="mentor-sections">
+            <div class="mentor-section-card new-game-card">
+                <div class="mentor-section-icon">⚡</div>
+                <h3 class="mentor-section-title">Entrevista Rápida</h3>
+                <p class="mentor-section-description">Pon a prueba tu capacidad de responder bajo presión en 30 segundos</p>
+                <div class="game-badge">🆕 NUEVO</div>
+                <button class="btn-primary" onclick="showScreen('speedInterviewScreen')">⚡ Jugar Ahora</button>
+            </div>
+
+            <div class="mentor-section-card new-game-card">
+                <div class="mentor-section-icon">🚩</div>
+                <h3 class="mentor-section-title">Detector de Red Flags</h3>
+                <p class="mentor-section-description">Aprende a identificar ofertas de trabajo fraudulentas y protégete</p>
+                <div class="game-badge">🆕 NUEVO</div>
+                <button class="btn-primary" onclick="showScreen('redFlagsScreen')">🔍 Detectar Estafas</button>
+            </div>
+
+            <div class="mentor-section-card new-game-card coming-soon">
+                <div class="mentor-section-icon">💰</div>
+                <h3 class="mentor-section-title">Negociación Salarial</h3>
+                <p class="mentor-section-description">Simula negociaciones salariales con IA y mejora tus habilidades</p>
+                <div class="game-badge coming-soon-badge">🚧 Próximamente</div>
+                <button class="btn-secondary" disabled>Próximamente</button>
+            </div>
+
+            <div class="mentor-section-card new-game-card coming-soon">
+                <div class="mentor-section-icon">🤝</div>
+                <h3 class="mentor-section-title">Lenguaje Corporal</h3>
+                <p class="mentor-section-description">Quiz interactivo sobre comunicación no verbal en entrevistas</p>
+                <div class="game-badge coming-soon-badge">🚧 Próximamente</div>
+                <button class="btn-secondary" disabled>Próximamente</button>
+            </div>
+
+            <div class="mentor-section-card new-game-card coming-soon">
+                <div class="mentor-section-icon">✉️</div>
+                <h3 class="mentor-section-title">Email Profesional</h3>
+                <p class="mentor-section-description">Construye emails profesionales con ayuda de IA y templates</p>
+                <div class="game-badge coming-soon-badge">🚧 Próximamente</div>
+                <button class="btn-secondary" disabled>Próximamente</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================
+     NUEVOS JUEGOS - RUTA 2
+     ======================================== -->
+
+<!-- SPEED INTERVIEW - ENTREVISTA RÁPIDA -->
+<div class="screen" id="speedInterviewScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <span>⚡ Entrevista Rápida</span>
+            </div>
+            <div class="nav-user">
+                <button class="btn-logout" onclick="showScreen('welcomeScreen')">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="game-intro">
+            <div class="game-intro-header">
+                <span class="game-intro-icon">⚡</span>
+                <h1>Entrevista Rápida</h1>
+                <p class="game-intro-subtitle">Pon a prueba tu capacidad de responder bajo presión</p>
+            </div>
+            <div class="game-intro-info">
+                <h3>📋 ¿Cómo funciona?</h3>
+                <ul>
+                    <li>🎯 Recibirás 5 preguntas de entrevista</li>
+                    <li>⏱️ Tienes solo 30 segundos por pregunta</li>
+                    <li>🤖 Cada respuesta será analizada por IA</li>
+                    <li>🏆 Gana XP según tu desempeño</li>
+                </ul>
+                <div class="game-intro-actions">
+                    <button class="btn-secondary" onclick="showScreen('welcomeScreen')">Cancelar</button>
+                    <button class="btn-primary" onclick="startSpeedInterview()">🚀 Comenzar</button>
+                </div>
+            </div>
+        </div>
+        <div id="speedInterviewContent"></div>
+    </div>
+</div>
+
+<!-- RED FLAGS DETECTOR -->
+<div class="screen" id="redFlagsScreen">
+    <nav class="navbar">
+        <div class="nav-content">
+            <div class="nav-brand">
+                <span>🚩 Detector de Red Flags</span>
+            </div>
+            <div class="nav-user">
+                <button class="btn-logout" onclick="showScreen('welcomeScreen')">← Volver</button>
+            </div>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="game-intro">
+            <div class="game-intro-header">
+                <span class="game-intro-icon">🚩</span>
+                <h1>Detector de Señales de Alerta</h1>
+                <p class="game-intro-subtitle">Aprende a identificar ofertas de trabajo fraudulentas</p>
+            </div>
+            <div class="game-intro-info">
+                <h3>📋 ¿Cómo funciona?</h3>
+                <ul>
+                    <li>📄 Verás varias ofertas de trabajo</li>
+                    <li>🔍 Identifica si son legítimas o estafas</li>
+                    <li>💡 Aprende sobre señales de alerta comunes</li>
+                    <li>🛡️ Protégete de fraudes laborales</li>
+                </ul>
+                <div class="game-intro-actions">
+                    <button class="btn-secondary" onclick="showScreen('welcomeScreen')">Cancelar</button>
+                    <button class="btn-primary" onclick="startRedFlagsDetector()">🚀 Comenzar</button>
+                </div>
+            </div>
+        </div>
+        <div id="redFlagsContent"></div>
     </div>
 </div>
 
@@ -2256,6 +2379,7 @@
 <script src="claude-ai-helper.js?v=4.3"></script>
 <script src="gamification-system.js?v=1.0"></script>
 <script src="industry-preparation.js?v=1.0"></script>
+<script src="games-new.js?v=1.0"></script>
 <script src="script-pro.js?v=4.3"></script>
 </body>
 </html>
