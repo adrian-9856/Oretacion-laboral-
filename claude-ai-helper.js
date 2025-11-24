@@ -41,8 +41,15 @@ class ClaudeAIHelper {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al analizar la entrevista');
+        let errorMessage = 'Error al analizar la entrevista';
+        try {
+          const error = await response.json();
+          errorMessage = error.error || error.message || errorMessage;
+        } catch (e) {
+          // Si no se puede parsear el JSON, usar mensaje por defecto
+          console.error('[ClaudeAI] Error al parsear respuesta de error:', e);
+        }
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
@@ -81,8 +88,14 @@ class ClaudeAIHelper {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al generar preguntas');
+        let errorMessage = 'Error al generar preguntas';
+        try {
+          const error = await response.json();
+          errorMessage = error.error || error.message || errorMessage;
+        } catch (e) {
+          console.error('[ClaudeAI] Error al parsear respuesta de error:', e);
+        }
+        throw new Error(errorMessage);
       }
 
       return await response.json();
@@ -114,8 +127,14 @@ class ClaudeAIHelper {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error en el coach virtual');
+        let errorMessage = 'Error en el coach virtual';
+        try {
+          const error = await response.json();
+          errorMessage = error.error || error.message || errorMessage;
+        } catch (e) {
+          console.error('[ClaudeAI] Error al parsear respuesta de error:', e);
+        }
+        throw new Error(errorMessage);
       }
 
       return await response.json();
@@ -147,8 +166,14 @@ class ClaudeAIHelper {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Error al analizar CV');
+        let errorMessage = 'Error al analizar CV';
+        try {
+          const error = await response.json();
+          errorMessage = error.error || error.message || errorMessage;
+        } catch (e) {
+          console.error('[ClaudeAI] Error al parsear respuesta de error:', e);
+        }
+        throw new Error(errorMessage);
       }
 
       return await response.json();

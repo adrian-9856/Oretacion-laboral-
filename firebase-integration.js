@@ -60,14 +60,28 @@ export function initializeFirebase() {
  */
 async function handleUserAuthenticated(user) {
     try {
+        // Validar que el usuario tenga los datos necesarios
+        if (!user || !user.uid) {
+            console.error('❌ Usuario inválido:', user);
+            return;
+        }
+
         // Actualizar UI con datos del usuario
-        if (window.currentUser) {
+        if (typeof window !== 'undefined' && window.currentUser) {
             window.currentUser = {
                 ...window.currentUser,
                 firebaseId: user.uid,
-                email: user.email,
-                displayName: user.displayName,
-                photoURL: user.photoURL
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || ''
+            };
+        } else if (typeof window !== 'undefined') {
+            // Crear currentUser si no existe
+            window.currentUser = {
+                firebaseId: user.uid,
+                email: user.email || '',
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || ''
             };
         }
 
@@ -92,7 +106,9 @@ async function handleUserAuthenticated(user) {
  * Manejar cierre de sesión
  */
 function handleUserLoggedOut() {
-    window.currentUser = null;
+    if (typeof window !== 'undefined') {
+        window.currentUser = null;
+    }
     // Redirigir al login si es necesario
 }
 

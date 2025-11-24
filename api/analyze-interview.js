@@ -111,7 +111,7 @@ Formato de respuesta en JSON:
 
     // Agregar metadata
     analysis.analyzedAt = new Date().toISOString();
-    analysis.model = 'claude-3.5-sonnet';
+    analysis.model = 'claude-3-5-sonnet-20241022';
 
     return res.status(200).json({
       success: true,

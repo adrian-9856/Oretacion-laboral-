@@ -31,6 +31,26 @@ let remainingTime = 0;
 let modalCallback = null;
 let lastTestResult = null;
 
+// Variables para CV y detección de errores
+let currentCVData = null;
+let cvWithErrors = {};
+let errorsToFind = [];
+let foundErrors = [];
+let errorStartTime;
+let errorTimerInterval;
+
+// Variables para tests de lookbook/vestimenta
+let formalInformalAnswers = [];
+let dressCodeAnswers = [];
+let codeExamAnswers = [];
+let strengthsAnswers = [];
+
+// Variables para administración
+let selectedUser = null;
+
+// Variables para gráficas
+let chartInstances = {};
+
 // FUNCIÓN HELPER PARA OBTENER PREGUNTAS SEGÚN DIFICULTAD
 function getQuestionsByDifficulty() {
     switch(currentDifficulty) {
@@ -2848,14 +2868,6 @@ const cvErrorsBank = [
         ]
     }
 ];
-
-// Variables globales para el CV actual
-let currentCVData = null;
-let cvWithErrors = {};
-let errorsToFind = [];
-let foundErrors = [];
-let errorStartTime;
-let errorTimerInterval;
 
 function startErrorDetection() {
     errorStartTime = Date.now();
@@ -6249,7 +6261,6 @@ const formalInformalQuestions = [
 ];
 
 let formalInformalCurrentQ = 0;
-let formalInformalAnswers = [];
 let formalInformalStartTime = 0;
 
 // Iniciar examen de trabajos formales/informales
@@ -6480,7 +6491,6 @@ const dressCodeScenarios = [
 ];
 
 let dressCodeCurrentQ = 0;
-let dressCodeAnswers = [];
 let dressCodeStartTime = 0;
 
 // Iniciar examen de código de vestimenta
@@ -7016,7 +7026,6 @@ function finishWordSearch() {
 let examCodes = JSON.parse(localStorage.getItem('examCodes') || '{}');
 let currentCodeExam = null;
 let currentCodeExamQuestion = 0;
-let codeExamAnswers = [];
 let codeExamStartTime;
 
 function showCodeExamInput() {
@@ -7390,7 +7399,6 @@ const strengthsQuestions = [
 ];
 
 let currentStrengthsQuestion = 0;
-let strengthsAnswers = [];
 let strengthsStartTime;
 
 function startStrengthsTest() {
@@ -8170,8 +8178,6 @@ function changeUserPassword() {
 // GESTIÓN DE USUARIOS (ADMIN)
 // ========================================
 
-let selectedUser = null;
-
 function showUsersManagement() {
     showScreen('usersManagementScreen');
     loadUsersGrid();
@@ -8696,7 +8702,6 @@ function createActivityChart() {
 // ========================================
 // GRÁFICAS CON CHART.JS - VERSIÓN PROFESIONAL
 // ========================================
-let chartInstances = {};
 
 function drawBarChart(ctx, labels, values, color) {
     // Destruir gráfica anterior si existe
