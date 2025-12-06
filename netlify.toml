@@ -1,0 +1,160 @@
+# ============================================
+# Configuración de Netlify
+# Sistema de Evaluación Laboral PRO
+# Optimizado para múltiples usuarios concurrentes
+# Migrado desde Vercel a Netlify Functions
+# ============================================
+
+[build]
+  publish = "."
+  command = "npm run build"
+  functions = "netlify/functions"
+
+# ============================================
+# HEADERS DE SEGURIDAD
+# ============================================
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
+    # CORS para múltiples usuarios
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type"
+
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Content-Type = "application/javascript; charset=utf-8"
+    # Cache agresivo para JS estático (1 año)
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Content-Type = "text/css; charset=utf-8"
+    # Cache agresivo para CSS estático (1 año)
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Content-Type = "text/html; charset=utf-8"
+    # Sin cache para HTML (siempre fresco)
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    # Asegurar que la página principal siempre esté actualizada
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# ============================================
+# REDIRECCIONES (SPA)
+# ============================================
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# ============================================
+# OPTIMIZACIÓN DE RENDIMIENTO
+# ============================================
+
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = false
+  minify = false
+
+[build.processing.html]
+  pretty_urls = true
+
+[build.processing.images]
+  compress = true
+
+# ============================================
+# NETLIFY FUNCTIONS
+# ============================================
+
+[functions]
+  # Directorio de funciones serverless
+  directory = "netlify/functions"
+
+  # Node version
+  node_bundler = "esbuild"
+
+  # External node modules (no bundlear)
+  external_node_modules = ["@anthropic-ai/sdk", "googleapis"]
+
+  # Included files
+  included_files = ["netlify/functions/**"]
+
+# Configuración específica para cada función
+[functions."analyze-interview"]
+  # Timeout de 30 segundos (Claude AI puede tardar)
+  timeout = 30
+
+[functions."generate-questions"]
+  timeout = 30
+
+[functions."mentor-coach"]
+  timeout = 30
+
+[functions."analyze-cv"]
+  timeout = 30
+
+[functions."save-to-sheets"]
+  timeout = 15
+
+# ============================================
+# VARIABLES DE ENTORNO
+# ============================================
+# IMPORTANTE: Configurar en Netlify Dashboard > Site settings > Environment variables
+#
+# Requeridas:
+# - ANTHROPIC_API_KEY: API key de Claude AI
+# - GOOGLE_SERVICE_ACCOUNT: JSON de service account de Google (como string)
+# - GOOGLE_SHEET_ID: ID del Google Sheet para guardar datos
+#
+# Firebase (Frontend):
+# - VITE_FIREBASE_API_KEY
+# - VITE_FIREBASE_AUTH_DOMAIN
+# - VITE_FIREBASE_PROJECT_ID
+# - VITE_FIREBASE_STORAGE_BUCKET
+# - VITE_FIREBASE_MESSAGING_SENDER_ID
+# - VITE_FIREBASE_APP_ID
+
+# ============================================
+# CONFIGURACIÓN DE CONTEXTOS
+# ============================================
+
+[context.production]
+  environment = { NODE_VERSION = "18" }
+
+[context.deploy-preview]
+  environment = { NODE_VERSION = "18" }
+
+[context.branch-deploy]
+  environment = { NODE_VERSION = "18" }
+
+# ============================================
+# CONFIGURACIÓN ADICIONAL
+# ============================================
+
+# Plugin Configuration
+[[plugins]]
+  package = "@netlify/plugin-functions-install-core"
